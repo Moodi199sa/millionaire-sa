@@ -409,7 +409,7 @@ export default function ReportPage() {
             {/* زر مشاركة */}
             <button
               onClick={() => {
-                const text = `💰 حصلت على تقريري المالي!\nسأصل للمليون خلال ${monthsToLabel(data.totalMonths)}\nاحسب هدفك المالي: millionaire-sa.netlify.app`
+                const text = `💰 حصلت على تقريري المالي!\nسأصل للمليون خلال ${monthsToLabel(data.totalMonths)}\nتحدي للمشاركة: millionaire-sa.netlify.app`
                 if (navigator.share) navigator.share({ text })
                 else navigator.clipboard.writeText(text)
               }}

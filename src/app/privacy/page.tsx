@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'سياسة الخصوصية | متى تصبح مليونير؟',
-  description: 'سياسة الخصوصية وحماية البيانات لموقع متى تصبح مليونير؟',
+  title: 'سياسة الخصوصية | متى تصير مليونير؟',
+  description: 'سياسة الخصوصية وحماية البيانات لموقع متى تصير مليونير؟',
 }
 
 export default function PrivacyPage() {

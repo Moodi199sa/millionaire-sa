@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'الشروط والأحكام | متى تصبح مليونير؟',
-  description: 'الشروط والأحكام لاستخدام موقع متى تصبح مليونير؟',
+  title: 'الشروط والأحكام | متى تصير مليونير؟',
+  description: 'الشروط والأحكام لاستخدام موقع متى تصير مليونير؟',
 }
 
 export default function TermsPage() {
@@ -22,7 +22,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-base font-bold text-white mb-3">1. قبول الشروط</h2>
-            <p>باستخدام موقع "متى تصبح مليونير؟"، فأنت توافق على هذه الشروط والأحكام. إذا كنت لا توافق على أي جزء منها، يرجى عدم استخدام الموقع.</p>
+            <p>باستخدام موقع "متى تصير مليونير؟"، فأنت توافق على هذه الشروط والأحكام. إذا كنت لا توافق على أي جزء منها، يرجى عدم استخدام الموقع.</p>
           </section>
 
           <section>

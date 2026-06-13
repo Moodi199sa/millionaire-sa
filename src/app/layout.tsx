@@ -3,23 +3,23 @@ import Script from 'next/script'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'متى تصبح مليونير؟ | احسب هدفك المالي مجاناً',
+  title: 'متى تصير مليونير؟ — تحدي للمشاركة',
   description: 'احسب خلال 30 ثانية متى ستصل لأول مليون ريال. أداة مجانية للتخطيط المالي الشخصي في السعودية.',
-  keywords: 'مليونير, ادخار, استثمار, حاسبة مالية, ثروة, ريال سعودي, تخطيط مالي, حرية مالية, كيف اوفر المال, كيف اصبح مليونير',
-  authors: [{ name: 'متى تصبح مليونير؟' }],
+  keywords: 'مليونير, ادخار, استثمار, حاسبة مالية, ثروة, ريال سعودي, تخطيط مالي, حرية مالية, كيف اوفر المال, كيف تصير مليونير',
+  authors: [{ name: 'متى تصير مليونير؟' }],
   robots: 'index, follow',
   openGraph: {
-    title: 'متى تصبح مليونير؟ 💰',
+    title: 'متى تصير مليونير؟ 🔥',
     description: 'احسب خلال 30 ثانية متى ستصل لأول مليون ريال — أداة مجانية',
     url: 'https://millionaire-sa.netlify.app',
-    siteName: 'متى تصبح مليونير؟',
+    siteName: 'متى تصير مليونير؟',
     locale: 'ar_SA',
     type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'متى تصبح مليونير؟ 💰',
+    title: 'متى تصير مليونير؟ 🔥',
     description: 'احسب خلال 30 ثانية متى ستصل لأول مليون ريال',
     images: ['/og-image.png'],
   },

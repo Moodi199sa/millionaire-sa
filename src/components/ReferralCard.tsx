@@ -23,7 +23,7 @@ export default function ReferralCard() {
   }
 
   const shareWhatsapp = () => {
-    const text = `💰 جربت حاسبة "متى تصبح مليونير؟" وعرفت متى أوصل لأول مليون ريال!\n\nجربها مجاناً: ${referralLink}`
+    const text = `💰 جربت حاسبة "متى تصير مليونير؟" وعرفت متى أوصل لأول مليون ريال!\n\nجربها مجاناً: ${referralLink}`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
   }
 

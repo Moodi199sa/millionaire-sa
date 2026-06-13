@@ -57,7 +57,7 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="border-b border-white/10 px-4 py-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="text-gold font-extrabold text-lg">💰 متى تصبح مليونير؟</div>
+          <div className="text-gold font-extrabold text-lg">💰 متى تصير مليونير؟</div>
           <button
             onClick={() => router.push('/')}
             className="px-4 py-2 bg-gold text-white text-sm font-bold rounded-xl hover:bg-yellow-600 transition-all"
@@ -84,7 +84,7 @@ export default function LandingPage() {
           onClick={() => router.push('/')}
           className="px-10 py-4 bg-gold hover:bg-yellow-600 text-white font-extrabold text-xl rounded-2xl transition-all active:scale-95 shadow-xl shadow-gold/20 mb-4"
         >
-          احسب متى تصبح مليونير 🚀
+          احسب متى تصير مليونير 🚀
         </button>
         <p className="text-gray-600 text-xs">مجاني تماماً · لا تسجيل · 30 ثانية</p>
 
@@ -190,7 +190,7 @@ export default function LandingPage() {
 
       {/* Final CTA */}
       <section className="bg-gold/10 border-y border-gold/20 py-16 px-4 text-center">
-        <h2 className="text-2xl font-extrabold mb-3">جاهز تعرف متى تصبح مليونير؟</h2>
+        <h2 className="text-2xl font-extrabold mb-3">تحدّ أصدقائك — من يصير مليونير أول؟</h2>
         <p className="text-gray-400 text-sm mb-8">30 ثانية بس — ومجاني تماماً</p>
         <button
           onClick={() => router.push('/')}
@@ -202,7 +202,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-8 px-4 text-center border-t border-white/10">
-        <div className="text-gold font-extrabold mb-2">💰 متى تصبح مليونير؟</div>
+        <div className="text-gold font-extrabold mb-2">💰 متى تصير مليونير؟</div>
         <div className="flex justify-center gap-5 text-xs text-gray-500 mb-3">
           <a href="/privacy" className="hover:text-gold transition-colors">سياسة الخصوصية</a>
           <span>·</span>
@@ -210,7 +210,7 @@ export default function LandingPage() {
           <span>·</span>
           <a href="mailto:hello@millionaire-sa.com" className="hover:text-gold transition-colors">تواصل معنا</a>
         </div>
-        <p className="text-gray-600 text-xs">© {new Date().getFullYear()} متى تصبح مليونير — للتوعية المالية فقط، ليست استشارة مالية</p>
+        <p className="text-gray-600 text-xs">© {new Date().getFullYear()} متى تصير مليونير — للتوعية المالية فقط، ليست استشارة مالية</p>
       </footer>
 
     </main>

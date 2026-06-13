@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'كيف تصبح مليونير في السعودية | دليل شامل 2025',
+  title: 'كيف تصير مليونير في السعودية | دليل شامل 2025',
   description: 'تعرف على أفضل طرق الادخار والاستثمار في السعودية وكيف تصل لأول مليون ريال بخطوات عملية.',
-  keywords: 'كيف اصبح مليونير, ادخار المال, استثمار في السعودية, طرق زيادة الدخل, حرية مالية',
+  keywords: 'كيف تصير مليونير, ادخار المال, استثمار في السعودية, طرق زيادة الدخل, حرية مالية',
 }
 
 const articles = [
@@ -68,7 +68,7 @@ export default function BlogPage() {
 
         {/* Nav */}
         <div className="flex justify-between items-center mb-10">
-          <Link href="/" className="text-gold font-extrabold text-lg">💰 متى تصبح مليونير؟</Link>
+          <Link href="/" className="text-gold font-extrabold text-lg">💰 متى تصير مليونير؟</Link>
           <Link href="/" className="text-sm text-gray-400 hover:text-white transition-colors">← الرئيسية</Link>
         </div>
 
@@ -94,7 +94,7 @@ export default function BlogPage() {
 
         {/* CTA */}
         <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 text-center">
-          <h3 className="text-lg font-extrabold mb-2">جاهز تحسب متى تصبح مليونير؟</h3>
+          <h3 className="text-lg font-extrabold mb-2">تحدّ أصدقائك الحين!</h3>
           <p className="text-gray-400 text-sm mb-4">30 ثانية فقط — مجاناً</p>
           <Link
             href="/"
