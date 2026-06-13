@@ -95,13 +95,8 @@ export default function Home() {
     ]
 
     const newResult = { totalMonths, netWorth, monthlySaving, chartLabels: labels, chartData: data, scenarios }
-    if (emailSubmitted) {
-      setResult(newResult)
-      setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-    } else {
-      setPendingResult(newResult)
-      setTimeout(() => document.getElementById('email-gate')?.scrollIntoView({ behavior: 'smooth' }), 100)
-    }
+    setResult(newResult)
+    setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
   }
 
   const canGoNext = () => {
@@ -361,16 +356,6 @@ export default function Home() {
                 {step === 4 ? '🚀 احسب النتيجة' : 'التالي →'}
               </button>
             </div>
-          </div>
-        )}
-
-        {/* Email Gate */}
-        {pendingResult && !result && (
-          <div id="email-gate">
-            <EmailGate
-              onSubmit={handleEmailSubmit}
-              previewYears={monthsToLabel(pendingResult.totalMonths)}
-            />
           </div>
         )}
 

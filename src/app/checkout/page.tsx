@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getUserData, UserData } from '@/lib/store'
+import { getUserData, UserData, saveEmail, saveUserData } from '@/lib/store'
 import { monthsToLabel, formatNumber } from '@/lib/calculator'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const [data, setData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
 
   useEffect(() => {
     const d = getUserData()
@@ -17,7 +19,12 @@ export default function CheckoutPage() {
   }, [router])
 
   const handlePay = async () => {
+    if (!email || !email.includes('@')) {
+      setEmailError('أدخل بريدك الإلكتروني لإرسال التقرير لك')
+      return
+    }
     setLoading(true)
+    saveEmail(email)
     // مؤقتاً — بدون دفع حقيقي — نروح مباشرة للتقرير
     setTimeout(() => {
       router.push('/report')
@@ -95,6 +102,20 @@ export default function CheckoutPage() {
         <div className="text-center mb-4">
           <div className="text-4xl font-extrabold text-gold mb-1">9 ريال</div>
           <p className="text-xs text-gray-500 mb-5">دفعة واحدة · بدون اشتراك</p>
+
+          {/* الإيميل */}
+          <div className="mb-4">
+            <label className="block text-sm text-gray-400 mb-2">📧 أرسل التقرير لبريدك الإلكتروني</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => { setEmail(e.target.value); setEmailError('') }}
+              placeholder="بريدك الإلكتروني"
+              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-gold transition-colors text-right"
+            />
+            {emailError && <p className="text-red-400 text-xs mt-2">{emailError}</p>}
+            <p className="text-xs text-gray-600 mt-1">لن نشارك إيميلك مع أحد</p>
+          </div>
 
           <button
             onClick={handlePay}
