@@ -26,7 +26,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   ]
   const motivation = motivations[totalMonths % motivations.length]
 
-  const challengeText = `🏆 تحدي المليونير!\n\nأنا سأصير مليونير خلال:\n${years} (${totalMonths} شهر فقط!)\n\nوأنت؟ كم شهر عندك؟\nاحسب نتيجتك الحين 👇\nmillionaire-sa.netlify.app\n\n#تحدي_المليون #كم_سنة_عندك #متى_تصير_مليونير`
+  const challengeText = `🏆 تحدي المليونير!\n\nأنا سأصير مليونير خلال:\n${years} (${totalMonths} شهر فقط!)\n\nوأنت؟ كم شهر عندك؟\nاحسب نتيجتك الحين 👇\nmillionaire-sa.netlify.app`
 
   const copyChallenge = () => {
     navigator.clipboard.writeText(challengeText)
@@ -174,10 +174,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
           </span>
         </div>
 
-        {/* الهاشتاق */}
-        <div style={{ color: '#374151', fontSize: '10px', marginTop: '10px' }}>
-          #تحدي_المليون · #كم_سنة_عندك · #متى_تصير_مليونير
-        </div>
+
       </div>
 
       {/* عنوان */}
@@ -215,9 +212,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
         </button>
       </div>
 
-      <div className="text-center">
-        <span className="text-xs text-gray-600">#تحدي_المليون · #كم_سنة_عندك · #متى_تصير_مليونير</span>
-      </div>
+
 
     </div>
   )
