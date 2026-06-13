@@ -20,39 +20,40 @@ interface ReportData {
 function LoadingReport() {
   const [step, setStep] = useState(0)
   const steps = [
-    '🔍 نحلل وضعك المالي بعمق...',
-    '💡 نبحث عن أفضل الفرص لك...',
-    '🎯 نبني خطتك الشخصية...',
-    '✨ يتم تجهيز تقريرك...',
+    'نحلل مصاريفك وادخارك...',
+    'نحسب أفضل الطرق لك...',
+    'نجهز خطتك الشخصية...',
+    'لحظات وتقريرك جاهز...',
   ]
   useEffect(() => {
     const t = setInterval(() => setStep(s => Math.min(s + 1, steps.length - 1)), 1800)
     return () => clearInterval(t)
   }, [])
   return (
-    <div className="text-center py-16 px-4">
-      <div className="text-6xl mb-6 animate-bounce">🤖</div>
-      <h2 className="text-xl font-bold mb-2">يتم تحليل وضعك المالي</h2>
-      <p className="text-gray-400 text-sm mb-6">هذا يأخذ ثوانٍ قليلة...</p>
-      <p className="text-gold font-bold text-lg mb-8 min-h-[28px]">{steps[step]}</p>
-      <div className="w-full bg-white/10 rounded-full h-2 max-w-xs mx-auto">
-        <div
-          className="bg-gold h-2 rounded-full transition-all duration-1000"
-          style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-        />
+    <div className="text-center py-20 px-4">
+      <div className="text-6xl mb-6">📊</div>
+      <h2 className="text-xl font-bold mb-2">يتم تجهيز تقريرك</h2>
+      <p className="text-gray-400 text-sm mb-8">{steps[step]}</p>
+      <div className="w-48 bg-white/10 rounded-full h-1.5 mx-auto">
+        <div className="bg-gold h-1.5 rounded-full transition-all duration-1000" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
-      <p className="text-xs text-gray-600 mt-6">يستغرق عادةً 10-15 ثانية</p>
     </div>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-      <p className="text-xs text-gray-400 font-bold mb-4 uppercase tracking-wide">{title}</p>
-      {children}
-    </div>
-  )
+function DiffBadge({ difficulty }: { difficulty: string }) {
+  const map: Record<string, string> = {
+    'سهل جداً': 'text-green-400 bg-green-400/10 border-green-400/20',
+    'سهل': 'text-green-400 bg-green-400/10 border-green-400/20',
+    'ممكن خلال شهر': 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+    'متوسط': 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
+    'يحتاج جهد': 'text-orange-400 bg-orange-400/10 border-orange-400/20',
+    'يحتاج 3 أشهر': 'text-orange-400 bg-orange-400/10 border-orange-400/20',
+    'يحتاج صبر': 'text-orange-400 bg-orange-400/10 border-orange-400/20',
+    'يحتاج تعلم': 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+  }
+  const cls = map[difficulty] || 'text-gray-400 bg-gray-400/10 border-gray-400/20'
+  return <span className={`text-xs px-2 py-0.5 rounded-full border font-bold ${cls}`}>{difficulty}</span>
 }
 
 export default function ReportPage() {
@@ -61,120 +62,26 @@ export default function ReportPage() {
   const [report, setReport] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [openIdea, setOpenIdea] = useState<number | null>(null)
 
   useEffect(() => {
     const d = getUserData()
-    if (!d) {
-      // لو البيانات ضاعت، نعطي بيانات افتراضية بسيطة
-      const defaultData = {
-        salary: 8000, expenses: 5000, savings: 0,
-        investments: 0, rate: 0, monthlySaving: 3000,
-        netWorth: 0, totalMonths: 168
-      }
-      setData(defaultData)
-      generateReport(defaultData)
-      return
+    const userData = d || {
+      salary: 8000, expenses: 5000, savings: 0,
+      investments: 0, rate: 0, monthlySaving: 3000,
+      netWorth: 0, totalMonths: 168
     }
-    setData(d)
-    generateReport(d)
-  }, [router])
+    setData(userData)
+    generateReport(userData)
+  }, [])
 
   const generateReport = async (d: UserData) => {
     try {
-      const savingRate = d.salary > 0 ? Math.round((d.monthlySaving / d.salary) * 100) : 0
-      const prompt = `أنت مستشار مالي سعودي خبير ومحفّز. مهمتك الأساسية: تحفيز شخص بدخل بسيط وتعريفه أن المليون ممكن.
-
-البيانات المالية:
-- الراتب: ${d.salary} ريال/شهر
-- المصروف: ${d.expenses} ريال/شهر  
-- الادخار الشهري: ${d.monthlySaving} ريال (${savingRate}% من الراتب)
-- المدخرات: ${d.savings} ريال
-- الاستثمارات: ${d.investments} ريال
-- صافي الثروة: ${d.netWorth} ريال
-- المدة الحالية للوصول للمليون: ${monthsToLabel(d.totalMonths)}
-
-اكتب تقريراً شاملاً بصيغة JSON فقط بدون أي نص إضافي أو backticks:
-{
-  "motivational_opener": "جملة تحفيزية قوية تخاطب وضعه مباشرة وتقول له ان المليون ممكن من راتبه، تكون شخصية ومؤثرة وليست عامة",
-  "reality_check": "فقرة صادقة عن وضعه الحالي، تعترف بالصعوبة لكن تفتح الأمل، بأسلوب أخ ناصح لا محاضر",
-  "strengths": [
-    {"title": "عنوان نقطة قوة", "description": "شرح مشجع كيف يستثمر هذه النقطة"},
-    {"title": "نقطة قوة ثانية", "description": "شرح مشجع"}
-  ],
-  "weaknesses": [
-    {"title": "نقطة ضعف بأسلوب لطيف", "fix": "حل عملي واضح وبسيط"},
-    {"title": "نقطة ضعف ثانية", "fix": "حل عملي"}
-  ],
-  "scenarios": [
-    {"label": "زيادة الادخار 500 ريال", "action": "كيف تحرر 500 ريال من مصاريفك بخطوة واحدة", "months": ${calcMonthsToGoal(d.netWorth, d.monthlySaving + 500, d.rate, 1000000)}, "monthly_saving": ${d.monthlySaving + 500}, "difficulty": "سهل"},
-    {"label": "دخل جانبي 1000 ريال", "action": "فكرة دخل جانبي واقعية تناسب وضعه", "months": ${calcMonthsToGoal(d.netWorth, d.monthlySaving + 1000, d.rate, 1000000)}, "monthly_saving": ${d.monthlySaving + 1000}, "difficulty": "متوسط"},
-    {"label": "دخل جانبي 2000 ريال", "action": "فكرة دخل جانبي أكبر قليلاً", "months": ${calcMonthsToGoal(d.netWorth, d.monthlySaving + 2000, d.rate, 1000000)}, "monthly_saving": ${d.monthlySaving + 2000}, "difficulty": "يحتاج جهد"},
-    {"label": "استثمار ذكي بعائد 10%", "action": "أين يضع فلوسه عشان تشتغل له", "months": ${calcMonthsToGoal(d.netWorth, d.monthlySaving, 10, 1000000)}, "monthly_saving": ${d.monthlySaving}, "difficulty": "يحتاج تعلم"}
-  ],
-  "income_ideas": [
-    {
-      "title": "اسم الفكرة",
-      "description": "وصف مشوق للفكرة يخلي القارئ يتحمس",
-      "potential": "الدخل المتوقع مثل 500-2000 ريال/شهر",
-      "difficulty": "سهل/متوسط/يحتاج وقت",
-      "how_to_start": "خطوة أولى واحدة يقدر يسويها اليوم"
-    },
-    {
-      "title": "التجارة الإلكترونية",
-      "description": "بيع منتجات أونلاين بدون مخزون — dropshipping أو منتجات رقمية. آلاف الشباب السعودي يكسبون منها من البيت",
-      "potential": "1000-5000 ريال/شهر",
-      "difficulty": "متوسط",
-      "how_to_start": "افتح متجر على Zid أو Salla اليوم ب 99 ريال وابدأ ببيع منتج واحد"
-    },
-    {
-      "title": "العمل الحر (Freelancing)",
-      "description": "بع مهاراتك على الإنترنت — تصميم، كتابة، ترجمة، برمجة، مونتاج. السوق السعودي يبحث عن مواهب",
-      "potential": "500-3000 ريال/شهر",
-      "difficulty": "سهل",
-      "how_to_start": "سجل على مستقل.com أو Fiverr وأضف خدمة واحدة بناءً على مهارة تتقنها"
-    },
-    {
-      "title": "إدارة السوشيال ميديا",
-      "description": "المحلات والمطاعم تبحث عن شخص يدير صفحاتهم. مهارة تقدر تتعلمها خلال أسبوع",
-      "potential": "500-2000 ريال/عميل",
-      "difficulty": "سهل",
-      "how_to_start": "تواصل مع 5 محلات قريبة منك وعرض عليهم خدمتك"
-    },
-    {
-      "title": "تأجير شيء تملكه",
-      "description": "سيارتك، غرفة، أجهزة، حتى كاميرا — الاقتصاد التشاركي يخلي أي شيء تملكه مصدر دخل",
-      "potential": "300-1500 ريال/شهر",
-      "difficulty": "سهل جداً",
-      "how_to_start": "ضع إعلان في حراج أو أبشر اليوم"
-    },
-    {
-      "title": "التدريس والتعليم",
-      "description": "إذا تتقن أي مادة أو مهارة، علّمها للآخرين. الطلب على التدريس الخاص في تزايد مستمر",
-      "potential": "100-300 ريال/ساعة",
-      "difficulty": "سهل",
-      "how_to_start": "أعلن في مجموعات واتساب المدرسية أو على حسابك في تويتر"
-    }
-  ],
-  "monthly_plan": [
-    {"week": "الأسبوع الأول", "task": "مهمة واحدة محددة وقابلة للتنفيذ", "why": "لماذا هذه المهمة مهمة جداً"},
-    {"week": "الأسبوع الثاني", "task": "مهمة الأسبوع الثاني", "why": "سبب أهميتها"},
-    {"week": "الأسبوع الثالث", "task": "مهمة الأسبوع الثالث", "why": "سبب أهميتها"},
-    {"week": "الأسبوع الرابع", "task": "مهمة الأسبوع الرابع", "why": "سبب أهميتها"}
-  ],
-  "mindset_tips": [
-    "حكمة أو نصيحة نفسية تحفيزية مختصرة",
-    "حكمة ثانية عن الصبر والاستمرار",
-    "حكمة ثالثة عن البدء الصغير",
-    "حكمة رابعة عن الخوف والمجازفة الحسابة"
-  ],
-  "closing_message": "رسالة ختامية مؤثرة تخاطبه مباشرة وتقول له ان هذه اللحظة هي نقطة التحول في حياته المالية"
-}`
-
       const res = await fetch('/api/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt,
+          prompt: buildPrompt(d),
           salary: d.salary,
           expenses: d.expenses,
           monthlySaving: d.monthlySaving,
@@ -182,79 +89,82 @@ export default function ReportPage() {
           netWorth: d.netWorth,
         }),
       })
-
       const json = await res.json()
-
-      // لو في نتيجة — استخدمها
       if (json.result) {
         try {
-          const parsed = JSON.parse(json.result)
-          setReport(parsed)
+          setReport(JSON.parse(json.result))
           return
         } catch {}
       }
-
-      throw new Error(json.error || 'خطأ في الاستجابة')
-    } catch (e) {
-      // لو فشل كل شيء — نولد تقرير محلي
-      if (data) {
-        const { calcMonthsToGoal } = await import('@/lib/calculator')
-        const localReport = {
-          motivational_opener: `${data.salary.toLocaleString('ar-SA')} ريال راتب يوصّل للمليون. مو كلام — الحاسبة أثبتته. ناس كثيرين بدأوا بأقل منك وصاروا مليونيرية. الفرق الوحيد أنهم قرروا يبدأون.`,
-          reality_check: `خلنا نكون صادقين. تدخر ${data.monthlySaving.toLocaleString('ar-SA')} ريال كل شهر — هذا كافٍ للبداية. المشكلة مو في الراتب — المشكلة في أننا نصرف بدون خطة. كل ريال تدخره اليوم يساوي أكثر من ريال في المستقبل بسبب التراكم.`,
-          strengths: [
-            { title: `تدخر ${data.monthlySaving.toLocaleString('ar-SA')} ريال كل شهر`, description: 'معظم الناس ما يوصلون للمليون لأنهم ما يدخرون بانتظام — أنت تعمل الشيء الصح.' },
-            { title: 'قررت تعرف وضعك المالي', description: 'الشخص العادي يعيش بدون ما يعرف كم يدخر أو متى يوصل لأهدافه. أنت الآن أفضل منهم.' },
-            { title: 'الوقت في صفك', description: 'كل شهر يمر وأنت تدخر = خطوة نحو المليون. الاستمرار هو السلاح الأقوى.' }
-          ],
-          weaknesses: [
-            { title: 'مصاريفك تأكل أكثر مما يجب', fix: 'سجّل كل ريال تصرفه لأسبوع واحد فقط. بعد 7 أيام هتصدم كم فلوس راحت على أشياء ما تستحق.' },
-            { title: 'راتب واحد = خطر واحد', fix: 'دخل إضافي ولو 500 ريال شهرياً يحميك ويسرع وصولك. خدمة صغيرة في وقت فراغك تكفي.' }
-          ],
-          scenarios: [
-            { label: 'وضعك الحالي', action: 'استمر على نفس الوتيرة', months: data.totalMonths, monthly_saving: data.monthlySaving, difficulty: 'الوضع الحالي' },
-            { label: 'وفّر 500 ريال إضافي', action: 'ألغِ اشتراكين + قلل طلبات الطعام', months: Math.round(data.totalMonths * 0.84), monthly_saving: data.monthlySaving + 500, difficulty: 'سهل جداً' },
-            { label: 'دخل جانبي 1000 ريال', action: 'خدمة في وقت فراغك', months: Math.round(data.totalMonths * 0.70), monthly_saving: data.monthlySaving + 1000, difficulty: 'ممكن خلال شهر' },
-            { label: 'دخل جانبي 2000 ريال', action: 'مشروع صغير بجانب العمل', months: Math.round(data.totalMonths * 0.56), monthly_saving: data.monthlySaving + 2000, difficulty: 'يحتاج 3 أشهر' }
-          ],
-          income_ideas: [
-            { title: 'بيع خدمة تتقنها أونلاين', description: 'تصميم، كتابة، ترجمة، مونتاج — في ناس تبحث عنك الآن. ما تحتاج رأس مال، فقط مهارة ووقت فراغ.', potential: '500-3,000 ريال/شهر', difficulty: 'سهل', how_to_start: 'اختر مهارتك الأقوى وأنشئ حساباً على مستقل.com اليوم' },
-            { title: 'إدارة سوشيال ميديا لمحل', description: 'المطعم اللي تحت بيتك يحتاج شخص يصور طعامه وينشر عنه. أسبوع تعلم + تواصل = أول عميل.', potential: '500-1,500 ريال/عميل', difficulty: 'سهل', how_to_start: 'صوّر منتجاً لمحل قريب مجاناً وأرسله لهم' },
-            { title: 'متجر إلكتروني بدون مخزون', description: 'تبيع بدون ما تلمس المنتج. تستقبل الطلب، المورد يوصّل، أنت تربح الفرق.', potential: '1,000-5,000 ريال/شهر', difficulty: 'متوسط', how_to_start: 'افتح متجراً على Salla وابدأ بمنتج واحد' },
-            { title: 'تدريس مادة تتقنها', description: 'رياضيات، إنجليزي، قرآن، أي مهارة — الطلب على التدريس لم يتوقف يوماً.', potential: '100-300 ريال/ساعة', difficulty: 'سهل', how_to_start: 'أرسل رسالة لـ5 مجموعات واتساب في منطقتك اليوم' },
-            { title: 'تأجير شيء تملكه', description: 'سيارتك، غرفة فاضية، كاميرا — أي شيء لا تستخدم يومياً يمكن تحويله لدخل.', potential: '300-1,500 ريال/شهر', difficulty: 'سهل جداً', how_to_start: 'ضع إعلاناً في حراج اليوم' },
-            { title: 'محتوى رقمي', description: 'يوتيوب أو تيك توك في مجال تحبه — البداية بطيئة لكن العائد يتراكم ويستمر.', potential: '500-10,000 ريال/شهر', difficulty: 'يحتاج صبر', how_to_start: 'سجّل أول فيديو هذا الأسبوع عن شيء تعرفه أكثر من غيرك' }
-          ],
-          monthly_plan: [
-            { week: 'الأسبوع الأول', task: 'سجّل كل ريال تصرفه لـ7 أيام كاملة', why: 'ناس صُدِموا: 20-30% من مصاريفهم كانت على أشياء ما يتذكرونها. لما تعرف، تقدر تغير.' },
-            { week: 'الأسبوع الثاني', task: 'اختر 3 مصاريف تلغيها أو تخفضها', why: 'مو المطلوب تعذّب نفسك — المطلوب تلغي ما لا تشعر بفقدانه.' },
-            { week: 'الأسبوع الثالث', task: 'خذ خطوة واحدة نحو دخل جانبي', why: 'الخطوة الأولى هي الأصعب. لا تنتظر الوقت المثالي.' },
-            { week: 'الأسبوع الرابع', task: 'فعّل تحويل تلقائي لحساب ادخار منفصل', why: '"ادخر ما تبقى بعد الصرف" لا يعمل. "اصرف ما تبقى بعد الادخار" يعمل دائماً.' }
-          ],
-          mindset_tips: [
-            'الفقر والغنى عادتان — وكلتاهما تبدأ بقرار تتخذه اليوم',
-            'ما في شخص وصل للمليون في شهر — لكن كل مليونير بدأ بادخار شهري منتظم',
-            'أخطر جملة تقولها هي "لما راتبي يزيد ادخر" — الوقت المثالي هو الآن',
-            'كل ريال توفره اليوم يساوي ريالاً وربع غداً — الزمن يضاعف ما تدخره'
-          ],
-          closing_message: 'اللي قرأته مو مجرد أرقام. هذا طريق حقيقي يوصلك للمليون. الوقت سيمر سواء ادخرت أو لم تدخر. الفرق الوحيد هو أين ستكون بعده. قرارك الآن يحدد جوابك.'
-        }
-        setReport(localReport)
-      } else {
-        setError('حدث خطأ — يرجى المحاولة مرة أخرى')
-      }
+      throw new Error('fallback')
+    } catch {
+      setReport(buildLocalReport(d))
     } finally {
       setLoading(false)
     }
   }
 
-  if (!data) return null
+  const buildPrompt = (d: UserData) => {
+    const savingRate = d.salary > 0 ? Math.round((d.monthlySaving / d.salary) * 100) : 0
+    return `أنت مستشار مالي سعودي صادق ومحفّز. اكتب تقريراً مالياً شخصياً بأسلوب "أخ ناصح" وليس "مستشار رسمي".
 
-  const difficultyColor = (d: string) => {
-    if (d === 'سهل' || d === 'سهل جداً') return 'text-green-400 bg-green-400/10'
-    if (d === 'متوسط') return 'text-yellow-400 bg-yellow-400/10'
-    return 'text-orange-400 bg-orange-400/10'
+البيانات: راتب ${d.salary} ريال | مصروف ${d.expenses} ريال | ادخار ${d.monthlySaving} ريال/شهر (${savingRate}%) | ثروة حالية ${d.netWorth} ريال | المدة للمليون: ${monthsToLabel(d.totalMonths)}
+
+أجب بـ JSON فقط بدون backticks:
+{"motivational_opener":"جملة واحدة تحفيزية شخصية تخاطبه مباشرة بناءً على أرقامه الحقيقية","reality_check":"فقرة قصيرة صادقة عن وضعه — بأسلوب شخص يحبك وخبره لك","strengths":[{"title":"نقطة قوة حقيقية من أرقامه","description":"شرح عملي كيف يستثمرها"},{"title":"نقطة قوة ثانية","description":"شرح"},{"title":"نقطة قوة ثالثة","description":"شرح"}],"weaknesses":[{"title":"نقطة ضعف بلطف","fix":"حل عملي خطوة واحدة"},{"title":"نقطة ضعف ثانية","fix":"حل"}],"scenarios":[{"label":"وضعك الحالي","action":"استمر على نفس الوتيرة","months":${d.totalMonths},"monthly_saving":${d.monthlySaving},"difficulty":"الوضع الحالي"},{"label":"وفّر 500 ريال إضافي","action":"كيف تحرر 500 ريال عملياً","months":${calcMonthsToGoal(d.netWorth,d.monthlySaving+500,d.rate,1000000)},"monthly_saving":${d.monthlySaving+500},"difficulty":"سهل جداً"},{"label":"دخل جانبي 1000 ريال","action":"فكرة دخل واقعية","months":${calcMonthsToGoal(d.netWorth,d.monthlySaving+1000,d.rate,1000000)},"monthly_saving":${d.monthlySaving+1000},"difficulty":"ممكن خلال شهر"},{"label":"دخل جانبي 2000 ريال","action":"مشروع صغير","months":${calcMonthsToGoal(d.netWorth,d.monthlySaving+2000,d.rate,1000000)},"monthly_saving":${d.monthlySaving+2000},"difficulty":"يحتاج جهد"}],"income_ideas":[{"title":"فكرة1","description":"وصف مشوق","potential":"X-Y ريال/شهر","difficulty":"سهل","how_to_start":"خطوة أولى اليوم"},{"title":"فكرة2","description":"...","potential":"...","difficulty":"...","how_to_start":"..."},{"title":"فكرة3","description":"...","potential":"...","difficulty":"...","how_to_start":"..."},{"title":"فكرة4","description":"...","potential":"...","difficulty":"...","how_to_start":"..."},{"title":"فكرة5","description":"...","potential":"...","difficulty":"...","how_to_start":"..."}],"monthly_plan":[{"week":"الأسبوع الأول","task":"مهمة واحدة محددة","why":"السبب بصدق"},{"week":"الأسبوع الثاني","task":"...","why":"..."},{"week":"الأسبوع الثالث","task":"...","why":"..."},{"week":"الأسبوع الرابع","task":"...","why":"..."}],"mindset_tips":["نصيحة نفسية قصيرة وقوية","نصيحة ثانية","نصيحة ثالثة","نصيحة رابعة"],"closing_message":"رسالة ختامية مؤثرة شخصية"}`
   }
+
+  const buildLocalReport = (d: UserData): ReportData => {
+    const daily = Math.round(d.monthlySaving / 30)
+    const savingRate = d.salary > 0 ? Math.round((d.monthlySaving / d.salary) * 100) : 0
+    const saving500months = calcMonthsToGoal(d.netWorth, d.monthlySaving + 500, d.rate, 1000000)
+    const saving1000months = calcMonthsToGoal(d.netWorth, d.monthlySaving + 1000, d.rate, 1000000)
+    const saving2000months = calcMonthsToGoal(d.netWorth, d.monthlySaving + 2000, d.rate, 1000000)
+    const diffMonths500 = d.totalMonths - saving500months
+    const diffMonths1000 = d.totalMonths - saving1000months
+
+    return {
+      motivational_opener: `${d.salary.toLocaleString('ar-SA')} ريال راتبك — وهذا كافٍ لتصير مليونير. مو تشجيع فارغ، الحاسبة أثبتته بأرقامك أنت.`,
+      reality_check: `تدخر ${d.monthlySaving.toLocaleString('ar-SA')} ريال كل شهر — يعني ${daily} ريال يومياً فقط. ${savingRate}% من راتبك. هذا الرقم يكفي للبداية. المشكلة مو في الراتب أبداً — المشكلة في أننا نصرف بدون أن نلاحظ. كل ريال توفره اليوم يساوي أكثر غداً.`,
+      strengths: [
+        { title: `${d.monthlySaving.toLocaleString('ar-SA')} ريال ادخار شهري منتظم`, description: 'معظم الناس ما يوصلون للمليون لأنهم ما يدخرون بانتظام. أنت تعمل الشيء الصح — وهذا الفرق الحقيقي.' },
+        { title: 'اتخذت قراراً بمعرفة وضعك', description: 'الشخص العادي يعيش سنوات بدون ما يعرف إلى أين تذهب فلوسه. أنت في موقع أفضل منهم الآن.' },
+        { title: 'الوقت في صفك — ليس ضدك', description: `${monthsToLabel(d.totalMonths)} تبدو كثيرة لكنها ستمر سواء ادخرت أو لم تدخر. الفرق هو أين ستكون في نهايتها.` }
+      ],
+      weaknesses: [
+        { title: 'مصاريفك تأكل أكثر مما تلاحظ', fix: 'سجّل كل ريال تصرفه لأسبوع واحد فقط — 7 أيام. ستكتشف أن 20-30% من مصاريفك ذهبت على أشياء لن تتذكرها بعد شهر.' },
+        { title: 'دخل واحد = خطر واحد', fix: `500 ريال دخل إضافي شهرياً يوفر لك ${monthsToLabel(diffMonths500)} من المدة. ليس مطلوباً مشروع كبير — خدمة صغيرة في وقت فراغك تكفي.` }
+      ],
+      scenarios: [
+        { label: 'وضعك الحالي', action: 'استمر على نفس الوتيرة', months: d.totalMonths, monthly_saving: d.monthlySaving, difficulty: 'الوضع الحالي' },
+        { label: 'وفّر 500 ريال إضافي', action: 'ألغِ اشتراكين + قلل طلبات الطعام مرتين', months: saving500months, monthly_saving: d.monthlySaving + 500, difficulty: 'سهل جداً' },
+        { label: 'دخل جانبي 1000 ريال', action: 'خدمة في وقت فراغك — تصميم أو تدريس أو توصيل', months: saving1000months, monthly_saving: d.monthlySaving + 1000, difficulty: 'ممكن خلال شهر' },
+        { label: 'دخل جانبي 2000 ريال', action: 'مشروع صغير بجانب عملك', months: saving2000months, monthly_saving: d.monthlySaving + 2000, difficulty: 'يحتاج جهد' }
+      ],
+      income_ideas: [
+        { title: 'بيع خدمة تتقنها أونلاين', description: 'تصميم، كتابة، ترجمة، مونتاج، إدخال بيانات — في ناس تبحث عنك الآن على مستقل.com. ما تحتاج رأس مال، فقط مهارة تتقنها ووقت فراغ.', potential: '500-3,000 ريال/شهر', difficulty: 'سهل', how_to_start: 'اكتب 3 مهارات تتقنها، اختر الأقوى، وأنشئ حساباً على مستقل.com اليوم' },
+        { title: 'إدارة سوشيال ميديا لمحل', description: 'المطعم اللي تحت بيتك أو المحل في الحي يحتاج شخص يصور منتجاته وينشر عنه. هذه مهنة كاملة يمارسها شباب كثيرون بدأوا من الصفر.', potential: '500-1,500 ريال/عميل', difficulty: 'سهل', how_to_start: 'صوّر منتجاً لمحل قريب مجاناً وأرسله لهم — هذا أفضل CV في العالم' },
+        { title: 'متجر إلكتروني بدون مخزون', description: 'تبيع منتجات أونلاين بدون ما تلمسها. تستقبل الطلب وتحوله للمورد، المورد يوصّل، وأنت تربح الفرق. آلاف الشباب السعودي يفعل هذا من غرفته.', potential: '1,000-5,000 ريال/شهر', difficulty: 'متوسط', how_to_start: 'ابحث عن منتج طلبه عالٍ، افتح متجراً على Salla بـ99 ريال، وابدأ بالتسويق عبر سناب' },
+        { title: 'تدريس أو تعليم خاص', description: 'رياضيات، إنجليزي، قرآن، برمجة، حتى مهارة يدوية — الطلب على التدريس لم يتوقف يوماً. ساعتان يومياً بعد العمل تحوّل مهارتك لدخل ثابت.', potential: '100-300 ريال/ساعة', difficulty: 'سهل', how_to_start: 'أرسل رسالة لـ5 مجموعات واتساب في منطقتك تعلن فيها خدمتك اليوم' },
+        { title: 'تأجير شيء لا تستخدمه', description: 'سيارتك نايمة وقت العمل؟ غرفة فاضية؟ كاميرا أو أدوات؟ كل شيء لا تستخدمه يومياً يمكن أن يكون مصدر دخل بدون أي تعب.', potential: '300-1,500 ريال/شهر', difficulty: 'سهل جداً', how_to_start: 'اكتب قائمة بما تملكه ولا تستخدم، ضع إعلاناً في حراج اليوم' }
+      ],
+      monthly_plan: [
+        { week: 'الأسبوع الأول', task: 'سجّل كل ريال تصرفه — حتى ريال الكافيه', why: 'ناس جربوا هذا وصُدِموا: ربع مصاريفهم ذهبت على أشياء لم يتذكروها. لما تشوف، تتغير.' },
+        { week: 'الأسبوع الثاني', task: 'من قائمتك، ألغِ أو خفّض 3 بنود لن تفتقدها', why: 'المطلوب مو تعذيب النفس. المطلوب تلغي ما لا تشعر بفقدانه — وغالباً هذا كثير.' },
+        { week: 'الأسبوع الثالث', task: 'اختر فكرة دخل جانبي واحدة وخذ خطوة أولى', why: 'الخطوة الأولى هي الأصعب دائماً. بعدها كل شيء يصبح أسهل. لا تنتظر الوقت المثالي.' },
+        { week: 'الأسبوع الرابع', task: 'افتح حساب ادخار منفصل وفعّل تحويل تلقائي أول الشهر', why: '"ادخر ما يتبقى بعد الصرف" لا يعمل أبداً. "اصرف ما يتبقى بعد الادخار" يعمل دائماً.' }
+      ],
+      mindset_tips: [
+        'الفقر والغنى عادتان — وكلتاهما تبدأ بقرار تتخذه اليوم لا غداً',
+        'ما في شخص وصل للمليون دفعة واحدة — لكن كل مليونير بدأ بادخار شهري منتظم مثلك',
+        'أخطر جملة تقولها لنفسك: "لما راتبي يزيد ادخر" — الوقت المثالي هو الآن بما عندك',
+        'كل ريال توفره اليوم يتضاعف مع الوقت — الزمن هو أقوى أداة مالية في يدك'
+      ],
+      closing_message: `اللي قرأته الآن مو مجرد كلام. هذا طريق حقيقي موجود أمامك. ${monthsToLabel(d.totalMonths)} ستمر سواء بدأت أو لم تبدأ. الفرق الوحيد هو أين ستكون في نهايتها. القرار الآن — لا بعد.`
+    }
+  }
+
+  if (!data) return null
 
   return (
     <main className="min-h-screen bg-[#0A0F1C] text-white font-tajawal" dir="rtl">
@@ -262,7 +172,7 @@ export default function ReportPage() {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => router.push('/')} className="text-gray-400 text-sm hover:text-white transition-colors">
+          <button onClick={() => router.push('/')} className="text-gray-400 text-sm hover:text-white transition-colors flex items-center gap-1">
             ← الرئيسية
           </button>
           <div className="text-xs bg-gold/20 text-gold px-3 py-1 rounded-full font-bold border border-gold/30">
@@ -276,7 +186,7 @@ export default function ReportPage() {
           <div className="text-center py-16">
             <div className="text-5xl mb-4">⚠️</div>
             <p className="text-red-400 mb-4">{error}</p>
-            <button onClick={() => { setLoading(true); setError(''); generateReport(data) }}
+            <button onClick={() => { setLoading(true); setError(''); if (data) generateReport(data) }}
               className="px-6 py-3 bg-gold text-white rounded-xl font-bold">
               أعد المحاولة
             </button>
@@ -284,203 +194,220 @@ export default function ReportPage() {
         )}
 
         {report && !loading && (
-          <div className="space-y-5">
+          <div className="space-y-4">
 
-            {/* الافتتاحية التحفيزية */}
-            <div className="bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/40 rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-3">🌟</div>
+            {/* 1. الافتتاحية */}
+            <div className="bg-gradient-to-br from-gold/15 to-transparent border border-gold/30 rounded-2xl p-6 text-center">
+              <div className="text-3xl mb-3">💰</div>
               <p className="text-lg font-bold text-gold leading-relaxed">{report.motivational_opener}</p>
             </div>
 
-            {/* الواقع بصدق */}
+            {/* 2. الواقع بصدق */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-xs text-gray-400 font-bold mb-3">📌 وضعك بصراحة</p>
-              <p className="text-sm text-gray-200 leading-relaxed">{report.reality_check}</p>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-base">👀</span>
+                <p className="text-sm font-bold text-white">وضعك بصراحة</p>
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed">{report.reality_check}</p>
             </div>
 
-            {/* نقاط القوة */}
-            <Section title="💪 نقاط قوتك — ركّز عليها">
+            {/* 3. السيناريوهات — أهم قسم */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-base">⏱️</span>
+                <p className="text-sm font-bold text-white">كم يتغير الوقت لو غيّرت شيئاً بسيطاً؟</p>
+              </div>
+              <div className="space-y-2">
+                {report.scenarios.map((s, i) => {
+                  const isCurrent = i === 0
+                  const isBest = i === report.scenarios.length - 1
+                  const saved = isCurrent ? 0 : data.totalMonths - s.months
+                  return (
+                    <div key={i} className={`rounded-xl p-3.5 ${
+                      isBest ? 'bg-gold/10 border border-gold/40' :
+                      isCurrent ? 'bg-white/5 border border-white/10' :
+                      'bg-white/5 border border-white/10'
+                    }`}>
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1">
+                          <p className={`text-sm font-bold ${isBest ? 'text-gold' : 'text-white'}`}>{s.label}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{s.action}</p>
+                        </div>
+                        <div className="text-left shrink-0">
+                          <p className={`text-sm font-extrabold ${isCurrent ? 'text-gray-400' : isBest ? 'text-gold' : 'text-green-400'}`}>
+                            {monthsToLabel(s.months)}
+                          </p>
+                          {saved > 0 && (
+                            <p className="text-xs text-green-400 font-bold">توفر {monthsToLabel(saved)} ✨</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* 4. نقاط القوة */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-base">💪</span>
+                <p className="text-sm font-bold text-white">ما يميزك — ركّز عليه</p>
+              </div>
               <div className="space-y-3">
                 {report.strengths.map((s, i) => (
-                  <div key={i} className="flex gap-3 p-3 bg-green-500/10 border border-green-500/20 rounded-xl">
-                    <span className="text-green-400 text-lg shrink-0">✓</span>
+                  <div key={i} className="flex gap-3">
+                    <div className="w-5 h-5 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-green-400 text-xs">✓</span>
+                    </div>
                     <div>
-                      <p className="text-sm font-bold text-green-400">{s.title}</p>
-                      <p className="text-xs text-gray-300 mt-1">{s.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* نقاط الضعف */}
-            <Section title="🔧 فرص التحسين — وكيف تصلحها">
-              <div className="space-y-3">
-                {report.weaknesses.map((w, i) => (
-                  <div key={i} className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                    <p className="text-sm font-bold text-orange-400 mb-1">⚡ {w.title}</p>
-                    <p className="text-xs text-gray-300">الحل: {w.fix}</p>
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* السيناريوهات */}
-            <Section title="🎯 مقارنة السيناريوهات — وين تذهب فلوسك">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                  <div>
-                    <p className="text-sm font-bold">وضعك الحالي بدون تغيير</p>
-                    <p className="text-xs text-gray-500">ادخار {formatNumber(data.monthlySaving)} ريال/شهر</p>
-                  </div>
-                  <span className="text-red-400 font-extrabold">{monthsToLabel(data.totalMonths)}</span>
-                </div>
-                {report.scenarios.map((s, i) => (
-                  <div key={i} className={`p-4 rounded-xl border ${i === report.scenarios.length - 1 ? 'border-gold bg-gold/10' : 'border-white/10 bg-white/5'}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <p className={`text-sm font-bold ${i === report.scenarios.length - 1 ? 'text-gold' : 'text-white'}`}>{s.label}</p>
-                      <div className="text-left">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${difficultyColor(s.difficulty)}`}>{s.difficulty}</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-xs text-gray-400">💡 {s.action}</p>
-                      <span className={`font-extrabold text-sm ${i === report.scenarios.length - 1 ? 'text-gold' : 'text-green-400'}`}>
-                        {monthsToLabel(s.months)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* أفكار زيادة الدخل */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-xs text-gray-400 font-bold mb-1 uppercase tracking-wide">💰 أفكار زيادة دخلك — مقدور عليها</p>
-              <p className="text-xs text-gray-500 mb-4">مناسبة للسوق السعودي الحالي</p>
-              <div className="space-y-4">
-                {report.income_ideas.map((idea, i) => (
-                  <div key={i} className="border border-white/10 rounded-xl overflow-hidden">
-                    <div className="flex justify-between items-center p-4 bg-white/5">
-                      <div>
-                        <p className="text-sm font-bold">{idea.title}</p>
-                        <p className="text-xs text-gold mt-0.5">{idea.potential}</p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-bold shrink-0 mr-2 ${difficultyColor(idea.difficulty)}`}>
-                        {idea.difficulty}
-                      </span>
-                    </div>
-                    <div className="p-4 space-y-2">
-                      <p className="text-sm text-gray-300">{idea.description}</p>
-                      <div className="flex items-start gap-2 bg-gold/10 border border-gold/20 rounded-lg p-3 mt-2">
-                        <span className="text-gold shrink-0">⚡</span>
-                        <p className="text-xs text-gray-200"><span className="text-gold font-bold">ابدأ اليوم:</span> {idea.how_to_start}</p>
-                      </div>
+                      <p className="text-sm font-bold text-white">{s.title}</p>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{s.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* الخطة الشهرية */}
-            <Section title="📅 خطتك للشهر القادم — أسبوع بأسبوع">
+            {/* 5. نقاط الضعف + الحل */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-base">🔧</span>
+                <p className="text-sm font-bold text-white">وين تقدر تتحسن — وكيف بالضبط</p>
+              </div>
               <div className="space-y-3">
-                {report.monthly_plan.map((item, i) => (
-                  <div key={i} className="flex gap-4 p-3 bg-white/5 rounded-xl">
-                    <div className="shrink-0 text-center">
-                      <div className="w-8 h-8 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-xs text-gold font-bold">
-                        {i + 1}
-                      </div>
+                {report.weaknesses.map((w, i) => (
+                  <div key={i} className="border border-white/10 rounded-xl overflow-hidden">
+                    <div className="bg-orange-500/10 px-4 py-2.5">
+                      <p className="text-sm font-bold text-orange-300">{w.title}</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-gold font-bold">{item.week}</p>
-                      <p className="text-sm text-white mt-0.5">{item.task}</p>
-                      <p className="text-xs text-gray-500 mt-1">لماذا؟ {item.why}</p>
+                    <div className="px-4 py-3">
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        <span className="text-gold font-bold">الحل: </span>{w.fix}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
-            </Section>
+            </div>
 
-            {/* نصائح العقلية */}
-            <Section title="🧠 عقلية المليونير — نصائح تغير طريقة تفكيرك">
+            {/* 6. أفكار زيادة الدخل */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">💡</span>
+                <p className="text-sm font-bold text-white">أفكار زيادة دخلك — مقدور عليها</p>
+              </div>
+              <p className="text-xs text-gray-500 mb-4 mr-6">اضغط على أي فكرة لتشوف كيف تبدأ</p>
+              <div className="space-y-2">
+                {report.income_ideas.map((idea, i) => (
+                  <div key={i} className="border border-white/10 rounded-xl overflow-hidden">
+                    <button
+                      onClick={() => setOpenIdea(openIdea === i ? null : i)}
+                      className="w-full flex justify-between items-center p-4 text-right hover:bg-white/5 transition-all"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-bold">{idea.title}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-gold font-bold">{idea.potential}</span>
+                          <DiffBadge difficulty={idea.difficulty} />
+                        </div>
+                      </div>
+                      <span className="text-gray-500 mr-3">{openIdea === i ? '▲' : '▼'}</span>
+                    </button>
+                    {openIdea === i && (
+                      <div className="px-4 pb-4 space-y-3 border-t border-white/10 pt-3">
+                        <p className="text-sm text-gray-300 leading-relaxed">{idea.description}</p>
+                        <div className="bg-gold/10 border border-gold/20 rounded-lg p-3">
+                          <p className="text-xs text-gray-200">
+                            <span className="text-gold font-bold">⚡ ابدأ اليوم: </span>
+                            {idea.how_to_start}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 7. الخطة الشهرية */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-base">📅</span>
+                <p className="text-sm font-bold text-white">خطتك — أسبوع بأسبوع هذا الشهر</p>
+              </div>
+              <div className="space-y-3">
+                {report.monthly_plan.map((item, i) => (
+                  <div key={i} className="flex gap-3">
+                    <div className="w-7 h-7 rounded-full bg-gold/15 border border-gold/30 flex items-center justify-center shrink-0 text-xs text-gold font-extrabold mt-0.5">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="text-xs text-gold font-bold mb-0.5">{item.week}</p>
+                      <p className="text-sm text-white font-medium">{item.task}</p>
+                      <p className="text-xs text-gray-500 mt-1 leading-relaxed">{item.why}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 8. عقلية المليونير */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-base">🧠</span>
+                <p className="text-sm font-bold text-white">حقائق يعرفها المليونيرية</p>
+              </div>
               <div className="space-y-3">
                 {report.mindset_tips.map((tip, i) => (
                   <div key={i} className="flex gap-3 items-start">
-                    <span className="text-gold text-lg shrink-0">{['💎', '⏰', '🌱', '🎯'][i] || '💡'}</span>
+                    <span className="text-lg shrink-0">{['💎','⏰','🚫','📈'][i]}</span>
                     <p className="text-sm text-gray-300 leading-relaxed">{tip}</p>
                   </div>
                 ))}
               </div>
-            </Section>
-
-            {/* الرسالة الختامية */}
-            <div className="bg-gradient-to-br from-gold/20 to-transparent border border-gold/30 rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-3">🏆</div>
-              <p className="text-base text-gray-200 leading-relaxed font-medium">{report.closing_message}</p>
             </div>
 
-            {/* ====== UPSELL: 100 فكرة مشروع ====== */}
-            <div className="border-2 border-gold rounded-2xl overflow-hidden">
-              {/* Header */}
-              <div className="bg-gold p-5 text-center">
-                <div className="text-3xl mb-2">🚀</div>
-                <h3 className="text-xl font-extrabold text-[#0A0F1C]">100 فكرة مشروع ناجح</h3>
-                <p className="text-[#0A0F1C]/80 text-sm mt-1">دليلك الشامل لبدء مشروعك الخاص</p>
-              </div>
+            {/* 9. الرسالة الختامية */}
+            <div className="bg-gradient-to-br from-gold/15 to-transparent border border-gold/30 rounded-2xl p-6 text-center">
+              <div className="text-3xl mb-3">🏆</div>
+              <p className="text-sm text-gray-200 leading-relaxed font-medium">{report.closing_message}</p>
+            </div>
 
-              <div className="p-5 space-y-4">
-                {/* ما تحصله */}
-                <div className="space-y-2">
-                  {[
-                    { icon: '📋', text: '100 فكرة مشروع مجربة وناجحة في السوق السعودي' },
-                    { icon: '💡', text: 'شرح كامل لكل فكرة: كيف تبدأ، كم تكلف، كم تربح' },
-                    { icon: '📊', text: 'تصنيف حسب رأس المال: بدون رأس مال / صغير / متوسط' },
-                    { icon: '🔄', text: 'يتحدث دائماً بأحدث الأفكار في السوق' },
-                    { icon: '⚡', text: 'خطوات تنفيذ واضحة لكل مشروع' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm">
-                      <span className="text-xl">{item.icon}</span>
-                      <span className="text-gray-300">{item.text}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* معاينة أفكار */}
-                <div className="bg-white/5 rounded-xl p-4">
-                  <p className="text-xs text-gray-500 mb-3">معاينة — أمثلة من الأفكار</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['☕ كافيه متنقل', '📱 تطبيقات الجوال', '🎨 تصميم جرافيك', '🚗 تطبيق توصيل',
-                      '👕 ملابس مخصصة', '📸 تصوير مناسبات', '🏋️ تدريب رياضي', '🍕 مطبخ من البيت'].map((idea, i) => (
-                      <div key={i} className="text-xs text-gray-400 bg-white/5 rounded-lg px-3 py-2">{idea}</div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-gold text-center mt-3">+ 92 فكرة أخرى في الدليل الكامل</p>
-                </div>
-
-                {/* السعر */}
-                <div className="text-center">
-                  <div className="text-3xl font-extrabold text-gold">20 ريال</div>
-                  <p className="text-xs text-gray-500">دفعة واحدة · وصول فوري · يتحدث مجاناً</p>
-                </div>
-
+            {/* 10. Upsell PDF */}
+            <div className="border-2 border-gold/40 rounded-2xl overflow-hidden">
+              <div className="bg-gold/10 p-5 text-center">
+                <div className="text-3xl mb-2">📄</div>
+                <h3 className="text-lg font-extrabold mb-1">تقرير PDF متكامل</h3>
+                <p className="text-gray-400 text-xs mb-3">خطة استثمار مفصلة + أهداف سنوية + تحليل أعمق</p>
+                <div className="text-3xl font-extrabold text-gold mb-3">49 ريال</div>
                 <button
-                  onClick={() => router.push('/ideas-checkout')}
-                  className="w-full py-4 bg-gold hover:bg-yellow-600 text-white font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow-lg shadow-gold/20"
+                  onClick={() => alert('قريباً! سنتواصل معك')}
+                  className="w-full py-3 bg-gold text-white font-bold rounded-xl hover:bg-yellow-600 transition-all"
                 >
-                  اشتر الدليل الآن — 20 ريال 🚀
+                  اطلب التقرير المتكامل
                 </button>
-
-                <p className="text-center text-xs text-gray-500">
-                  💳 دفع آمن · استرداد مضمون خلال 24 ساعة
-                </p>
               </div>
+            </div>
+
+            {/* 11. Upsell أفكار */}
+            <div className="border border-white/10 rounded-2xl p-5 text-center">
+              <div className="text-3xl mb-2">🚀</div>
+              <h3 className="text-base font-bold mb-1">100 فكرة مشروع ناجح</h3>
+              <p className="text-gray-400 text-xs mb-3">دليل شامل بأفضل المشاريع في السوق السعودي — محدّث باستمرار</p>
+              <div className="text-2xl font-extrabold text-gold mb-3">20 ريال</div>
+              <button
+                onClick={() => router.push('/ideas-checkout')}
+                className="w-full py-3 bg-white/10 border border-white/20 text-white font-bold rounded-xl hover:bg-white/15 transition-all"
+              >
+                شوف الأفكار الـ100
+              </button>
             </div>
 
             {/* زر مشاركة */}
             <button
               onClick={() => {
-                const text = `💰 حصلت على تقريري المالي!\nسأصل للمليون خلال ${monthsToLabel(data.totalMonths)}\nتحدي للمشاركة: millionaire-sa.netlify.app`
+                const text = `💰 حصلت على تقريري المالي!\nسأصير مليونير خلال ${monthsToLabel(data.totalMonths)}\n\nاحسب هدفك المالي:\nmillionaire-sa.netlify.app`
                 if (navigator.share) navigator.share({ text })
                 else navigator.clipboard.writeText(text)
               }}
