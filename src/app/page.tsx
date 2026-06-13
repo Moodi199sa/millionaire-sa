@@ -111,6 +111,7 @@ export default function Home() {
     if (step === 1) return salary !== '' && expenses !== '' && Number(salary) > 0
     if (step === 2) return hasSavings !== null && (hasSavings === false || savings !== '')
     if (step === 3) return hasInvestments !== null && (hasInvestments === false || investments !== '')
+    if (step === 4) return true
     return false
   }
 
