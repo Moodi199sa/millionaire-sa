@@ -95,7 +95,7 @@ export default function Home() {
                 type="number"
                 value={salary}
                 onChange={e => setSalary(e.target.value)}
-                placeholder="مثال: 8000"
+                placeholder=""
                 className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
               />
               <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
@@ -110,7 +110,7 @@ export default function Home() {
                 type="number"
                 value={expenses}
                 onChange={e => setExpenses(e.target.value)}
-                placeholder="مثال: 5000"
+                placeholder=""
                 className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
               />
               <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
@@ -154,7 +154,7 @@ export default function Home() {
                   type="number"
                   value={savings}
                   onChange={e => setSavings(e.target.value)}
-                  placeholder="كم عندك؟ مثال: 20000"
+                  placeholder=""
                   className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
                   autoFocus
                 />
@@ -191,7 +191,7 @@ export default function Home() {
                     type="number"
                     value={investments}
                     onChange={e => setInvestments(e.target.value)}
-                    placeholder="كم قيمة استثماراتك؟ مثال: 50000"
+                    placeholder=""
                     className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
                     autoFocus
                   />
