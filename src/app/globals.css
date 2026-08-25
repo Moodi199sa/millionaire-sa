@@ -3,19 +3,24 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   direction: rtl;
   font-family: 'Tajawal', sans-serif;
-  background-color: #0A0F1C;
-  color: #ffffff;
+  background: linear-gradient(135deg, #e8f7f0 0%, #ffffff 40%, #e8f4f8 100%);
+  min-height: 100vh;
+  color: #0d1b3e;
 }
 
 :root {
-  --gold: #D4A017;
-  --gold-light: #F5C842;
-  --gold-pale: #FDF6DC;
+  --gold: #B8860B;
+  --gold-light: #DAA520;
+  --teal: #1a9e6b;
+  --navy: #0d1b3e;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
 }
