@@ -204,7 +204,52 @@ export default function ReportPage() {
   const extraNeeded = Math.max(0, requiredMonthly - data.monthlySaving)
   const today = new Date().toLocaleDateString('ar-SA', { year:'numeric', month:'long', day:'numeric' })
 
-  const sectionStyle = 'bg-white rounded-3xl border border-gray-100 shadow-sm p-6'
+  const downloadPDF = async () => {
+    try {
+      const { default: html2canvas } = await import('html2canvas')
+      const { default: jsPDF } = await import('jspdf')
+      
+      const element = document.getElementById('report-content')
+      if (!element) return
+      
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#f8fbff',
+        logging: false,
+        windowWidth: 600,
+      })
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.95)
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      const imgWidth = canvas.width
+      const imgHeight = canvas.height
+      const ratio = imgWidth / imgHeight
+      const pageImgHeight = pdfWidth / ratio
+      
+      let heightLeft = pageImgHeight
+      let position = 0
+      
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pageImgHeight)
+      heightLeft -= pdfHeight
+      
+      while (heightLeft > 0) {
+        position = heightLeft - pageImgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pageImgHeight)
+        heightLeft -= pdfHeight
+      }
+      
+      pdf.save('تقريري-المالي-saudimillion.pdf')
+    } catch (e) {
+      console.error(e)
+      window.print()
+    }
+  }
+
+  const sectionStyle = 'bg-white rounded-3xl border border-gray-100 shadow-sm p-6 print-page'
   const titleStyle = { color:'#0d1b3e' }
 
   return (
@@ -244,6 +289,21 @@ export default function ReportPage() {
         )}
 
         {report && !loading && (
+          <div>
+          {/* Download buttons */}
+          <div className="flex gap-3 mb-4 no-print">
+            <button onClick={downloadPDF}
+              className="flex-1 py-3.5 text-white font-bold rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 text-sm"
+              style={{background:'linear-gradient(135deg,#0d1b3e,#1a3a6b)'}}>
+              📥 تحميل التقرير PDF
+            </button>
+            <button onClick={() => window.print()}
+              className="px-4 py-3.5 font-bold rounded-2xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-all text-sm">
+              🖨️ طباعة
+            </button>
+          </div>
+
+          <div id="report-content">
           <div className="space-y-4">
 
             {/* COVER — غلاف التقرير */}
@@ -633,11 +693,14 @@ export default function ReportPage() {
             </button>
 
             <button onClick={() => router.push('/')}
-              className="w-full py-3 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+              className="w-full py-3 text-sm text-gray-400 hover:text-gray-600 transition-colors no-print">
               ← أعد الحساب بأرقام مختلفة
             </button>
 
           </div>
+          </div>
+          </div>
+
         )}
       </div>
     </main>
