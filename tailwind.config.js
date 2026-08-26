@@ -8,12 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        gold: '#B8860B',
-        'gold-light': '#DAA520',
-        'gold-pale': '#FFF8DC',
-        'teal': '#1a9e6b',
-        'teal-light': '#e8f7f0',
-        'navy': '#0d1b3e',
+        gold: '#D4A017',
+        'gold-light': '#F5C842',
+        'gold-pale': '#FDF6DC',
         dark: '#0A0F1C',
       },
       fontFamily: {
