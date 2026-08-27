@@ -16,6 +16,16 @@ interface ReportData {
   monthly_plan: { week: string; task: string; why: string }[]
   mindset_tips: string[]
   closing_message: string
+  savings_behavior?: string
+  daily_cost?: number
+  coffee_equivalent?: number
+  yearly_milestones?: { year: number; amount: number }[]
+  expense_analysis?: { category: string; pct: number; amount: number; tip: string }[]
+  money_personality?: { type: string; desc: string; advice: string }
+  compound_effect?: { year1: number; year5: number; year10: number }
+  emergency_fund?: { current: number; needed: number; status: string }
+  risk_analysis?: { risk: string; impact: string; mitigation: string }[]
+  age_comparison?: { age: string; typical: string; yours: string }[]
 }
 
 function LoadingReport() {
@@ -190,6 +200,43 @@ export default function ReportPage() {
         'كل مليونير بدأ بادخار شهري منتظم مثلك',
         'أخطر جملة: "لما راتبي يزيد ادخر" — الوقت المثالي هو الآن',
         'كل ريال توفره اليوم يتضاعف مع الوقت',
+      ],
+      // أقسام جديدة
+      savings_behavior: savingRate >= 30 ? 'ممتاز' : savingRate >= 20 ? 'جيد' : savingRate >= 10 ? 'يحتاج تحسين' : 'ضعيف',
+      daily_cost: Math.round((1000000 - d.netWorth) / d.totalMonths / 30),
+      coffee_equivalent: Math.round(d.monthlySaving / 18),
+      yearly_milestones: [
+        { year: 1, amount: d.netWorth + d.monthlySaving * 12 },
+        { year: 3, amount: d.netWorth + d.monthlySaving * 36 },
+        { year: 5, amount: d.netWorth + d.monthlySaving * 60 },
+        { year: 10, amount: Math.min(1000000, d.netWorth + d.monthlySaving * 120) },
+      ],
+      expense_analysis: [
+        { category: 'السكن', pct: 30, amount: Math.round(d.expenses * 0.3), tip: 'لو وفّرت 10% من السكن = ' + Math.round(d.expenses*0.03).toLocaleString('ar-SA') + ' ريال/شهر' },
+        { category: 'الطعام', pct: 25, amount: Math.round(d.expenses * 0.25), tip: 'الطبخ في البيت يوفر 40% من ميزانية الأكل' },
+        { category: 'المواصلات', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'المشاركة في التوصيل توفر 500-1000 ريال/شهر' },
+        { category: 'الترفيه والاشتراكات', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'راجع اشتراكاتك — معظم الناس عندهم 2-3 اشتراكات ما يستخدمونها' },
+        { category: 'أخرى', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'المصاريف الصغيرة المتكررة هي القاتل الصامت للادخار' },
+      ],
+      money_personality: savingRate >= 25 ? { type: 'المدخر الذكي 🧠', desc: 'تعرف قيمة المال وتتحكم في مصاريفك — استمر وركز على الاستثمار', advice: 'وقتك الحين تتعلم عن الاستثمار — الادخار وحده بطيء' }
+        : savingRate >= 15 ? { type: 'المتوازن ⚖️', desc: 'تستمتع بحياتك وتدخر — بس ممكن تسرّع أكثر', advice: 'حاول ترفع ادخارك 5% كل 3 أشهر — ما بتحس بالفرق' }
+        : savingRate >= 5 ? { type: 'المستمتع 🎉', desc: 'تحب تعيش اللحظة — لكن المستقبل يحتاج اهتمام أكثر', advice: 'ابدأ بادخار تلقائي — حوّل المبلغ أول ما ينزل الراتب' }
+        : { type: 'المغامر 🎲', desc: 'تصرف أكثر مما تدخر — تحتاج خطة واضحة', advice: 'ابدأ بتسجيل مصاريفك لمدة أسبوع — ستنصدم بالنتيجة' },
+      compound_effect: {
+        year1: Math.round(d.monthlySaving * 12),
+        year5: Math.round(d.monthlySaving * 60 * (d.rate > 0 ? Math.pow(1 + d.rate/100, 5) / 5 : 1)),
+        year10: Math.round(d.monthlySaving * 120 * (d.rate > 0 ? Math.pow(1 + d.rate/100, 10) / 10 : 1)),
+      },
+      emergency_fund: { current: d.netWorth, needed: d.expenses * 6, status: d.netWorth >= d.expenses * 6 ? 'مكتمل ✅' : d.netWorth >= d.expenses * 3 ? 'جيد — أكمل لـ6 أشهر' : 'تحتاج بناء صندوق طوارئ أولاً' },
+      risk_analysis: [
+        { risk: 'فقدان الوظيفة', impact: 'عالي', mitigation: `عندك ${Math.round(d.netWorth / d.expenses)} شهر احتياطي — ${d.netWorth >= d.expenses * 6 ? 'وضعك آمن' : 'تحتاج توصل لـ6 أشهر'}` },
+        { risk: 'مصروف طارئ كبير', impact: 'متوسط', mitigation: 'صندوق الطوارئ يحميك — لا تلمسه إلا للضرورة' },
+        { risk: 'التضخم', impact: 'متوسط', mitigation: d.rate > 0 ? `عائد ${d.rate}% يحميك جزئياً` : 'بدون استثمار فلوسك تخسر قيمتها مع الوقت' },
+      ],
+      age_comparison: [
+        { age: '20-25', typical: '500-2,000 ريال/شهر', yours: d.monthlySaving >= 2000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
+        { age: '25-30', typical: '2,000-4,000 ريال/شهر', yours: d.monthlySaving >= 4000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
+        { age: '30-40', typical: '3,000-6,000 ريال/شهر', yours: d.monthlySaving >= 6000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
       ],
       closing_message: `${monthsToLabel(d.totalMonths)} ستمر سواء بدأت أو لم تبدأ. الفرق الوحيد: أين ستكون في نهايتها.`,
     }
@@ -651,6 +698,222 @@ export default function ReportPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* MONEY PERSONALITY — شخصيتك المالية */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#ec4899'}}>🪞</span>
+                شخصيتك المالية
+              </h2>
+              {(report as any).money_personality && (
+                <div className="space-y-4">
+                  <div className="p-5 rounded-2xl text-center" style={{background:'rgba(236,72,153,0.06)', border:'1.5px solid rgba(236,72,153,0.2)'}}>
+                    <div className="text-3xl mb-2">{(report as any).money_personality.type.split(' ').pop()}</div>
+                    <div className="text-xl font-extrabold mb-1" style={{color:'#0d1b3e'}}>{(report as any).money_personality.type}</div>
+                    <p className="text-sm text-gray-500">{(report as any).money_personality.desc}</p>
+                  </div>
+                  <div className="p-4 rounded-2xl" style={{background:'rgba(26,158,107,0.06)', border:'1px solid rgba(26,158,107,0.2)'}}>
+                    <p className="text-sm font-bold mb-1" style={{color:'#1a9e6b'}}>💡 نصيحة مخصصة لك</p>
+                    <p className="text-sm text-gray-600">{(report as any).money_personality.advice}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* EXPENSE ANALYSIS — تحليل مصاريفك */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#ef4444'}}>📊</span>
+                تحليل مصاريفك — وين تروح فلوسك؟
+              </h2>
+              <p className="text-xs text-gray-400 mb-4">تقدير بناءً على متوسطات الإنفاق في السعودية</p>
+              <div className="space-y-3">
+                {((report as any).expense_analysis || []).map((exp: any, i: number) => (
+                  <div key={i} className="rounded-2xl border border-gray-100 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">{['🏠','🍽️','🚗','🎬','📦'][i]}</span>
+                        <div>
+                          <p className="text-sm font-bold" style={{color:'#0d1b3e'}}>{exp.category}</p>
+                          <p className="text-xs text-gray-400">{exp.pct}% من مصاريفك</p>
+                        </div>
+                      </div>
+                      <span className="font-extrabold text-sm" style={{color:'#ef4444'}}>~{exp.amount.toLocaleString('ar-SA')} ر</span>
+                    </div>
+                    <div className="px-4 pb-3">
+                      <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden mb-2">
+                        <div className="h-full rounded-full" style={{width:`${exp.pct}%`, background: i===0?'#ef4444':i===1?'#f97316':i===2?'#f59e0b':i===3?'#8b5cf6':'#6b7280'}} />
+                      </div>
+                      <p className="text-xs" style={{color:'#1a9e6b'}}>💡 {exp.tip}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 rounded-2xl text-center" style={{background:'rgba(26,158,107,0.06)', border:'1px solid rgba(26,158,107,0.2)'}}>
+                <p className="text-sm font-bold" style={{color:'#1a9e6b'}}>
+                  💡 لو وفّرت 10% فقط من مصاريفك = {formatNumber(Math.round(data.expenses * 0.1))} ريال/شهر إضافي
+                </p>
+              </div>
+            </div>
+
+            {/* DAILY COST — تكلفة المليون يومياً */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#0ea5e9'}}>☕</span>
+                المليون بلغة يومية
+              </h2>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="p-4 rounded-2xl text-center" style={{background:'rgba(14,165,233,0.06)', border:'1px solid rgba(14,165,233,0.2)'}}>
+                  <p className="text-xs text-gray-400 mb-1">تكلفة المليون يومياً</p>
+                  <p className="text-2xl font-extrabold" style={{color:'#0ea5e9'}}>{(report as any).daily_cost || Math.round((1000000-data.netWorth)/data.totalMonths/30)} ر</p>
+                  <p className="text-xs text-gray-400 mt-1">فقط!</p>
+                </div>
+                <div className="p-4 rounded-2xl text-center" style={{background:'rgba(184,134,11,0.06)', border:'1px solid rgba(184,134,11,0.2)'}}>
+                  <p className="text-xs text-gray-400 mb-1">ادخارك الشهري يعادل</p>
+                  <p className="text-2xl font-extrabold" style={{color:'#B8860B'}}>{(report as any).coffee_equivalent || Math.round(data.monthlySaving/18)} ☕</p>
+                  <p className="text-xs text-gray-400 mt-1">كوب قهوة</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 text-center leading-relaxed">
+                لو كل يوم حطيت <span className="font-bold" style={{color:'#0ea5e9'}}>{(report as any).daily_cost || Math.round((1000000-data.netWorth)/data.totalMonths/30)} ريال</span> في صندوق — بتوصل للمليون. هذا أقل من وجبة غداء.
+              </p>
+            </div>
+
+            {/* MILESTONES — محطات رحلتك */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#10b981'}}>🚩</span>
+                محطات رحلتك للمليون
+              </h2>
+              <div className="relative">
+                <div className="absolute right-4 top-0 bottom-0 w-0.5" style={{background:'rgba(16,185,129,0.2)'}} />
+                <div className="space-y-4 pr-10">
+                  {((report as any).yearly_milestones || []).map((m: any, i: number) => {
+                    const pct = Math.min(100, Math.round(m.amount / 1000000 * 100))
+                    const isMillionaire = m.amount >= 1000000
+                    return (
+                      <div key={i} className="relative">
+                        <div className="absolute -right-10 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                          style={{background: isMillionaire ? '#B8860B' : '#10b981'}}>
+                          {isMillionaire ? '🏆' : m.year}
+                        </div>
+                        <div className="p-3 rounded-2xl" style={{background:isMillionaire?'rgba(184,134,11,0.06)':'#f8fbff', border:`1px solid ${isMillionaire?'rgba(184,134,11,0.2)':'#e8f0fb'}`}}>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-bold" style={{color:'#0d1b3e'}}>بعد {m.year} {m.year === 1 ? 'سنة' : 'سنوات'}</span>
+                            <span className="text-sm font-extrabold" style={{color:isMillionaire?'#B8860B':'#10b981'}}>{formatNumber(m.amount)} ر</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                            <div className="h-full rounded-full" style={{width:`${pct}%`, background: isMillionaire?'#B8860B':'#10b981'}} />
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">{pct}% من هدف المليون</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* EMERGENCY FUND — صندوق الطوارئ */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#f59e0b'}}>🛡️</span>
+                صندوق الطوارئ — هل أنت محمي؟
+              </h2>
+              {(report as any).emergency_fund && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-4 rounded-2xl text-center" style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
+                      <p className="text-xs text-gray-400 mb-1">عندك الآن</p>
+                      <p className="text-lg font-extrabold" style={{color:'#0d1b3e'}}>{formatNumber((report as any).emergency_fund.current)} ر</p>
+                    </div>
+                    <div className="p-4 rounded-2xl text-center" style={{background:'rgba(245,158,11,0.06)', border:'1px solid rgba(245,158,11,0.2)'}}>
+                      <p className="text-xs text-gray-400 mb-1">تحتاج (6 أشهر مصاريف)</p>
+                      <p className="text-lg font-extrabold" style={{color:'#f59e0b'}}>{formatNumber((report as any).emergency_fund.needed)} ر</p>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-2xl text-center" style={{
+                    background: (report as any).emergency_fund.current >= (report as any).emergency_fund.needed ? 'rgba(26,158,107,0.06)' : 'rgba(245,158,11,0.06)',
+                    border: `1px solid ${(report as any).emergency_fund.current >= (report as any).emergency_fund.needed ? 'rgba(26,158,107,0.2)' : 'rgba(245,158,11,0.2)'}`}}>
+                    <p className="text-sm font-bold" style={{color: (report as any).emergency_fund.current >= (report as any).emergency_fund.needed ? '#1a9e6b' : '#f59e0b'}}>
+                      {(report as any).emergency_fund.status}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-400 text-center">
+                    قاعدة: احتفظ بمصاريف 6 أشهر في حساب منفصل قبل أي استثمار
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* RISK ANALYSIS — تحليل المخاطر */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#dc2626'}}>⚠️</span>
+                المخاطر المالية وكيف تحمي نفسك
+              </h2>
+              <div className="space-y-3">
+                {((report as any).risk_analysis || []).map((risk: any, i: number) => (
+                  <div key={i} className="rounded-2xl border border-gray-100 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3" style={{background:'rgba(220,38,38,0.04)'}}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{['💼','🏥','📉'][i]}</span>
+                        <span className="text-sm font-bold" style={{color:'#0d1b3e'}}>{risk.risk}</span>
+                      </div>
+                      <span className="text-xs px-2 py-0.5 rounded-full font-bold"
+                        style={{background: risk.impact === 'عالي' ? 'rgba(220,38,38,0.1)' : 'rgba(245,158,11,0.1)',
+                          color: risk.impact === 'عالي' ? '#dc2626' : '#f59e0b'}}>
+                        {risk.impact}
+                      </span>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-sm text-gray-600">
+                        <span className="font-bold" style={{color:'#1a9e6b'}}>🛡️ الحل: </span>{risk.mitigation}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* COMPOUND EFFECT — قوة الوقت */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#7c3aed'}}>⏳</span>
+                قوة الوقت — كيف فلوسك تنمو
+              </h2>
+              {(report as any).compound_effect && (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    لو بدأت اليوم بادخار {formatNumber(data.monthlySaving)} ريال/شهر:
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      {label: 'بعد سنة', amount: (report as any).compound_effect.year1},
+                      {label: 'بعد 5 سنوات', amount: (report as any).compound_effect.year5},
+                      {label: 'بعد 10 سنوات', amount: (report as any).compound_effect.year10},
+                    ].map((p, i) => (
+                      <div key={i} className="p-3 rounded-2xl text-center"
+                        style={{background:'rgba(124,58,237,0.06)', border:'1px solid rgba(124,58,237,0.15)'}}>
+                        <p className="text-xs text-gray-400 mb-1">{p.label}</p>
+                        <p className="text-base font-extrabold" style={{color:'#7c3aed'}}>{formatNumber(p.amount)}</p>
+                        <p className="text-xs text-gray-400">ريال</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-400 text-center">
+                    {data.rate > 0 ? `بعائد ${data.rate}% سنوياً — كل سنة إضافية تسرع النمو` : 'بدون استثمار — مع الاستثمار الأرقام تتضاعف'}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* MINDSET */}
