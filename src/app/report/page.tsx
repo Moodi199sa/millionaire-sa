@@ -258,7 +258,7 @@ export default function ReportPage() {
 
       {/* Header */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between">
           <button onClick={() => router.push('/')} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors">
             ← الرئيسية
           </button>
@@ -272,7 +272,7 @@ export default function ReportPage() {
         </div>
       </nav>
 
-      <div className="max-w-xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-6">
 
         {loading && <LoadingReport />}
 

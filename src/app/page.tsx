@@ -147,7 +147,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
-      <div className="max-w-xl mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
 
         {/* Social Proof */}
         <div className="flex flex-col items-center gap-2 mb-6">

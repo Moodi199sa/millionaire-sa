@@ -64,7 +64,7 @@ const tagColors: Record<string, string> = {
 export default function BlogPage() {
   return (
     <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10">
 
         {/* Nav */}
         <div className="flex justify-between items-center mb-10">

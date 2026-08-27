@@ -41,7 +41,7 @@ export default function CheckoutPage() {
 
   return (
     <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
-      <div className="max-w-md mx-auto px-4 py-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10">
 
         {/* Header */}
         <button onClick={() => router.back()} className="text-gray-400 text-sm mb-6 hover:text-white transition-colors flex items-center gap-2">

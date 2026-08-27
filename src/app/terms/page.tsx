@@ -9,14 +9,14 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10">
 
         <Link href="/" className="text-gold text-sm hover:underline mb-8 block">
           ← العودة للرئيسية
         </Link>
 
         <h1 className="text-2xl font-extrabold mb-2">الشروط والأحكام</h1>
-        <p className="text-gray-400 text-sm mb-8">آخر تحديث: يناير 2025</p>
+        <p className="text-gray-400 text-sm mb-8">آخر تحديث: أغسطس 2026</p>
 
         <div className="space-y-8 text-sm text-gray-300 leading-relaxed">
 
@@ -65,7 +65,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-base font-bold text-white mb-3">7. التواصل</h2>
-            <p>لأي استفسار: <a href="mailto:hello@millionaire-sa.com" className="text-gold hover:underline">hello@millionaire-sa.com</a></p>
+            <p>لأي استفسار: <a href="mailto:support@saudimillion.com" className="text-gold hover:underline">support@saudimillion.com</a></p>
           </section>
 
         </div>
