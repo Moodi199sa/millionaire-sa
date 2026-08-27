@@ -26,6 +26,9 @@ interface ReportData {
   emergency_fund?: { current: number; needed: number; status: string }
   risk_analysis?: { risk: string; impact: string; mitigation: string }[]
   age_comparison?: { age: string; typical: string; yours: string }[]
+  investment_options?: { name: string; return_pct: number; risk: string; min: string; desc: string; pros: string; cons: string; best_for: string; action: string }[]
+  saudi_advantages?: { icon: string; title: string; desc: string; value: string }[]
+  common_mistakes?: { mistake: string; pct: number; fix: string }[]
 }
 
 function LoadingReport() {
@@ -283,6 +286,27 @@ export default function ReportPage() {
         { risk: 'فقدان الوظيفة', impact: 'عالي', mitigation: `عندك ${Math.round(d.netWorth / d.expenses)} شهر احتياطي — ${d.netWorth >= d.expenses * 6 ? 'وضعك آمن' : 'تحتاج توصل لـ6 أشهر'}` },
         { risk: 'مصروف طارئ كبير', impact: 'متوسط', mitigation: 'صندوق الطوارئ يحميك — لا تلمسه إلا للضرورة' },
         { risk: 'التضخم', impact: 'متوسط', mitigation: d.rate > 0 ? `عائد ${d.rate}% يحميك جزئياً` : 'بدون استثمار فلوسك تخسر قيمتها مع الوقت' },
+      ],
+      investment_options: [
+        { name: 'حساب ادخار بنكي', return_pct: 4, risk: 'صفر', min: '0 ريال', desc: 'حسابات مثل واعد من البنك الأهلي أو مشابهاتها', pros: 'مضمون 100%، سيولة فورية', cons: 'عائد منخفض لا يتفوق على التضخم على المدى البعيد', best_for: 'صندوق الطوارئ والادخار قصير المدى', action: 'افتح حساب ادخار هذا الأسبوع' },
+        { name: 'صكوك وسندات', return_pct: 5.5, risk: 'منخفض', min: '1,000 ريال', desc: 'أدوات دين إسلامية تصدرها الحكومة أو الشركات الكبرى', pros: 'عائد ثابت، متوافق مع الشريعة، أمان عالٍ', cons: 'عائد محدود، يحتاج ربط المبلغ لفترة', best_for: 'من يريد عائد ثابت بمخاطرة منخفضة', action: 'تصفح منصة تداول الصكوك عبر بنكك' },
+        { name: 'مؤشر السوق السعودي (تداول)', return_pct: 7, risk: 'متوسط', min: '500 ريال', desc: 'تتبع أداء السوق السعودي بالكامل عبر صناديق المؤشر. تاريخياً حقق السوق السعودي 4.9%-7.2% سنوياً', pros: 'تنويع تلقائي، سيولة عالية، رسوم منخفضة (0.23%)', cons: 'تقلبات قصيرة المدى، يتأثر بأسعار النفط', best_for: 'الاستثمار طويل المدى 5-10 سنوات', action: 'افتح محفظة عبر تطبيق بنكك واشترِ ETF تداول 30' },
+        { name: 'أسهم قطاع الطاقة والبنوك', return_pct: 8, risk: 'متوسط-عالٍ', min: '1,000 ريال', desc: 'قطاعات الطاقة (أرامكو) والبنوك من أكثر القطاعات استقراراً في السوق السعودي. توزيعات أرامكو 7.3%', pros: 'توزيعات أرباح منتظمة، قطاع محمي حكومياً', cons: 'يحتاج دراسة ومتابعة، تركيز في قطاع واحد', best_for: 'من يفهم الأسواق ويريد توزيعات منتظمة', action: 'ابدأ بـ1000 ريال في أسهم موزعة للأرباح' },
+        { name: 'عقار للإيجار', return_pct: 6.5, risk: 'منخفض-متوسط', min: '200,000 ريال', desc: 'أسعار الرياض تراجعت 17% في 2025-2026 مما يخلق فرصة للشراء. الإيجار مثبّت 5 سنوات في الرياض', pros: 'دخل إيجاري ثابت، أصل حقيقي، مضخة للتضخم', cons: 'رأس مال كبير، سيولة منخفضة، صيانة وإدارة', best_for: 'من يملك رأس مال كافٍ ويريد دخلاً ثابتاً', action: 'ابحث في حراج ومواقع العقار عن فرص المرحلة الحالية' },
+        { name: 'صناديق ريت (عقار بدون شراء)', return_pct: 7, risk: 'متوسط', min: '1,000 ريال', desc: 'تستثمر في العقارات التجارية والسكنية دون شراء مباشر. متوفرة على تداول كالأسهم', pros: 'توزيعات فصلية، سيولة كالأسهم، تنويع جغرافي', cons: 'تأثر بأسعار الفائدة، يحتاج اختيار صندوق مناسب', best_for: 'من يريد الاستفادة من العقار بمبلغ صغير', action: 'ابحث عن REITs المدرجة على تداول وراجع توزيعاتها' },
+      ],
+      saudi_advantages: [
+        { icon: '🚫', title: 'لا ضريبة دخل شخصية', desc: 'ما تدفع ضريبة على راتبك ولا أرباحك — ميزة ضخمة مقارنة بمعظم دول العالم', value: `${formatNumber(Math.round(d.salary * 0.2 * 12))} ريال/سنة توفرها` },
+        { icon: '📈', title: 'تضخم منخفض 1.6%', desc: 'مقارنة بالعالم، التضخم السعودي منخفض — فلوسك تحتفظ بقيمتها أكثر', value: 'عائد 4%+ يتفوق على التضخم' },
+        { icon: '🏛️', title: 'صندوق التنمية الوطنية', desc: 'قروض مدعومة للمساكن والمشاريع بأسعار فائدة أقل من السوق بكثير', value: 'وفر فوائد بآلاف الريالات' },
+        { icon: '🌍', title: 'اقتصاد نمو 4.6% (2025)', desc: 'الاقتصاد السعودي ينمو بأحد أعلى المعدلات إقليمياً — فرص أكثر للاستثمار', value: 'بيئة مواتية لتنمية الثروة' },
+      ],
+      common_mistakes: [
+        { mistake: 'رفع مستوى المعيشة مع كل زيادة', pct: 73, fix: '"معدل تضخم نمط الحياة" — كل 1000 ريال زيادة، 700 منها تروح على مصاريف أعلى. الحل: الزيادة الأولى تروح للادخار كاملاً' },
+        { mistake: 'فلوس في الحساب الجاري (0% عائد)', pct: 68, fix: `عندك ${formatNumber(d.netWorth)} ريال في البنك؟ حوّل ${formatNumber(Math.round(d.netWorth * 0.7))} منها لحساب ادخار = ${formatNumber(Math.round(d.netWorth * 0.7 * 0.04 / 12))} ريال إضافي كل شهر` },
+        { mistake: 'مصدر دخل واحد = خطر واحد', pct: 61, fix: 'الشخص الذي دخله من مصدرين أو أكثر يصل للمليون بشكل أسرع بـ40% في المتوسط' },
+        { mistake: 'لا خطة مالية مكتوبة', pct: 85, fix: 'الأشخاص الذين يكتبون أهدافهم المالية أكثر احتمالاً لتحقيقها بـ42%. هذا التقرير خطوتك الأولى' },
+        { mistake: 'تأجيل الاستثمار لـ"لما الوضع يستقر"', pct: 79, fix: `لو بدأت تستثمر ${formatNumber(d.monthlySaving)} ريال/شهر قبل 5 سنوات بعائد 7% — كنت الآن عندك ${formatNumber(Math.round(d.monthlySaving * 60 * Math.pow(1.07, 5) / 5))} ريال إضافي` },
       ],
       age_comparison: [
         { age: '20-25', typical: '500-2,000 ريال/شهر', yours: d.monthlySaving >= 2000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
@@ -1000,6 +1024,125 @@ export default function ReportPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* INVESTMENT ROADMAP — خارطة الاستثمار */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-1 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#059669'}}>💹</span>
+                خارطة الاستثمار في السعودية 2026
+              </h2>
+              <p className="text-xs text-gray-400 mb-4 mr-10">مرتبة من الأقل مخاطرة للأعلى — اختر حسب وضعك</p>
+              {(report as any).investment_options && (
+                <div className="space-y-2">
+                  {((report as any).investment_options as any[]).map((inv: any, i: number) => (
+                    <div key={i} className="rounded-2xl overflow-hidden border border-gray-100">
+                      <button onClick={() => setOpenIdea(openIdea === (100+i) ? null : (100+i))}
+                        className="w-full flex justify-between items-center p-4 text-right hover:bg-gray-50 transition-all">
+                        <div className="flex-1">
+                          <p className="text-sm font-bold" style={{color:'#0d1b3e'}}>{inv.name}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'rgba(5,150,105,0.1)', color:'#059669'}}>
+                              عائد {inv.return_pct}% سنوياً
+                            </span>
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{background:'rgba(107,114,128,0.1)', color:'#6b7280'}}>
+                              مخاطرة: {inv.risk}
+                            </span>
+                            <span className="text-xs text-gray-400">من {inv.min}</span>
+                          </div>
+                        </div>
+                        <span className="text-gray-400 mr-3 text-lg">{openIdea===(100+i)?'−':'+'}</span>
+                      </button>
+                      {openIdea===(100+i) && (
+                        <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
+                          <p className="text-sm text-gray-600 leading-relaxed">{inv.desc}</p>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="p-3 rounded-xl" style={{background:'rgba(26,158,107,0.06)', border:'1px solid rgba(26,158,107,0.2)'}}>
+                              <p className="text-xs font-bold mb-1" style={{color:'#1a9e6b'}}>✅ المزايا</p>
+                              <p className="text-xs text-gray-600">{inv.pros}</p>
+                            </div>
+                            <div className="p-3 rounded-xl" style={{background:'rgba(249,115,22,0.06)', border:'1px solid rgba(249,115,22,0.2)'}}>
+                              <p className="text-xs font-bold mb-1" style={{color:'#f97316'}}>⚠️ العيوب</p>
+                              <p className="text-xs text-gray-600">{inv.cons}</p>
+                            </div>
+                          </div>
+                          <div className="p-3 rounded-xl" style={{background:'rgba(59,130,246,0.06)', border:'1px solid rgba(59,130,246,0.2)'}}>
+                            <p className="text-xs font-bold mb-1" style={{color:'#3b82f6'}}>👤 مناسب لـ</p>
+                            <p className="text-xs text-gray-600">{inv.best_for}</p>
+                          </div>
+                          <div className="p-3 rounded-xl" style={{background:'rgba(5,150,105,0.06)', border:'1px solid rgba(5,150,105,0.2)'}}>
+                            <p className="text-xs font-bold" style={{color:'#059669'}}>⚡ {inv.action}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div className="p-3 rounded-2xl text-center text-xs text-gray-500 mt-2"
+                    style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
+                    💡 أفضل استراتيجية: ابدأ بصندوق الطوارئ ← ثم ادخار بنكي ← ثم استثمار تدريجي
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* SAUDI ADVANTAGES — ميزاتك كساكن في السعودية */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#16a34a'}}>🇸🇦</span>
+                ميزاتك كساكن في السعودية
+              </h2>
+              {(report as any).saudi_advantages && (
+                <div className="space-y-3">
+                  {((report as any).saudi_advantages as any[]).map((adv: any, i: number) => (
+                    <div key={i} className="flex gap-3 p-4 rounded-2xl"
+                      style={{background:'rgba(22,163,74,0.05)', border:'1px solid rgba(22,163,74,0.15)'}}>
+                      <span className="text-2xl flex-shrink-0">{adv.icon}</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold" style={{color:'#0d1b3e'}}>{adv.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{adv.desc}</p>
+                        <div className="mt-2 inline-block px-2 py-0.5 rounded-full text-xs font-bold"
+                          style={{background:'rgba(22,163,74,0.1)', color:'#16a34a'}}>
+                          {adv.value}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* COMMON MISTAKES — الأخطاء المالية الشائعة */}
+            <div className={sectionStyle}>
+              <h2 className="text-base font-extrabold mb-1 flex items-center gap-2" style={titleStyle}>
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
+                  style={{background:'#dc2626'}}>🚨</span>
+                الأخطاء التي تؤخر وصولك للمليون
+              </h2>
+              <p className="text-xs text-gray-400 mb-4 mr-10">مبنية على دراسات السلوك المالي في السعودية</p>
+              {(report as any).common_mistakes && (
+                <div className="space-y-3">
+                  {((report as any).common_mistakes as any[]).map((m: any, i: number) => (
+                    <div key={i} className="rounded-2xl overflow-hidden border border-gray-100">
+                      <div className="p-4" style={{background:'rgba(220,38,38,0.04)'}}>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm font-bold" style={{color:'#dc2626'}}>❌ {m.mistake}</p>
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                            style={{background:'rgba(220,38,38,0.1)', color:'#dc2626'}}>
+                            {m.pct}% يقعون فيه
+                          </span>
+                        </div>
+                        <div className="p-3 rounded-xl" style={{background:'rgba(26,158,107,0.06)', border:'1px solid rgba(26,158,107,0.2)'}}>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            <span className="font-bold" style={{color:'#1a9e6b'}}>✅ الحل: </span>{m.fix}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* CLOSING */}
