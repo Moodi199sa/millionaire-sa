@@ -10,7 +10,7 @@ export default function Footer() {
         <span className="hidden sm:inline">·</span>
         <a href="/blog" className="hover:text-gold transition-colors">نصائح مالية</a>
         <span className="hidden sm:inline">·</span>
-        <a href="mailto:support@saudimillion.com" className="hover:text-gold transition-colors">تواصل معنا</a>
+        <a href="mailto:support@amerniksa.com" className="hover:text-gold transition-colors">تواصل معنا</a>
       </div>
       <p className="text-gray-600 text-xs">
         © {new Date().getFullYear()} متى تصير مليونير — جميع الحقوق محفوظة

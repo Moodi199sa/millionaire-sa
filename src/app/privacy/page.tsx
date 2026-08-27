@@ -60,7 +60,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-bold text-white mb-3">6. التواصل</h2>
-            <p>لأي استفسار متعلق بالخصوصية: <a href="mailto:support@saudimillion.com" className="text-gold hover:underline">support@saudimillion.com</a></p>
+            <p>لأي استفسار متعلق بالخصوصية: <a href="mailto:support@amerniksa.com" className="text-gold hover:underline">support@amerniksa.com</a></p>
           </section>
 
         </div>
