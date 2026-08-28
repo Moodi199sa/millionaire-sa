@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
     })
 
     const data = await res.json()
-    if (!res.ok) return NextResponse.json({ error: data }, { status: 400 })
+    console.log('Paymob response:', JSON.stringify(data))
+    if (!res.ok) return NextResponse.json({ error: data, status_code: res.status }, { status: 400 })
+    if (!data.client_secret) return NextResponse.json({ error: 'no client_secret', data }, { status: 400 })
     return NextResponse.json({ client_secret: data.client_secret, id: data.id })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

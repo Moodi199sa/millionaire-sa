@@ -21,10 +21,12 @@ export default function PaymobButton({ amount, product, label, className }: Prop
         body: JSON.stringify({ amount, product }),
       })
       const data = await res.json()
+      console.log('Pay response:', data)
       if (data.client_secret) {
         window.location.href = `https://ksa.paymob.com/unifiedcheckout/?publicKey=${publicKey}&clientSecret=${data.client_secret}`
       } else {
-        alert('خطأ في الدفع — حاول مرة أخرى')
+        const errMsg = JSON.stringify(data.error || data)
+        alert('خطأ في الدفع: ' + errMsg)
       }
     } catch {
       alert('خطأ — حاول مرة أخرى')
