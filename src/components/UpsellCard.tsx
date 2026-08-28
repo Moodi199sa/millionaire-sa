@@ -57,7 +57,7 @@ export default function UpsellCard({ scenarios, userData }: Props) {
       {/* السعر */}
       <div className="bg-gold/10 border border-gold/30 rounded-xl p-4 mb-4">
         <div className="inline-block bg-green-500/20 border border-green-500/40 text-green-400 text-xs font-bold px-3 py-1 rounded-full mb-2">
-          🎁 مجاني الآن
+          📊 تقرير شخصي مدفوع
         </div>
         <div className="flex items-center gap-2">
           <span className="text-lg text-gray-500 line-through">9 ريال</span>
@@ -83,7 +83,7 @@ export default function UpsellCard({ scenarios, userData }: Props) {
         onClick={handleBuy}
         className="w-full py-4 bg-gold hover:bg-yellow-600 text-white font-bold text-lg rounded-xl transition-all active:scale-95 shadow-lg shadow-gold/20"
       >
-        احصل على تقريرك مجاناً 🚀
+        احصل على تقريرك — 9 ريال 🚀
       </button>
 
       <p className="mt-3 text-xs text-gray-500">
