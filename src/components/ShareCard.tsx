@@ -19,10 +19,10 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
 
   // عبارات تحفيزية عشوائية
   const motivations = [
-    `🔥 ${totalMonths} شهر فقط تفصلك عن المليون الأول!`,
-    `⚡ ${days.toLocaleString('ar-SA')} يوم وتصير مليونير!`,
-    `🚀 ${weeks.toLocaleString('ar-SA')} أسبوع وتغير حياتك!`,
-    `💎 المليون الأول في ${years} — هل تقبل التحدي؟`,
+    `🔥 على بُعد ${totalMonths} شهراً من المليون الأول`,
+    `⚡ رحلتك للمليون تستغرق ${years}`,
+    `🚀 كل شهر يقربك أكثر من المليون`,
+    `💎 المليون الأول ليس بعيداً — ${years} وتصله`,
   ]
   const motivation = motivations[totalMonths % motivations.length]
 
@@ -45,6 +45,8 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
     try {
       const { default: html2canvas } = await import('html2canvas')
       if (!cardRef.current) return
+      // Load font first
+      await document.fonts.ready
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#0A0F1C',
         scale: 3,
@@ -96,7 +98,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
           marginBottom: '16px',
           letterSpacing: '1px',
         }}>
-          🔥 تحدي المليونير
+          تحدي المليونير 🔥
         </div>
 
         {/* العبارة التحفيزية */}
