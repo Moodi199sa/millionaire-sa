@@ -145,6 +145,10 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.ANTHROPIC_API_KEY
     if (apiKey) {
       try {
+        // timeout: تحت الضغط، لو تأخر Anthropic ننتقل فوراً للنسخة الجاهزة
+        // بدل ما يعلّق المستخدم منتظراً. المستخدم يستلم تقريراً دائماً وبسرعة.
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 15000)
         const res = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
@@ -157,7 +161,9 @@ export async function POST(req: NextRequest) {
             max_tokens: 3000,
             messages: [{ role: 'user', content: prompt }],
           }),
+          signal: controller.signal,
         })
+        clearTimeout(timer)
         const data = await res.json()
         if (!data.error && data.content?.[0]?.text) {
           const text = data.content[0].text

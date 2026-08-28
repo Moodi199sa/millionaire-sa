@@ -391,11 +391,15 @@ export async function GET(req: NextRequest) {
 
 اجعل كل فكرة مختلفة تماماً عن الأخرى، وغطِّ تنوعاً في الفئات ومستويات رأس المال.`
 
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 20000)
         const res = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
           body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 8000, messages: [{ role: 'user', content: prompt }] }),
+          signal: controller.signal,
         })
+        clearTimeout(timer)
         const data = await res.json()
         if (!data.error && data.content?.[0]?.text) {
           const text = data.content[0].text.replace(/```json|```/g, '').trim()

@@ -73,7 +73,7 @@ export default function LandingPage() {
           🎯 أداة مجانية للتخطيط المالي
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-          متى تصبح<br /><span className="text-gold">مليونير</span>؟
+          متى تصير<br /><span className="text-gold">مليونير</span>؟
         </h1>
         <p className="text-gray-400 text-lg md:text-xl mb-4 max-w-xl mx-auto leading-relaxed">
           أجب على 4 أسئلة بسيطة واكتشف متى ستصل لأول مليون ريال — ومشاريع وأفكار تساعدك تصل أسرع

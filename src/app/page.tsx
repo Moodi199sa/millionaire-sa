@@ -175,7 +175,7 @@ export default function Home() {
         {/* Hero */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3 leading-tight">
-            متى تصبح <span className="text-gold">مليونير</span>؟
+            متى تصير <span className="text-gold">مليونير</span>؟
           </h1>
           <p className="text-gray-400 text-base">
             أجب على {4} أسئلة بسيطة واعرف متى ستصل لأول مليون ريال
