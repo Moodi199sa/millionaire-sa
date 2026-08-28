@@ -21,6 +21,7 @@ interface Result {
   totalMonths: number
   netWorth: number
   monthlySaving: number
+  effectiveRate?: number
   chartLabels: string[]
   chartData: number[]
   scenarios: { label: string; months: number }[]
@@ -78,7 +79,10 @@ export default function Home() {
     const e = Number(expenses) || 0
     const sv = hasSavings ? (Number(savings) || 0) : 0
     const inv = hasInvestments ? (Number(investments) || 0) : 0
-    const r = hasInvestments ? rate : 0
+    // حتى لو ما عنده استثمار حالي، ادخاره الشهري واقعياً ينمو بعائد محافظ
+    // (حساب ادخار/صكوك ~4%). حساب المليون بعائد صفر متشائم وغير واقعي
+    // ويناقض رسالة "الاستثمار يسرّعك". نفترض 4% كحد أدنى واقعي.
+    const r = hasInvestments ? rate : 4
     const goal = 1000000
     const netWorth = sv + inv
     const monthlySaving = s - e
@@ -102,7 +106,7 @@ export default function Home() {
       return
     }
 
-    const newResult = { totalMonths, netWorth, monthlySaving, chartLabels: labels, chartData: data, scenarios }
+    const newResult = { totalMonths, netWorth, monthlySaving, effectiveRate: r, chartLabels: labels, chartData: data, scenarios }
     setResult(newResult)
     setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
   }
@@ -475,7 +479,7 @@ export default function Home() {
               goal="مليون ريال"
             />
 
-            <UpsellCard scenarios={result.scenarios} userData={{ salary: Number(salary), expenses: Number(expenses), savings: Number(savings), investments: Number(investments), rate, monthlySaving: result.monthlySaving, netWorth: result.netWorth, totalMonths: result.totalMonths }} />
+            <UpsellCard scenarios={result.scenarios} userData={{ salary: Number(salary), expenses: Number(expenses), savings: Number(savings), investments: Number(investments), rate: result.effectiveRate ?? rate, monthlySaving: result.monthlySaving, netWorth: result.netWorth, totalMonths: result.totalMonths }} />
 
             <ReferralCard />
 

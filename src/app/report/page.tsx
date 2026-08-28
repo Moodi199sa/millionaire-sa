@@ -465,6 +465,24 @@ export default function ReportPage() {
               </div>
             </div>
 
+            {/* FIRST STEP — خطوتك الأولى (CTA واحد واضح) */}
+            <div className="rounded-3xl p-5" style={{background:'rgba(184,134,11,0.08)', border:'2px solid rgba(184,134,11,0.3)'}}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm" style={{background:'#B8860B'}}>🎯</span>
+                <h2 className="text-base font-extrabold" style={{color:'#B8860B'}}>ابدأ من هنا — خطوتك هذا الأسبوع</h2>
+              </div>
+              <p className="text-base font-bold leading-relaxed" style={{color:'#0d1b3e'}}>
+                {savingRate < 10
+                  ? 'سجّل كل ريال تصرفه لمدة 7 أيام. لا تغيّر شيئاً بعد — فقط راقب. ستكتشف أين تتسرب فلوسك، وهذي أول خطوة لأي خطة ادخار.'
+                  : data.netWorth < data.expenses * 3
+                  ? `افتح حساب ادخار منفصل وحوّل ${formatNumber(Math.round(data.monthlySaving * 0.5))} ريال إليه تلقائياً أول ما ينزل راتبك. ابنِ صندوق طوارئ يغطي 3 أشهر قبل أي استثمار.`
+                  : savingRate < 20
+                  ? `ارفع ادخارك 500 ريال هذا الشهر من بند واحد لن تفتقده — وحوّلها تلقائياً لحساب منفصل. هذا وحده يقرّب مليونك ${monthsToLabel(data.totalMonths - calcMonthsToGoal(data.netWorth, data.monthlySaving + 500, data.rate, 1000000))}.`
+                  : 'فائضك جيد — المرحلة القادمة استثماره. افتح محفظة استثمارية هذا الأسبوع وابدأ بمبلغ صغير في صندوق مؤشر تداول. راجع «خارطة الاستثمار» أدناه.'}
+              </p>
+              <p className="text-xs text-gray-500 mt-3">↓ باقي التقرير يشرح لك التفاصيل والخيارات — لكن ابدأ بهذي الخطوة.</p>
+            </div>
+
             {/* زبدة التقرير */}
             <div className={sectionStyle}>
               <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
@@ -758,9 +776,25 @@ export default function ReportPage() {
                   </div>
                 ))}
               </div>
-            </div>
 
-            {/* MONTHLY PLAN */}
+              <a href="/ideas" className="mt-4 block p-4 rounded-2xl text-right transition-all hover:opacity-90"
+                style={{background:'linear-gradient(135deg, #B8860B, #8a6508)', border:'1px solid rgba(184,134,11,0.3)'}}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm font-extrabold text-white mb-1">🚀 عجبتك فكرة؟ خذها للنهاية</p>
+                    <p className="text-xs leading-relaxed" style={{color:'rgba(255,255,255,0.85)'}}>
+                      دليل «٨ أفكار دخل مربحة» يفصّل كل فكرة: رأس المال، هامش الربح الحقيقي، مستوى المنافسة، وخطة تنفيذ يوم بيوم — بأرقام السوق السعودي ٢٠٢٦.
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 text-center">
+                    <div className="bg-white rounded-xl px-3 py-2">
+                      <p className="text-lg font-extrabold" style={{color:'#B8860B'}}>٤٩</p>
+                      <p className="text-[10px]" style={{color:'#8a6508'}}>ريال</p>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
             <div className={sectionStyle}>
               <h2 className="text-base font-extrabold mb-4 flex items-center gap-2" style={titleStyle}>
                 <span className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm"
@@ -836,7 +870,12 @@ export default function ReportPage() {
                   style={{background:'#ef4444'}}>📊</span>
                 تحليل مصاريفك — وين تروح فلوسك؟
               </h2>
-              <p className="text-xs text-gray-400 mb-4">تقدير بناءً على متوسطات الإنفاق في السعودية</p>
+              <div className="mb-4 p-3 rounded-2xl flex items-start gap-2" style={{background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.25)'}}>
+                <span className="text-sm flex-shrink-0">ℹ️</span>
+                <p className="text-xs leading-relaxed" style={{color:'#92600a'}}>
+                  هذا <b>توزيع نموذجي</b> لأسرة سعودية بمصاريف مشابهة لمصاريفك — وليس تحليلاً لفواتيرك الفعلية. استخدمه كمرجع تقارن به إنفاقك الحقيقي.
+                </p>
+              </div>
               <div className="space-y-3">
                 {((report as any).expense_analysis || []).map((exp: any, i: number) => (
                   <div key={i} className="rounded-2xl border border-gray-100 overflow-hidden">
@@ -845,7 +884,7 @@ export default function ReportPage() {
                         <span className="text-lg">{['🏠','🍽️','🚗','🎬','📦'][i]}</span>
                         <div>
                           <p className="text-sm font-bold" style={{color:'#0d1b3e'}}>{exp.category}</p>
-                          <p className="text-xs text-gray-400">{exp.pct}% من مصاريفك</p>
+                          <p className="text-xs text-gray-400">{exp.pct}% نموذجياً</p>
                         </div>
                       </div>
                       <span className="font-extrabold text-sm" style={{color:'#ef4444'}}>~{exp.amount.toLocaleString('ar-SA')} ر</span>
