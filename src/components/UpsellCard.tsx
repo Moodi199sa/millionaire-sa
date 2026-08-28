@@ -91,12 +91,12 @@ export default function UpsellCard({ scenarios, userData }: Props) {
       </p>
 
       <div className="mt-5 pt-5 border-t border-white/10 text-center">
-        <p className="text-xs text-gray-500 mb-2">تبي متابعة شهرية لثروتك؟</p>
+        <p className="text-xs text-gray-500 mb-2">تبي أفكار عملية تزيد دخلك؟</p>
         <button
-          onClick={() => router.push('/subscribe')}
+          onClick={() => router.push('/ideas')}
           className="text-gold text-sm font-bold hover:underline"
         >
-          🤖 اشترك في مساعد الثروة الشخصي — 29 ريال/شهر ←
+          💡 دليل 8 أفكار دخل مربحة — 49 ريال ←
         </button>
       </div>
     </div>
