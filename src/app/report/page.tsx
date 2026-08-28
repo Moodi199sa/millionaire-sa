@@ -355,20 +355,22 @@ export default function ReportPage() {
 
   const downloadPDF = async () => {
     try {
-      const { default: html2canvas } = await import('html2canvas')
+      const { toCanvas } = await import('html-to-image')
       const { default: jsPDF } = await import('jspdf')
-      
+
       const element = document.getElementById('report-content')
       if (!element) return
-      
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
+
+      await document.fonts.ready
+      await new Promise((r) => setTimeout(r, 150))
+
+      // html-to-image يحافظ على تشكيل الحروف العربية بعكس html2canvas
+      const canvas = await toCanvas(element, {
+        pixelRatio: 2,
         backgroundColor: '#f8fbff',
-        logging: false,
-        windowWidth: 600,
+        cacheBust: true,
       })
-      
+
       const imgData = canvas.toDataURL('image/jpeg', 0.95)
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pdfWidth = pdf.internal.pageSize.getWidth()

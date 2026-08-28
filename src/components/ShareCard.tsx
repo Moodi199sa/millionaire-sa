@@ -43,19 +43,21 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   const downloadCard = async () => {
     setDownloading(true)
     try {
-      const { default: html2canvas } = await import('html2canvas')
+      // html-to-image يتعامل مع تشكيل الحروف العربية والاتجاه RTL بشكل صحيح،
+      // بعكس html2canvas الذي كان يقطّع الحروف ويعكسها.
+      const { toPng } = await import('html-to-image')
       if (!cardRef.current) return
-      // Load font first
       await document.fonts.ready
-      const canvas = await html2canvas(cardRef.current, {
+      // انتظار إضافي بسيط لضمان تحميل خط Tajawal كاملاً قبل الالتقاط
+      await new Promise((r) => setTimeout(r, 150))
+      const dataUrl = await toPng(cardRef.current, {
         backgroundColor: '#0A0F1C',
-        scale: 3,
-        useCORS: true,
-        logging: false,
+        pixelRatio: 3,
+        cacheBust: true,
       })
       const link = document.createElement('a')
       link.download = 'تحدي-المليون.png'
-      link.href = canvas.toDataURL('image/png')
+      link.href = dataUrl
       link.click()
     } catch (e) {
       console.error(e)
@@ -96,7 +98,6 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
           padding: '5px 16px',
           borderRadius: '20px',
           marginBottom: '16px',
-          letterSpacing: '1px',
         }}>
           تحدي المليونير 🔥
         </div>
