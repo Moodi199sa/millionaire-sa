@@ -777,7 +777,7 @@ export default function ReportPage() {
                 ))}
               </div>
 
-              <a href="/ideas" className="mt-4 block p-4 rounded-2xl text-right transition-all hover:opacity-90"
+              <a href="/ideas-checkout" className="mt-4 block p-4 rounded-2xl text-right transition-all hover:opacity-90"
                 style={{background:'linear-gradient(135deg, #B8860B, #8a6508)', border:'1px solid rgba(184,134,11,0.3)'}}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1">

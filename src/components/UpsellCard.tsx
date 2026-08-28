@@ -93,7 +93,7 @@ export default function UpsellCard({ scenarios, userData }: Props) {
       <div className="mt-5 pt-5 border-t border-white/10 text-center">
         <p className="text-xs text-gray-500 mb-2">تبي أفكار عملية تزيد دخلك؟</p>
         <button
-          onClick={() => router.push('/ideas')}
+          onClick={() => router.push('/ideas-checkout')}
           className="text-gold text-sm font-bold hover:underline"
         >
           💡 دليل 8 أفكار دخل مربحة — 49 ريال ←
