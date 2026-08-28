@@ -8,7 +8,7 @@ import {
   formatNumber,
   buildChartData,
 } from '@/lib/calculator'
-import GrowthChart from '@/components/GrowthChart'
+import ResultDashboard from '@/components/ResultDashboard'
 import ShareCard from '@/components/ShareCard'
 import UpsellCard from '@/components/UpsellCard'
 import Footer from '@/components/Footer'
@@ -458,10 +458,15 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-              <p className="text-sm text-gray-400 mb-4">نمو ثروتك بمرور الوقت</p>
-              <GrowthChart labels={result.chartLabels} data={result.chartData} goal={1000000} />
-            </div>
+            {result.totalMonths < 99999 && (
+              <ResultDashboard
+                netWorth={result.netWorth}
+                monthlySaving={result.monthlySaving}
+                totalMonths={result.totalMonths}
+                targetDate={targetDate(result.totalMonths)}
+                goal={1000000}
+              />
+            )}
 
             <ShareCard
               years={monthsToLabel(result.totalMonths)}

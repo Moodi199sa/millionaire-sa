@@ -141,12 +141,85 @@ export default function ReportPage() {
         body: JSON.stringify({ salary:d.salary, expenses:d.expenses, monthlySaving:d.monthlySaving, totalMonths:d.totalMonths, netWorth:d.netWorth, rate:d.rate }),
       })
       const json = await res.json()
-      if (json.result) { try { setReport(JSON.parse(json.result)); return } catch {} }
+      if (json.result) {
+        try {
+          const ai = JSON.parse(json.result)
+          // ندمج الحقول الحسابية فوق رد الـAI — الـAI يعطي النصوص الإبداعية،
+          // والباقي (المحطات، الشخصية، الطوارئ، المصاريف...) يُحسب محلياً دائماً
+          setReport({ ...ai, ...computeExtras(d) })
+          return
+        } catch {}
+      }
       throw new Error('fallback')
     } catch {
       setReport(buildLocalReport(d))
     } finally {
       setLoading(false)
+    }
+  }
+
+  // كل الحقول الحسابية (لا تحتاج AI) — تُدمج فوق رد الـAPI دائماً حتى لا يظهر أي قسم فارغ
+  const computeExtras = (d: UserData) => {
+    const savingRate = d.salary > 0 ? Math.round((d.monthlySaving / d.salary) * 100) : 0
+    return {
+      savings_behavior: savingRate >= 30 ? 'ممتاز' : savingRate >= 20 ? 'جيد' : savingRate >= 10 ? 'يحتاج تحسين' : 'ضعيف',
+      daily_cost: Math.round((1000000 - d.netWorth) / d.totalMonths / 30),
+      coffee_equivalent: Math.round(d.monthlySaving / 18),
+      yearly_milestones: [
+        { year: 1, amount: d.netWorth + d.monthlySaving * 12 },
+        { year: 3, amount: d.netWorth + d.monthlySaving * 36 },
+        { year: 5, amount: d.netWorth + d.monthlySaving * 60 },
+        { year: 10, amount: Math.min(1000000, d.netWorth + d.monthlySaving * 120) },
+      ],
+      expense_analysis: [
+        { category: 'السكن', pct: 30, amount: Math.round(d.expenses * 0.3), tip: 'لو وفّرت 10% من السكن = ' + Math.round(d.expenses*0.03).toLocaleString('ar-SA') + ' ريال/شهر' },
+        { category: 'الطعام', pct: 25, amount: Math.round(d.expenses * 0.25), tip: 'الطبخ في البيت يوفر 40% من ميزانية الأكل' },
+        { category: 'المواصلات', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'المشاركة في التوصيل توفر 500-1000 ريال/شهر' },
+        { category: 'الترفيه والاشتراكات', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'راجع اشتراكاتك — معظم الناس عندهم 2-3 اشتراكات ما يستخدمونها' },
+        { category: 'أخرى', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'المصاريف الصغيرة المتكررة هي القاتل الصامت للادخار' },
+      ],
+      money_personality: savingRate >= 25 ? { type: 'المدخر الذكي 🧠', desc: 'تعرف قيمة المال وتتحكم في مصاريفك — استمر وركز على الاستثمار', advice: 'وقتك الحين تتعلم عن الاستثمار — الادخار وحده بطيء' }
+        : savingRate >= 15 ? { type: 'المتوازن ⚖️', desc: 'تستمتع بحياتك وتدخر — بس ممكن تسرّع أكثر', advice: 'حاول ترفع ادخارك 5% كل 3 أشهر — ما بتحس بالفرق' }
+        : savingRate >= 5 ? { type: 'المستمتع 🎉', desc: 'تحب تعيش اللحظة — لكن المستقبل يحتاج اهتمام أكثر', advice: 'ابدأ بادخار تلقائي — حوّل المبلغ أول ما ينزل الراتب' }
+        : { type: 'المغامر 🎲', desc: 'تصرف أكثر مما تدخر — تحتاج خطة واضحة', advice: 'ابدأ بتسجيل مصاريفك لمدة أسبوع — ستنصدم بالنتيجة' },
+      compound_effect: {
+        year1: Math.round(d.monthlySaving * 12),
+        year5: Math.round(d.monthlySaving * 60 * (d.rate > 0 ? Math.pow(1 + d.rate/100, 5) / 5 : 1)),
+        year10: Math.round(d.monthlySaving * 120 * (d.rate > 0 ? Math.pow(1 + d.rate/100, 10) / 10 : 1)),
+      },
+      emergency_fund: { current: d.netWorth, needed: d.expenses * 6, status: d.netWorth >= d.expenses * 6 ? 'مكتمل ✅' : d.netWorth >= d.expenses * 3 ? 'جيد — أكمل لـ6 أشهر' : 'تحتاج بناء صندوق طوارئ أولاً' },
+      risk_analysis: [
+        { risk: 'فقدان الوظيفة', impact: 'عالي', mitigation: `عندك ${Math.round(d.netWorth / d.expenses)} شهر احتياطي — ${d.netWorth >= d.expenses * 6 ? 'وضعك آمن' : 'تحتاج توصل لـ6 أشهر'}` },
+        { risk: 'مصروف طارئ كبير', impact: 'متوسط', mitigation: 'صندوق الطوارئ يحميك — لا تلمسه إلا للضرورة' },
+        { risk: 'التضخم', impact: 'متوسط', mitigation: d.rate > 0 ? `عائد ${d.rate}% يحميك جزئياً` : 'بدون استثمار فلوسك تخسر قيمتها مع الوقت' },
+      ],
+      investment_options: [
+        { name: 'حساب ادخار بنكي', return_pct: 4, risk: 'صفر', min: '0 ريال', desc: 'حسابات مثل واعد من البنك الأهلي أو مشابهاتها', pros: 'مضمون 100%، سيولة فورية', cons: 'عائد منخفض لا يتفوق على التضخم على المدى البعيد', best_for: 'صندوق الطوارئ والادخار قصير المدى', action: 'افتح حساب ادخار هذا الأسبوع' },
+        { name: 'صكوك وسندات', return_pct: 5.5, risk: 'منخفض', min: '1,000 ريال', desc: 'أدوات دين إسلامية تصدرها الحكومة أو الشركات الكبرى', pros: 'عائد ثابت، متوافق مع الشريعة، أمان عالٍ', cons: 'عائد محدود، يحتاج ربط المبلغ لفترة', best_for: 'من يريد عائد ثابت بمخاطرة منخفضة', action: 'تصفح منصة تداول الصكوك عبر بنكك' },
+        { name: 'مؤشر السوق السعودي (تداول)', return_pct: 7, risk: 'متوسط', min: '500 ريال', desc: 'تتبع أداء السوق السعودي بالكامل عبر صناديق المؤشر. تاريخياً حقق السوق السعودي 4.9%-7.2% سنوياً', pros: 'تنويع تلقائي، سيولة عالية، رسوم منخفضة (0.23%)', cons: 'تقلبات قصيرة المدى، يتأثر بأسعار النفط', best_for: 'الاستثمار طويل المدى 5-10 سنوات', action: 'افتح محفظة عبر تطبيق بنكك واشترِ ETF تداول 30' },
+        { name: 'أسهم قطاع الطاقة والبنوك', return_pct: 8, risk: 'متوسط-عالٍ', min: '1,000 ريال', desc: 'قطاعات الطاقة (أرامكو) والبنوك من أكثر القطاعات استقراراً في السوق السعودي. توزيعات أرامكو 7.3%', pros: 'توزيعات أرباح منتظمة، قطاع محمي حكومياً', cons: 'يحتاج دراسة ومتابعة، تركيز في قطاع واحد', best_for: 'من يفهم الأسواق ويريد توزيعات منتظمة', action: 'ابدأ بـ1000 ريال في أسهم موزعة للأرباح' },
+        { name: 'عقار للإيجار', return_pct: 6.5, risk: 'منخفض-متوسط', min: '200,000 ريال', desc: 'أسعار الرياض تراجعت 17% في 2025-2026 مما يخلق فرصة للشراء. الإيجار مثبّت 5 سنوات في الرياض', pros: 'دخل إيجاري ثابت، أصل حقيقي، مضخة للتضخم', cons: 'رأس مال كبير، سيولة منخفضة، صيانة وإدارة', best_for: 'من يملك رأس مال كافٍ ويريد دخلاً ثابتاً', action: 'ابحث في حراج ومواقع العقار عن فرص المرحلة الحالية' },
+        { name: 'صناديق ريت (عقار بدون شراء)', return_pct: 7, risk: 'متوسط', min: '1,000 ريال', desc: 'تستثمر في العقارات التجارية والسكنية دون شراء مباشر. متوفرة على تداول كالأسهم', pros: 'توزيعات فصلية، سيولة كالأسهم، تنويع جغرافي', cons: 'تأثر بأسعار الفائدة، يحتاج اختيار صندوق مناسب', best_for: 'من يريد الاستفادة من العقار بمبلغ صغير', action: 'ابحث عن REITs المدرجة على تداول وراجع توزيعاتها' },
+      ],
+      saudi_advantages: [
+        { icon: '🚫', title: 'لا ضريبة دخل شخصية', desc: 'ما تدفع ضريبة على راتبك ولا أرباحك — ميزة ضخمة مقارنة بمعظم دول العالم', value: `${formatNumber(Math.round(d.salary * 0.2 * 12))} ريال/سنة توفرها` },
+        { icon: '📈', title: 'تضخم منخفض 1.6%', desc: 'مقارنة بالعالم، التضخم السعودي منخفض — فلوسك تحتفظ بقيمتها أكثر', value: 'عائد 4%+ يتفوق على التضخم' },
+        { icon: '🏛️', title: 'صندوق التنمية الوطنية', desc: 'قروض مدعومة للمساكن والمشاريع بأسعار فائدة أقل من السوق بكثير', value: 'وفر فوائد بآلاف الريالات' },
+        { icon: '🌍', title: 'اقتصاد نمو 4.6% (2025)', desc: 'الاقتصاد السعودي ينمو بأحد أعلى المعدلات إقليمياً — فرص أكثر للاستثمار', value: 'بيئة مواتية لتنمية الثروة' },
+      ],
+      common_mistakes: [
+        { mistake: 'رفع مستوى المعيشة مع كل زيادة', pct: 73, fix: '"معدل تضخم نمط الحياة" — كل 1000 ريال زيادة، 700 منها تروح على مصاريف أعلى. الحل: الزيادة الأولى تروح للادخار كاملاً' },
+        { mistake: 'فلوس في الحساب الجاري (0% عائد)', pct: 68, fix: `عندك ${formatNumber(d.netWorth)} ريال في البنك؟ حوّل ${formatNumber(Math.round(d.netWorth * 0.7))} منها لحساب ادخار = ${formatNumber(Math.round(d.netWorth * 0.7 * 0.04 / 12))} ريال إضافي كل شهر` },
+        { mistake: 'مصدر دخل واحد = خطر واحد', pct: 61, fix: 'الشخص الذي دخله من مصدرين أو أكثر يصل للمليون بشكل أسرع بـ40% في المتوسط' },
+        { mistake: 'لا خطة مالية مكتوبة', pct: 85, fix: 'الأشخاص الذين يكتبون أهدافهم المالية أكثر احتمالاً لتحقيقها بـ42%. هذا التقرير خطوتك الأولى' },
+        { mistake: 'تأجيل الاستثمار لـ"لما الوضع يستقر"', pct: 79, fix: `لو بدأت تستثمر ${formatNumber(d.monthlySaving)} ريال/شهر قبل 5 سنوات بعائد 7% — كنت الآن عندك ${formatNumber(Math.round(d.monthlySaving * 60 * Math.pow(1.07, 5) / 5))} ريال إضافي` },
+      ],
+      age_comparison: [
+        { age: '20-25', typical: '500-2,000 ريال/شهر', yours: d.monthlySaving >= 2000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
+        { age: '25-30', typical: '2,000-4,000 ريال/شهر', yours: d.monthlySaving >= 4000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
+        { age: '30-40', typical: '3,000-6,000 ريال/شهر', yours: d.monthlySaving >= 6000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
+      ],
+      closing_message: `${monthsToLabel(d.totalMonths)} ستمر سواء بدأت أو لم تبدأ. الفرق الوحيد: أين ستكون في نهايتها.`,
     }
   }
 
@@ -255,65 +328,7 @@ export default function ReportPage() {
         'أخطر جملة: "لما راتبي يزيد ادخر" — الوقت المثالي هو الآن',
         'كل ريال توفره اليوم يتضاعف مع الوقت',
       ],
-      // أقسام جديدة
-      savings_behavior: savingRate >= 30 ? 'ممتاز' : savingRate >= 20 ? 'جيد' : savingRate >= 10 ? 'يحتاج تحسين' : 'ضعيف',
-      daily_cost: Math.round((1000000 - d.netWorth) / d.totalMonths / 30),
-      coffee_equivalent: Math.round(d.monthlySaving / 18),
-      yearly_milestones: [
-        { year: 1, amount: d.netWorth + d.monthlySaving * 12 },
-        { year: 3, amount: d.netWorth + d.monthlySaving * 36 },
-        { year: 5, amount: d.netWorth + d.monthlySaving * 60 },
-        { year: 10, amount: Math.min(1000000, d.netWorth + d.monthlySaving * 120) },
-      ],
-      expense_analysis: [
-        { category: 'السكن', pct: 30, amount: Math.round(d.expenses * 0.3), tip: 'لو وفّرت 10% من السكن = ' + Math.round(d.expenses*0.03).toLocaleString('ar-SA') + ' ريال/شهر' },
-        { category: 'الطعام', pct: 25, amount: Math.round(d.expenses * 0.25), tip: 'الطبخ في البيت يوفر 40% من ميزانية الأكل' },
-        { category: 'المواصلات', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'المشاركة في التوصيل توفر 500-1000 ريال/شهر' },
-        { category: 'الترفيه والاشتراكات', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'راجع اشتراكاتك — معظم الناس عندهم 2-3 اشتراكات ما يستخدمونها' },
-        { category: 'أخرى', pct: 15, amount: Math.round(d.expenses * 0.15), tip: 'المصاريف الصغيرة المتكررة هي القاتل الصامت للادخار' },
-      ],
-      money_personality: savingRate >= 25 ? { type: 'المدخر الذكي 🧠', desc: 'تعرف قيمة المال وتتحكم في مصاريفك — استمر وركز على الاستثمار', advice: 'وقتك الحين تتعلم عن الاستثمار — الادخار وحده بطيء' }
-        : savingRate >= 15 ? { type: 'المتوازن ⚖️', desc: 'تستمتع بحياتك وتدخر — بس ممكن تسرّع أكثر', advice: 'حاول ترفع ادخارك 5% كل 3 أشهر — ما بتحس بالفرق' }
-        : savingRate >= 5 ? { type: 'المستمتع 🎉', desc: 'تحب تعيش اللحظة — لكن المستقبل يحتاج اهتمام أكثر', advice: 'ابدأ بادخار تلقائي — حوّل المبلغ أول ما ينزل الراتب' }
-        : { type: 'المغامر 🎲', desc: 'تصرف أكثر مما تدخر — تحتاج خطة واضحة', advice: 'ابدأ بتسجيل مصاريفك لمدة أسبوع — ستنصدم بالنتيجة' },
-      compound_effect: {
-        year1: Math.round(d.monthlySaving * 12),
-        year5: Math.round(d.monthlySaving * 60 * (d.rate > 0 ? Math.pow(1 + d.rate/100, 5) / 5 : 1)),
-        year10: Math.round(d.monthlySaving * 120 * (d.rate > 0 ? Math.pow(1 + d.rate/100, 10) / 10 : 1)),
-      },
-      emergency_fund: { current: d.netWorth, needed: d.expenses * 6, status: d.netWorth >= d.expenses * 6 ? 'مكتمل ✅' : d.netWorth >= d.expenses * 3 ? 'جيد — أكمل لـ6 أشهر' : 'تحتاج بناء صندوق طوارئ أولاً' },
-      risk_analysis: [
-        { risk: 'فقدان الوظيفة', impact: 'عالي', mitigation: `عندك ${Math.round(d.netWorth / d.expenses)} شهر احتياطي — ${d.netWorth >= d.expenses * 6 ? 'وضعك آمن' : 'تحتاج توصل لـ6 أشهر'}` },
-        { risk: 'مصروف طارئ كبير', impact: 'متوسط', mitigation: 'صندوق الطوارئ يحميك — لا تلمسه إلا للضرورة' },
-        { risk: 'التضخم', impact: 'متوسط', mitigation: d.rate > 0 ? `عائد ${d.rate}% يحميك جزئياً` : 'بدون استثمار فلوسك تخسر قيمتها مع الوقت' },
-      ],
-      investment_options: [
-        { name: 'حساب ادخار بنكي', return_pct: 4, risk: 'صفر', min: '0 ريال', desc: 'حسابات مثل واعد من البنك الأهلي أو مشابهاتها', pros: 'مضمون 100%، سيولة فورية', cons: 'عائد منخفض لا يتفوق على التضخم على المدى البعيد', best_for: 'صندوق الطوارئ والادخار قصير المدى', action: 'افتح حساب ادخار هذا الأسبوع' },
-        { name: 'صكوك وسندات', return_pct: 5.5, risk: 'منخفض', min: '1,000 ريال', desc: 'أدوات دين إسلامية تصدرها الحكومة أو الشركات الكبرى', pros: 'عائد ثابت، متوافق مع الشريعة، أمان عالٍ', cons: 'عائد محدود، يحتاج ربط المبلغ لفترة', best_for: 'من يريد عائد ثابت بمخاطرة منخفضة', action: 'تصفح منصة تداول الصكوك عبر بنكك' },
-        { name: 'مؤشر السوق السعودي (تداول)', return_pct: 7, risk: 'متوسط', min: '500 ريال', desc: 'تتبع أداء السوق السعودي بالكامل عبر صناديق المؤشر. تاريخياً حقق السوق السعودي 4.9%-7.2% سنوياً', pros: 'تنويع تلقائي، سيولة عالية، رسوم منخفضة (0.23%)', cons: 'تقلبات قصيرة المدى، يتأثر بأسعار النفط', best_for: 'الاستثمار طويل المدى 5-10 سنوات', action: 'افتح محفظة عبر تطبيق بنكك واشترِ ETF تداول 30' },
-        { name: 'أسهم قطاع الطاقة والبنوك', return_pct: 8, risk: 'متوسط-عالٍ', min: '1,000 ريال', desc: 'قطاعات الطاقة (أرامكو) والبنوك من أكثر القطاعات استقراراً في السوق السعودي. توزيعات أرامكو 7.3%', pros: 'توزيعات أرباح منتظمة، قطاع محمي حكومياً', cons: 'يحتاج دراسة ومتابعة، تركيز في قطاع واحد', best_for: 'من يفهم الأسواق ويريد توزيعات منتظمة', action: 'ابدأ بـ1000 ريال في أسهم موزعة للأرباح' },
-        { name: 'عقار للإيجار', return_pct: 6.5, risk: 'منخفض-متوسط', min: '200,000 ريال', desc: 'أسعار الرياض تراجعت 17% في 2025-2026 مما يخلق فرصة للشراء. الإيجار مثبّت 5 سنوات في الرياض', pros: 'دخل إيجاري ثابت، أصل حقيقي، مضخة للتضخم', cons: 'رأس مال كبير، سيولة منخفضة، صيانة وإدارة', best_for: 'من يملك رأس مال كافٍ ويريد دخلاً ثابتاً', action: 'ابحث في حراج ومواقع العقار عن فرص المرحلة الحالية' },
-        { name: 'صناديق ريت (عقار بدون شراء)', return_pct: 7, risk: 'متوسط', min: '1,000 ريال', desc: 'تستثمر في العقارات التجارية والسكنية دون شراء مباشر. متوفرة على تداول كالأسهم', pros: 'توزيعات فصلية، سيولة كالأسهم، تنويع جغرافي', cons: 'تأثر بأسعار الفائدة، يحتاج اختيار صندوق مناسب', best_for: 'من يريد الاستفادة من العقار بمبلغ صغير', action: 'ابحث عن REITs المدرجة على تداول وراجع توزيعاتها' },
-      ],
-      saudi_advantages: [
-        { icon: '🚫', title: 'لا ضريبة دخل شخصية', desc: 'ما تدفع ضريبة على راتبك ولا أرباحك — ميزة ضخمة مقارنة بمعظم دول العالم', value: `${formatNumber(Math.round(d.salary * 0.2 * 12))} ريال/سنة توفرها` },
-        { icon: '📈', title: 'تضخم منخفض 1.6%', desc: 'مقارنة بالعالم، التضخم السعودي منخفض — فلوسك تحتفظ بقيمتها أكثر', value: 'عائد 4%+ يتفوق على التضخم' },
-        { icon: '🏛️', title: 'صندوق التنمية الوطنية', desc: 'قروض مدعومة للمساكن والمشاريع بأسعار فائدة أقل من السوق بكثير', value: 'وفر فوائد بآلاف الريالات' },
-        { icon: '🌍', title: 'اقتصاد نمو 4.6% (2025)', desc: 'الاقتصاد السعودي ينمو بأحد أعلى المعدلات إقليمياً — فرص أكثر للاستثمار', value: 'بيئة مواتية لتنمية الثروة' },
-      ],
-      common_mistakes: [
-        { mistake: 'رفع مستوى المعيشة مع كل زيادة', pct: 73, fix: '"معدل تضخم نمط الحياة" — كل 1000 ريال زيادة، 700 منها تروح على مصاريف أعلى. الحل: الزيادة الأولى تروح للادخار كاملاً' },
-        { mistake: 'فلوس في الحساب الجاري (0% عائد)', pct: 68, fix: `عندك ${formatNumber(d.netWorth)} ريال في البنك؟ حوّل ${formatNumber(Math.round(d.netWorth * 0.7))} منها لحساب ادخار = ${formatNumber(Math.round(d.netWorth * 0.7 * 0.04 / 12))} ريال إضافي كل شهر` },
-        { mistake: 'مصدر دخل واحد = خطر واحد', pct: 61, fix: 'الشخص الذي دخله من مصدرين أو أكثر يصل للمليون بشكل أسرع بـ40% في المتوسط' },
-        { mistake: 'لا خطة مالية مكتوبة', pct: 85, fix: 'الأشخاص الذين يكتبون أهدافهم المالية أكثر احتمالاً لتحقيقها بـ42%. هذا التقرير خطوتك الأولى' },
-        { mistake: 'تأجيل الاستثمار لـ"لما الوضع يستقر"', pct: 79, fix: `لو بدأت تستثمر ${formatNumber(d.monthlySaving)} ريال/شهر قبل 5 سنوات بعائد 7% — كنت الآن عندك ${formatNumber(Math.round(d.monthlySaving * 60 * Math.pow(1.07, 5) / 5))} ريال إضافي` },
-      ],
-      age_comparison: [
-        { age: '20-25', typical: '500-2,000 ريال/شهر', yours: d.monthlySaving >= 2000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
-        { age: '25-30', typical: '2,000-4,000 ريال/شهر', yours: d.monthlySaving >= 4000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
-        { age: '30-40', typical: '3,000-6,000 ريال/شهر', yours: d.monthlySaving >= 6000 ? 'أعلى من المتوسط ⭐' : 'ضمن المعدل' },
-      ],
-      closing_message: `${monthsToLabel(d.totalMonths)} ستمر سواء بدأت أو لم تبدأ. الفرق الوحيد: أين ستكون في نهايتها.`,
+      ...computeExtras(d),
     }
   }
 
