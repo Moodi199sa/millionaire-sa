@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyAccessToken } from '@/lib/accessToken'
 
 // فريق الأمن السيبراني: حماية بسيطة ضد الاستدعاء المتكرر السريع لنفس الـIP —
 // تخفف من استنزاف رصيد API حتى بعد إغلاق ثغرة الـprompt المفتوح. هذا حل
@@ -104,6 +105,12 @@ function generateStaticReport(salary: number, expenses: number, monthlySaving: n
 
 export async function POST(req: NextRequest) {
   try {
+    // بوابة الدفع: التقرير محتوى مدفوع — يتطلب توكن وصول صالح
+    const token = req.cookies.get('sm_access_report')?.value || ''
+    if (!verifyAccessToken(token, 'report')) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    }
+
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
     if (isRateLimited(ip)) {
       return NextResponse.json({ error: 'طلبات كثيرة جداً — حاول بعد دقيقة' }, { status: 429 })

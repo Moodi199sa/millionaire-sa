@@ -126,11 +126,23 @@ export default function ReportPage() {
   const [error, setError] = useState('')
   const [openIdea, setOpenIdea] = useState<number | null>(null)
   const [targetYears, setTargetYears] = useState(10)
+  const [accessChecked, setAccessChecked] = useState(false)
 
   useEffect(() => {
-    const d = getUserData() || { salary:8000, expenses:5000, savings:0, investments:0, rate:0, monthlySaving:3000, netWorth:0, totalMonths:168 }
-    setData(d)
-    generateReport(d)
+    // حارس الوصول: التقرير محتوى مدفوع — نتحقق من توكن الوصول قبل عرض أي شيء
+    fetch('/api/check-access?product=report')
+      .then(r => r.json())
+      .then(res => {
+        if (res.access) {
+          setAccessChecked(true)
+          const d = getUserData() || { salary:8000, expenses:5000, savings:0, investments:0, rate:0, monthlySaving:3000, netWorth:0, totalMonths:168 }
+          setData(d)
+          generateReport(d)
+        } else {
+          router.push('/checkout')
+        }
+      })
+      .catch(() => router.push('/checkout'))
   }, [])
 
   const generateReport = async (d: UserData) => {

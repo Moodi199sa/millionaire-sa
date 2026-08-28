@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyAccessToken } from '@/lib/accessToken'
 
 const staticIdeas = [
   {
@@ -348,6 +349,12 @@ const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000
 
 export async function GET(req: NextRequest) {
   try {
+    // بوابة الدفع: لا يُعرض المحتوى المدفوع إلا بتوكن وصول صالح صادر بعد دفعة مؤكدة
+    const token = req.cookies.get('sm_access_ideas')?.value || ''
+    if (!verifyAccessToken(token, 'ideas')) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    }
+
     const now = Date.now()
 
     if (cachedIdeas && now - cacheTime < CACHE_DURATION) {

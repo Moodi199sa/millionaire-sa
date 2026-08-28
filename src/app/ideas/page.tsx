@@ -58,7 +58,16 @@ export default function IdeasPage() {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<number | null>(null)
 
-  useEffect(() => { generateIdeas() }, [])
+  useEffect(() => {
+    // حارس الوصول: دليل الأفكار محتوى مدفوع — نتحقق من التوكن قبل التوليد
+    fetch('/api/check-access?product=ideas')
+      .then(r => r.json())
+      .then(res => {
+        if (res.access) generateIdeas()
+        else router.push('/ideas-checkout')
+      })
+      .catch(() => router.push('/ideas-checkout'))
+  }, [])
 
   const generateIdeas = async () => {
     setLoading(true)
