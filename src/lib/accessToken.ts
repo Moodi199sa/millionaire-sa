@@ -59,14 +59,22 @@ export function verifyPaymobHmac(fields: Record<string, string>, receivedHmac: s
   try {
     const secret = process.env.PAYMOB_HMAC_SECRET || ''
     if (!secret || !receivedHmac) return false
-    // ترتيب الحقول المعتمد من Paymob للـ transaction callback
+    // ترتيب الحقول المعتمد من Paymob للـ transaction callback (بصيغة النقاط الرسمية)
     const order = [
       'amount_cents', 'created_at', 'currency', 'error_occured', 'has_parent_transaction',
       'id', 'integration_id', 'is_3d_secure', 'is_auth', 'is_capture', 'is_refunded',
       'is_standalone_payment', 'is_voided', 'order', 'owner', 'pending',
-      'source_data_pan', 'source_data_sub_type', 'source_data_type', 'success',
+      'source_data.pan', 'source_data.sub_type', 'source_data.type', 'success',
     ]
-    const concat = order.map(k => fields[k] ?? '').join('')
+    // Paymob قد يرسل المفاتيح بنقطة (source_data.pan) أو بشرطة (source_data_pan)،
+    // و order قد يصل كـ order أو order.id — نجرّب كل الصيغ لضمان التطابق.
+    const resolve = (key: string): string => {
+      const candidates = [key, key.replace(/\./g, '_')]
+      if (key === 'order') candidates.push('order.id', 'order_id')
+      for (const c of candidates) if (fields[c] !== undefined) return fields[c]
+      return ''
+    }
+    const concat = order.map(resolve).join('')
     const computed = crypto.createHmac('sha512', secret).update(concat).digest('hex')
     const a = Buffer.from(computed)
     const b = Buffer.from(receivedHmac)
