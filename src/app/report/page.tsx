@@ -1223,6 +1223,30 @@ export default function ReportPage() {
               </div>
             </div>
 
+            {/* UPSELL — عرض دليل الأفكار في نهاية التقرير (أقوى نقطة تحويل) */}
+            <a href="/ideas-checkout" className="block rounded-3xl p-6 text-right transition-all hover:opacity-95 active:scale-[0.99] no-print"
+              style={{background:'linear-gradient(135deg,#B8860B,#7a5a06)', border:'1px solid rgba(184,134,11,0.4)', boxShadow:'0 12px 40px rgba(184,134,11,0.28)'}}>
+              <div className="inline-block px-3 py-1 rounded-full text-[11px] font-bold mb-3" style={{background:'rgba(0,0,0,0.25)', color:'#fff'}}>
+                الخطوة التالية 🚀
+              </div>
+              <h3 className="text-white font-extrabold text-lg mb-2 leading-snug">
+                عرفت متى تصير مليونير… الحين خذ الطريق اللي يوصّلك
+              </h3>
+              <p className="text-sm leading-relaxed mb-4" style={{color:'rgba(255,255,255,0.9)'}}>
+                دليل «٨ أفكار دخل مربحة» يحوّل خطتك إلى تنفيذ: كل فكرة بـ رأس المال المطلوب، هامش الربح الحقيقي، مستوى المنافسة، وخطة يوم بيوم — بأرقام السوق السعودي ٢٠٢٦.
+              </p>
+              <div className="space-y-1.5 mb-5">
+                {['٨ أفكار مدروسة بأرقام حقيقية', 'رأس المال والربح المتوقع لكل فكرة', 'خطة تنفيذ عملية من أول يوم'].map((b, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs font-medium" style={{color:'rgba(255,255,255,0.95)'}}>
+                    <span>✓</span><span>{b}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="py-3.5 rounded-2xl text-center font-extrabold text-sm" style={{background:'#fff', color:'#7a5a06'}}>
+                احصل على دليل الأفكار — ٤٩ ريال ←
+              </div>
+            </a>
+
             {/* مشاركة */}
             <button onClick={() => {
               const text = `💰 حصلت على تقريري المالي!\nسأصير مليونير خلال ${monthsToLabel(data.totalMonths)}\n\naحسب هدفك المالي:\nwww.saudimillion.com`
