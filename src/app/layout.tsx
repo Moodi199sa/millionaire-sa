@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'متى تصير مليونير؟ 🔥',
     description: 'احسب خلال 30 ثانية متى ستصل لأول مليون ريال — أداة مجانية',
-    url: 'https://www.saudimillion.com',
+    url: 'https://saudimillion.com',
     siteName: 'متى تصير مليونير؟',
     locale: 'ar_SA',
     type: 'website',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   icons: { icon: '/favicon.ico', apple: '/apple-icon.png' },
-  metadataBase: new URL('https://www.saudimillion.com'),
+  metadataBase: new URL('https://saudimillion.com'),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

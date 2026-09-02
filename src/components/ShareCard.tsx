@@ -26,7 +26,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   ]
   const motivation = motivations[totalMonths % motivations.length]
 
-  const challengeText = `🏆 تحدي المليونير!\n\nأنا بكون مليونير خلال:\n${years} (${totalMonths} شهر فقط!)\n\nوأنت؟ احسب متى بتصير مليونير 👇\nwww.saudimillion.com`
+  const challengeText = `🏆 تحدي المليونير!\n\nأنا بكون مليونير خلال:\n${years} (${totalMonths} شهر فقط!)\n\nوأنت؟ احسب متى بتصير مليونير 👇\nhttps://saudimillion.com`
 
   const copyChallenge = () => {
     navigator.clipboard.writeText(challengeText)
@@ -173,7 +173,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
           display: 'inline-block',
         }}>
           <span style={{ color: '#D4A017', fontSize: '11px', fontWeight: 700 }}>
-            www.saudimillion.com
+            saudimillion.com
           </span>
         </div>
 
