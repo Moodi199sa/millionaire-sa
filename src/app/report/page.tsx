@@ -1249,7 +1249,7 @@ export default function ReportPage() {
 
             {/* مشاركة */}
             <button onClick={() => {
-              const text = `💰 حصلت على تقريري المالي!\nسأصير مليونير خلال ${monthsToLabel(data.totalMonths)}\n\naحسب هدفك المالي:\nhttps://saudimillion.com`
+              const text = `💰 حصلت على تقريري المالي!\nسأصير مليونير خلال ${monthsToLabel(data.totalMonths)}\n\naحسب هدفك المالي:\nhttps://saudimillion.com/s/${data.totalMonths}`
               if (navigator.share) navigator.share({text})
               else navigator.clipboard.writeText(text)
             }}
