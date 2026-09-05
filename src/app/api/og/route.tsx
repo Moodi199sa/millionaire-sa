@@ -63,7 +63,9 @@ export async function GET(req: Request) {
   return new ImageResponse(
     (
       <div style={{ width: '1200px', height: '630px', display: 'flex', background: '#070b14', padding: 28, fontFamily: 'Tajawal' }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0A0F1C', border: `2px solid ${GOLD}`, borderRadius: 24, padding: '22px 40px', gap: 11 }}>
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0A0F1C', border: `2px solid ${GOLD}`, borderRadius: 24, padding: '22px 40px', gap: 11 }}>
+          <div style={{ position: 'absolute', top: -10, right: 20, fontSize: 150, opacity: 0.05, display: 'flex' }}>💰</div>
+          <div style={{ position: 'absolute', bottom: -20, left: 20, fontSize: 150, opacity: 0.05, display: 'flex' }}>🏆</div>
           <div style={{ display: 'flex', background: GOLD, color: '#0A0F1C', padding: '6px 22px', borderRadius: 20 }}>
             <AR text="تحدي المليونير 🔥" style={{ fontSize: 22, fontWeight: 800 }} />
           </div>
