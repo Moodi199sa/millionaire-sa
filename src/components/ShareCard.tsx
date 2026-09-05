@@ -26,7 +26,8 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   ]
   const motivation = motivations[totalMonths % motivations.length]
 
-  const challengeText = `🏆 تحدي المليونير!\n\nأنا بكون مليونير خلال:\n${years} (${totalMonths} شهر فقط!)\n\nوأنت؟ احسب متى بتصير مليونير 👇\nhttps://saudimillion.com/s/${totalMonths}`
+  const arDigits = (n: number) => String(n).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
+  const challengeText = `🏆 تحدي المليونير\n\nأنا بكون مليونير خلال ${years}\nيعني ${arDigits(totalMonths)} شهر فقط 🔥\n\nوأنت؟ احسب متى بتصير مليونير 👇\nhttps://saudimillion.com/s/${totalMonths}`
 
   const copyChallenge = () => {
     navigator.clipboard.writeText(challengeText)

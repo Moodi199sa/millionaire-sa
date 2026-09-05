@@ -10,7 +10,7 @@ const SOFT = '#F5C842'
 // لأن Satori لا يطبّق خوارزمية الاتجاه (bidi) على النص المتصل.
 function AR({ text, style }: { text: string; style?: React.CSSProperties }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', gap: '0.28em', ...style }}>
+    <div style={{ display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', gap: '0.14em', ...style }}>
       {text.split(' ').map((w, i) => (<span key={i}>{w}</span>))}
     </div>
   )
