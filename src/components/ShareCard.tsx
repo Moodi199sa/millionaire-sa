@@ -27,35 +27,69 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   const motivation = motivations[totalMonths % motivations.length]
 
   const arDigits = (n: number) => String(n).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
-  const challengeText = `🏆 تحدي المليونير\n\nأنا بكون مليونير خلال ${years}\nيعني ${arDigits(totalMonths)} شهر فقط 🔥\n\nوأنت؟ احسب متى بتصير مليونير 👇\nhttps://saudimillion.com/s/${totalMonths}`
+  const fallbackLink = `https://saudimillion.com/s/${totalMonths}`
+  const buildText = (link: string) =>
+    `🏆 تحدي المليونير\n\nأنا بكون مليونير خلال ${years}\nيعني ${arDigits(totalMonths)} شهر فقط 🔥\n\nوأنت؟ احسب متى بتصير مليونير 👇\n${link}`
 
-  const copyChallenge = () => {
-    navigator.clipboard.writeText(challengeText)
+  const [sharing, setSharing] = useState<'x' | 'whatsapp' | 'copy' | null>(null)
+
+  // يلتقط نفس الكرت المعروض فعلياً (html-to-image) — هذا يضمن تطابق الصورة المشارَكة
+  // مع ما يراه المستخدم بالضبط، بدون أي إعادة بناء للتصميم على السيرفر.
+  const generateCardPng = async () => {
+    const { toPng } = await import('html-to-image')
+    if (!cardRef.current) return null
+    await document.fonts.ready
+    await new Promise((r) => setTimeout(r, 150))
+    return toPng(cardRef.current, { backgroundColor: '#0A0F1C', pixelRatio: 3, cacheBust: true })
+  }
+
+  // يرفع نفس الصورة الملتقطة ويبني رابط مشاركة يعرضها كما هي (OG image حقيقية).
+  // عند أي فشل (شبكة، إلخ) يرجع لرابط /s/{months} كخطة بديلة حتى لا تتعطل المشاركة.
+  const getShareLink = async (): Promise<string> => {
+    try {
+      const dataUrl = await generateCardPng()
+      if (!dataUrl) return fallbackLink
+      const res = await fetch('/api/share-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl, months: totalMonths }),
+      })
+      if (!res.ok) return fallbackLink
+      const { id } = await res.json()
+      return id ? `https://saudimillion.com/c/${id}` : fallbackLink
+    } catch {
+      return fallbackLink
+    }
+  }
+
+  const copyChallenge = async () => {
+    setSharing('copy')
+    const link = await getShareLink()
+    await navigator.clipboard.writeText(buildText(link))
+    setSharing(null)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const shareWhatsapp = () =>
-    window.open(`https://wa.me/?text=${encodeURIComponent(challengeText)}`, '_blank')
+  const shareWhatsapp = async () => {
+    setSharing('whatsapp')
+    const link = await getShareLink()
+    window.open(`https://wa.me/?text=${encodeURIComponent(buildText(link))}`, '_blank')
+    setSharing(null)
+  }
 
-  const shareX = () =>
-    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(challengeText)}`, '_blank')
+  const shareX = async () => {
+    setSharing('x')
+    const link = await getShareLink()
+    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(buildText(link))}`, '_blank')
+    setSharing(null)
+  }
 
   const downloadCard = async () => {
     setDownloading(true)
     try {
-      // html-to-image يتعامل مع تشكيل الحروف العربية والاتجاه RTL بشكل صحيح،
-      // بعكس html2canvas الذي كان يقطّع الحروف ويعكسها.
-      const { toPng } = await import('html-to-image')
-      if (!cardRef.current) return
-      await document.fonts.ready
-      // انتظار إضافي بسيط لضمان تحميل خط Tajawal كاملاً قبل الالتقاط
-      await new Promise((r) => setTimeout(r, 150))
-      const dataUrl = await toPng(cardRef.current, {
-        backgroundColor: '#0A0F1C',
-        pixelRatio: 3,
-        cacheBust: true,
-      })
+      const dataUrl = await generateCardPng()
+      if (!dataUrl) return
       const link = document.createElement('a')
       link.download = 'تحدي-المليون.png'
       link.href = dataUrl
@@ -198,23 +232,27 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
         </button>
         <button
           onClick={copyChallenge}
-          className="py-3 bg-white/5 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/10 transition-all"
+          disabled={sharing === 'copy'}
+          className="py-3 bg-white/5 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/10 transition-all disabled:opacity-50"
         >
-          {copied ? '✅ تم النسخ!' : '📋 نسخ التحدي'}
+          {sharing === 'copy' ? '⏳ جاري التجهيز...' : copied ? '✅ تم النسخ!' : '📋 نسخ التحدي'}
         </button>
         <button
           onClick={shareWhatsapp}
-          className="py-3 bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all"
+          disabled={sharing === 'whatsapp'}
+          className="py-3 bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all disabled:opacity-50"
         >
-          📱 تحدّ على واتساب
+          {sharing === 'whatsapp' ? '⏳ جاري التجهيز...' : '📱 تحدّ على واتساب'}
         </button>
         <button
           onClick={shareX}
-          className="py-3 bg-white/10 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/20 transition-all"
+          disabled={sharing === 'x'}
+          className="py-3 bg-white/10 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/20 transition-all disabled:opacity-50"
         >
-          𝕏 تحدّ على X
+          {sharing === 'x' ? '⏳ جاري التجهيز...' : '𝕏 تحدّ على X'}
         </button>
       </div>
+
 
 
 
