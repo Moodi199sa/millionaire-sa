@@ -6,36 +6,28 @@ export const runtime = 'edge'
 const GOLD = '#D4A017'
 const SOFT = '#F5C842'
 
-// نص عربي: كل كلمة عنصر flex مع row-reverse — يضمن الترتيب الصحيح (RTL) والمسافات،
-// لأن Satori لا يطبّق خوارزمية الاتجاه (bidi) على النص المتصل.
-function AR({ text, style }: { text: string; style?: React.CSSProperties }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', gap: '0.14em', ...style }}>
-      {text.split(' ').map((w, i) => (<span key={i}>{w}</span>))}
-    </div>
-  )
+// @vercel/og يرتّب العربي (RTL) صحيحاً من نفسه، لكنه يجعل المسافة العادية عريضة جداً.
+// الحل: مسافة غير فاصلة (nbsp) تعطي تباعداً طبيعياً وثابتاً. ونتجنّب الشرطات/النقطتين
+// لأنها (كمحايدات bidi) تعكس ترتيب الجُمَل في هذا المحرّك.
+const sp = (t: string) => t.replace(/ /g, '\u00A0')
+
+function Tx({ text, style }: { text: string; style?: React.CSSProperties }) {
+  return <div style={{ display: 'flex', ...style }}>{sp(text)}</div>
 }
 
-// رقم: صف flex ثابت الاتجاه — يمنع انعكاس الأرقام الهندية في Satori
-function NUM({ value, style }: { value: number; style?: React.CSSProperties }) {
-  const s = value.toLocaleString('en-US').replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', ...style }}>
-      {[...s].map((c, i) => (<span key={i}>{c}</span>))}
-    </div>
-  )
-}
+// أرقام هندية بفاصلة عادية — next/og يضعها بالاتجاه الصحيح
+const arNum = (n: number) => n.toLocaleString('en-US').replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
 
 function Stat({ value, unit }: { value: number; unit: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: 16, padding: '12px 26px' }}>
-      <NUM value={value} style={{ color: GOLD, fontSize: 38, fontWeight: 800 }} />
-      <div style={{ color: '#8b93a1', fontSize: 18 }}>{unit}</div>
+      <div style={{ display: 'flex', color: GOLD, fontSize: 38, fontWeight: 800 }}>{arNum(value)}</div>
+      <div style={{ display: 'flex', color: '#8b93a1', fontSize: 18 }}>{unit}</div>
     </div>
   )
 }
 
-const Divider = () => <div style={{ width: 560, height: 1, background: 'rgba(212,160,23,0.3)', margin: '6px 0' }} />
+const Divider = () => <div style={{ display: 'flex', width: 560, height: 1, background: 'rgba(212,160,23,0.3)', margin: '6px 0' }} />
 
 export async function GET(req: Request) {
   const { searchParams, origin } = new URL(req.url)
@@ -46,11 +38,12 @@ export async function GET(req: Request) {
   const days = months * 30
   const weeks = Math.round(months * 4.3)
   const date = months ? targetDate(months) : ''
+  // عبارات تحفيزية بلا شرطات أو أرقام لاتينية (آمنة للاتجاه)
   const motivations = [
-    `على بُعد ${months} شهراً من المليون الأول`,
-    `رحلتك للمليون تستغرق ${label}`,
-    `كل شهر يقربك أكثر من المليون`,
-    `المليون الأول ليس بعيداً — ${label} وتصله`,
+    'المليون الأول أقرب مما تتوقع',
+    `رحلتك للمليون تستغرق ${label} فقط`,
+    'كل شهر يقرّبك أكثر من المليون',
+    `المليون الأول ليس بعيداً ويصلك خلال ${label}`,
   ]
   const motivation = months ? motivations[months % 4] : 'احسب خلال 30 ثانية متى تصل لأول مليون'
 
@@ -67,12 +60,12 @@ export async function GET(req: Request) {
           <div style={{ position: 'absolute', top: -10, right: 20, fontSize: 150, opacity: 0.05, display: 'flex' }}>💰</div>
           <div style={{ position: 'absolute', bottom: -20, left: 20, fontSize: 150, opacity: 0.05, display: 'flex' }}>🏆</div>
           <div style={{ display: 'flex', background: GOLD, color: '#0A0F1C', padding: '6px 22px', borderRadius: 20 }}>
-            <AR text="تحدي المليونير 🔥" style={{ fontSize: 22, fontWeight: 800 }} />
+            <Tx text="تحدي المليونير 🔥" style={{ fontSize: 22, fontWeight: 800 }} />
           </div>
-          <AR text={`💎 ${motivation}`} style={{ color: SOFT, fontSize: 24, fontWeight: 700, maxWidth: 980 }} />
+          <Tx text={`💎 ${motivation}`} style={{ color: SOFT, fontSize: 23, fontWeight: 700, maxWidth: 1000 }} />
           <Divider />
-          <AR text="أنا بكون مليونير خلال" style={{ color: '#9CA3AF', fontSize: 24 }} />
-          <AR text={label} style={{ color: GOLD, fontSize: 72, fontWeight: 800, maxWidth: 1050 }} />
+          <Tx text="أنا بكون مليونير خلال" style={{ color: '#9CA3AF', fontSize: 24 }} />
+          <Tx text={label} style={{ color: GOLD, fontSize: 72, fontWeight: 800, maxWidth: 1080 }} />
           {months ? (
             <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: 18, margin: '6px 0' }}>
               <Stat value={months} unit="شهر" />
@@ -81,9 +74,9 @@ export async function GET(req: Request) {
             </div>
           ) : null}
           <Divider />
-          <AR text="وأنت؟ احسب متى بتصير مليونير 👇" style={{ color: SOFT, fontSize: 30, fontWeight: 800 }} />
-          <AR text="تحدّ أصدقائك — من يصير مليونير أول؟" style={{ color: '#6B7280', fontSize: 20 }} />
-          {date ? <AR text={`📅 التاريخ المتوقع: ${date}`} style={{ color: '#9CA3AF', fontSize: 20 }} /> : null}
+          <Tx text="وأنت؟ احسب متى بتصير مليونير 👇" style={{ color: SOFT, fontSize: 30, fontWeight: 800 }} />
+          <Tx text="تحدّ أصدقائك ومن يصير مليونير أول؟" style={{ color: '#6B7280', fontSize: 20 }} />
+          {date ? <Tx text={`📅 التاريخ المتوقع ${date}`} style={{ color: '#9CA3AF', fontSize: 20 }} /> : null}
           <div style={{ display: 'flex', background: 'rgba(212,160,23,0.15)', borderRadius: 10, padding: '6px 20px', color: GOLD, fontSize: 22, fontWeight: 700 }}>saudimillion.com</div>
         </div>
       </div>
