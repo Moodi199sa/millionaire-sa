@@ -64,24 +64,45 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
 
   const copyChallenge = async () => {
     setSharing('copy')
-    const link = await getShareLink()
-    await navigator.clipboard.writeText(buildText(link))
-    setSharing(null)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      // Safari يشترط أن يكون كتابة الحافظة ضمن استدعاء متزامن ناتج عن ضغطة المستخدم؛
+      // ClipboardItem مع Promise نص يحافظ على هذا الشرط رغم أن الرابط يجهز لاحقاً بشكل غير متزامن.
+      const textPromise = getShareLink().then((link) => buildText(link))
+      if (navigator.clipboard && 'write' in navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'text/plain': textPromise.then((t) => new Blob([t], { type: 'text/plain' })) }),
+        ])
+      } else {
+        await navigator.clipboard.writeText(await textPromise)
+      }
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSharing(null)
+    }
   }
 
+  // فتح نافذة المشاركة فوراً عند الضغط (ضمن نفس استدعاء المستخدم المباشر) ثم توجيهها
+  // بعد جهوزية الرابط — متصفحات مثل Safari تحظر window.open بصمت لو جاء بعد await.
   const shareWhatsapp = async () => {
     setSharing('whatsapp')
+    const win = window.open('', '_blank')
     const link = await getShareLink()
-    window.open(`https://wa.me/?text=${encodeURIComponent(buildText(link))}`, '_blank')
+    const url = `https://wa.me/?text=${encodeURIComponent(buildText(link))}`
+    if (win) win.location.href = url
+    else window.location.href = url // خطة بديلة لو حُظرت النافذة بالكامل
     setSharing(null)
   }
 
   const shareX = async () => {
     setSharing('x')
+    const win = window.open('', '_blank')
     const link = await getShareLink()
-    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(buildText(link))}`, '_blank')
+    const url = `https://x.com/intent/tweet?text=${encodeURIComponent(buildText(link))}`
+    if (win) win.location.href = url
+    else window.location.href = url
     setSharing(null)
   }
 
