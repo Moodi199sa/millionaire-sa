@@ -12,7 +12,10 @@ export async function generateMetadata(
   const label = valid ? monthsToLabel(m) : 'احسب متى تصير مليونير'
   const title = valid ? `أنا بكون مليونير خلال ${label} 🔥` : 'متى تصير مليونير؟ 🔥'
   const description = 'وأنت؟ احسب خلال 30 ثانية متى بتصير مليونير — وتحدَّ أصدقائك.'
-  const ogImage = `/api/og?m=${valid ? m : 0}`
+  // تويتر يخزّن الصورة حسب رابطها بالضبط (لا حسب رابط الصفحة)، فرقم الإصدار هذا
+  // يجعل رابط الصورة يتغيّر مع أي تعديل تصميم مستقبلي ويكسر الكاش القديم فوراً.
+  const OG_VERSION = 2
+  const ogImage = `/api/og?m=${valid ? m : 0}&v=${OG_VERSION}`
 
   return {
     title,
