@@ -11,6 +11,7 @@ interface Props {
 
 export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   const cardRef = useRef<HTMLDivElement>(null)
+  const ogCardRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
@@ -46,12 +47,24 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
     return toPng(cardRef.current, { backgroundColor: '#0A0F1C', pixelRatio: 3, cacheBust: true })
   }
 
+  // نسخة أفقية بنفس الألوان والنصوص والعناصر بالضبط (نفس عناصر DOM حقيقية عبر
+  // html-to-image، بلا أي محرّك رسم بديل) — تُستخدم فقط لصورة مشاركة تويتر/X،
+  // لأن تويتر يرفض عرض معاينة لصورة عمودية طويلة كصورة "summary_large_image"
+  // ويستبدلها بأيقونة عامة. الكرت الأصلي الطويل يبقى كما هو لزر "حمّل الصورة".
+  const generateOgPng = async () => {
+    const { toPng } = await import('html-to-image')
+    if (!ogCardRef.current) return null
+    await document.fonts.ready
+    await new Promise((r) => setTimeout(r, 150))
+    return toPng(ogCardRef.current, { backgroundColor: '#070b14', pixelRatio: 2, cacheBust: true })
+  }
+
   // رفع الصورة في الخلفية بمجرد جهوزية الكرت — لا ينتظره أي زر مشاركة لاحقاً.
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const dataUrl = await generateCardPng()
+        const dataUrl = await generateOgPng()
         if (!dataUrl || cancelled) return
         const res = await fetch('/api/share-upload', {
           method: 'POST',
@@ -213,6 +226,67 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
         </div>
 
 
+      </div>
+
+      {/* نسخة أفقية مخفية بنفس الألوان والنصوص — تُستخدم فقط كصورة مشاركة تويتر/X
+          (تويتر يرفض معاينة صورة عمودية طويلة كصورة كبيرة). موجودة في الصفحة فعلياً
+          (مو display:none) عشان html-to-image يقدر يرسمها، لكن خارج الشاشة المرئية. */}
+      <div
+        ref={ogCardRef}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: '-99999px',
+          width: '1200px',
+          height: '630px',
+          background: '#070b14',
+          padding: '28px',
+          fontFamily: 'Tajawal, sans-serif',
+          direction: 'rtl',
+        }}
+      >
+        <div style={{
+          width: '100%', height: '100%', position: 'relative', overflow: 'hidden', boxSizing: 'border-box',
+          background: '#0A0F1C', border: '2px solid #D4A017', borderRadius: '24px',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: '22px 40px', gap: '11px', textAlign: 'center',
+        }}>
+          <div style={{ position: 'absolute', fontSize: '150px', opacity: 0.05, top: '-10px', right: '20px', lineHeight: 1 }}>💰</div>
+          <div style={{ position: 'absolute', fontSize: '150px', opacity: 0.05, bottom: '-20px', left: '20px', lineHeight: 1 }}>🏆</div>
+
+          <div style={{ background: '#D4A017', color: '#0A0F1C', fontSize: '22px', fontWeight: 800, padding: '6px 22px', borderRadius: '20px' }}>
+            تحدي المليونير 🔥
+          </div>
+          <div style={{ color: '#F5C842', fontSize: '23px', fontWeight: 700, maxWidth: '1000px' }}>
+            {motivation}
+          </div>
+          <div style={{ width: '560px', height: '1px', background: 'rgba(212,160,23,0.3)', margin: '6px 0' }} />
+          <div style={{ color: '#9CA3AF', fontSize: '24px' }}>أنا بكون مليونير خلال</div>
+          <div style={{ color: '#D4A017', fontSize: '68px', fontWeight: 800, lineHeight: 1.15 }}>{years}</div>
+
+          <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: '18px', margin: '6px 0' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '16px', padding: '12px 26px' }}>
+              <div style={{ color: '#D4A017', fontSize: '38px', fontWeight: 800 }}>{totalMonths.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#8b93a1', fontSize: '18px' }}>شهر</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '16px', padding: '12px 26px' }}>
+              <div style={{ color: '#D4A017', fontSize: '38px', fontWeight: 800 }}>{days.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#8b93a1', fontSize: '18px' }}>يوم</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '16px', padding: '12px 26px' }}>
+              <div style={{ color: '#D4A017', fontSize: '38px', fontWeight: 800 }}>{weeks.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#8b93a1', fontSize: '18px' }}>أسبوع</div>
+            </div>
+          </div>
+
+          <div style={{ width: '560px', height: '1px', background: 'rgba(212,160,23,0.3)', margin: '6px 0' }} />
+          <div style={{ color: '#F5C842', fontSize: '30px', fontWeight: 800 }}>وأنت؟ احسب متى بتصير مليونير 👇</div>
+          <div style={{ color: '#6B7280', fontSize: '20px' }}>تحدّ أصدقائك — من يصير مليونير أول؟</div>
+          {date && <div style={{ color: '#9CA3AF', fontSize: '20px' }}>📅 التاريخ المتوقع: {date}</div>}
+          <div style={{ background: 'rgba(212,160,23,0.15)', borderRadius: '10px', padding: '6px 20px', color: '#D4A017', fontSize: '22px', fontWeight: 700 }}>
+            saudimillion.com
+          </div>
+        </div>
       </div>
 
       {/* عنوان */}
