@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   years: string
@@ -31,7 +31,10 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   const buildText = (link: string) =>
     `🏆 تحدي المليونير\n\nأنا بكون مليونير خلال ${years}\nيعني ${arDigits(totalMonths)} شهر فقط 🔥\n\nوأنت؟ احسب متى بتصير مليونير 👇\n${link}`
 
-  const [sharing, setSharing] = useState<'x' | 'whatsapp' | 'copy' | null>(null)
+  // رابط المشاركة الجاهز (يُرفع تلقائياً في الخلفية عند ظهور الكرت) — بحيث تكون
+  // أزرار المشاركة متزامنة تماماً عند الضغط، بلا أي await قبل window.open، تجنّباً
+  // لحظر النوافذ المنبثقة الذي تفرضه Safari على أي فتح نافذة يأتي بعد انتظار غير متزامن.
+  const [shareLink, setShareLink] = useState(fallbackLink)
 
   // يلتقط نفس الكرت المعروض فعلياً (html-to-image) — هذا يضمن تطابق الصورة المشارَكة
   // مع ما يراه المستخدم بالضبط، بدون أي إعادة بناء للتصميم على السيرفر.
@@ -43,67 +46,43 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
     return toPng(cardRef.current, { backgroundColor: '#0A0F1C', pixelRatio: 3, cacheBust: true })
   }
 
-  // يرفع نفس الصورة الملتقطة ويبني رابط مشاركة يعرضها كما هي (OG image حقيقية).
-  // عند أي فشل (شبكة، إلخ) يرجع لرابط /s/{months} كخطة بديلة حتى لا تتعطل المشاركة.
-  const getShareLink = async (): Promise<string> => {
-    try {
-      const dataUrl = await generateCardPng()
-      if (!dataUrl) return fallbackLink
-      const res = await fetch('/api/share-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl, months: totalMonths }),
-      })
-      if (!res.ok) return fallbackLink
-      const { id } = await res.json()
-      return id ? `https://saudimillion.com/c/${id}` : fallbackLink
-    } catch {
-      return fallbackLink
-    }
-  }
-
-  const copyChallenge = async () => {
-    setSharing('copy')
-    try {
-      // Safari يشترط أن يكون كتابة الحافظة ضمن استدعاء متزامن ناتج عن ضغطة المستخدم؛
-      // ClipboardItem مع Promise نص يحافظ على هذا الشرط رغم أن الرابط يجهز لاحقاً بشكل غير متزامن.
-      const textPromise = getShareLink().then((link) => buildText(link))
-      if (navigator.clipboard && 'write' in navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-        await navigator.clipboard.write([
-          new ClipboardItem({ 'text/plain': textPromise.then((t) => new Blob([t], { type: 'text/plain' })) }),
-        ])
-      } else {
-        await navigator.clipboard.writeText(await textPromise)
+  // رفع الصورة في الخلفية بمجرد جهوزية الكرت — لا ينتظره أي زر مشاركة لاحقاً.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const dataUrl = await generateCardPng()
+        if (!dataUrl || cancelled) return
+        const res = await fetch('/api/share-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: dataUrl, months: totalMonths }),
+        })
+        if (!res.ok || cancelled) return
+        const { id } = await res.json()
+        if (id && !cancelled) setShareLink(`https://saudimillion.com/c/${id}`)
+      } catch {
+        // يبقى الرابط الاحتياطي /s/{months} كما هو — المشاركة تظل تعمل
       }
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setSharing(null)
-    }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalMonths])
+
+  const copyChallenge = () => {
+    navigator.clipboard.writeText(buildText(shareLink))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
-  // فتح نافذة المشاركة فوراً عند الضغط (ضمن نفس استدعاء المستخدم المباشر) ثم توجيهها
-  // بعد جهوزية الرابط — متصفحات مثل Safari تحظر window.open بصمت لو جاء بعد await.
-  const shareWhatsapp = async () => {
-    setSharing('whatsapp')
-    const win = window.open('', '_blank')
-    const link = await getShareLink()
-    const url = `https://wa.me/?text=${encodeURIComponent(buildText(link))}`
-    if (win) win.location.href = url
-    else window.location.href = url // خطة بديلة لو حُظرت النافذة بالكامل
-    setSharing(null)
+  // الرابط والنص جاهزان مسبقاً (shareLink) فالفتح هنا متزامن تماماً مع الضغطة —
+  // هذا هو الشرط الذي يمنع Safari من حظر النافذة.
+  const shareWhatsapp = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent(buildText(shareLink))}`, '_blank')
   }
 
-  const shareX = async () => {
-    setSharing('x')
-    const win = window.open('', '_blank')
-    const link = await getShareLink()
-    const url = `https://x.com/intent/tweet?text=${encodeURIComponent(buildText(link))}`
-    if (win) win.location.href = url
-    else window.location.href = url
-    setSharing(null)
+  const shareX = () => {
+    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(buildText(shareLink))}`, '_blank')
   }
 
   const downloadCard = async () => {
@@ -253,24 +232,21 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
         </button>
         <button
           onClick={copyChallenge}
-          disabled={sharing === 'copy'}
-          className="py-3 bg-white/5 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/10 transition-all disabled:opacity-50"
+          className="py-3 bg-white/5 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/10 transition-all"
         >
-          {sharing === 'copy' ? '⏳ جاري التجهيز...' : copied ? '✅ تم النسخ!' : '📋 نسخ التحدي'}
+          {copied ? '✅ تم النسخ!' : '📋 نسخ التحدي'}
         </button>
         <button
           onClick={shareWhatsapp}
-          disabled={sharing === 'whatsapp'}
-          className="py-3 bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all disabled:opacity-50"
+          className="py-3 bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all"
         >
-          {sharing === 'whatsapp' ? '⏳ جاري التجهيز...' : '📱 تحدّ على واتساب'}
+          📱 تحدّ على واتساب
         </button>
         <button
           onClick={shareX}
-          disabled={sharing === 'x'}
-          className="py-3 bg-white/10 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/20 transition-all disabled:opacity-50"
+          className="py-3 bg-white/10 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/20 transition-all"
         >
-          {sharing === 'x' ? '⏳ جاري التجهيز...' : '𝕏 تحدّ على X'}
+          𝕏 تحدّ على X
         </button>
       </div>
 
