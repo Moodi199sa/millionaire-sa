@@ -249,41 +249,41 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
           width: '100%', height: '100%', position: 'relative', overflow: 'hidden', boxSizing: 'border-box',
           background: '#0A0F1C', border: '2px solid #D4A017', borderRadius: '24px',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          padding: '22px 40px', gap: '11px', textAlign: 'center',
+          padding: '55px 44px', gap: '9px', textAlign: 'center',
         }}>
           <div style={{ position: 'absolute', fontSize: '150px', opacity: 0.05, top: '-10px', right: '20px', lineHeight: 1 }}>💰</div>
           <div style={{ position: 'absolute', fontSize: '150px', opacity: 0.05, bottom: '-20px', left: '20px', lineHeight: 1 }}>🏆</div>
 
-          <div style={{ background: '#D4A017', color: '#0A0F1C', fontSize: '22px', fontWeight: 800, padding: '6px 22px', borderRadius: '20px' }}>
+          <div style={{ background: '#D4A017', color: '#0A0F1C', fontSize: '20px', fontWeight: 800, padding: '5px 20px', borderRadius: '18px' }}>
             تحدي المليونير 🔥
           </div>
-          <div style={{ color: '#F5C842', fontSize: '23px', fontWeight: 700, maxWidth: '1000px' }}>
+          <div style={{ color: '#F5C842', fontSize: '19px', fontWeight: 700, maxWidth: '1020px' }}>
             {motivation}
           </div>
-          <div style={{ width: '560px', height: '1px', background: 'rgba(212,160,23,0.3)', margin: '6px 0' }} />
-          <div style={{ color: '#9CA3AF', fontSize: '24px' }}>أنا بكون مليونير خلال</div>
-          <div style={{ color: '#D4A017', fontSize: '68px', fontWeight: 800, lineHeight: 1.15 }}>{years}</div>
+          <div style={{ width: '520px', height: '1px', background: 'rgba(212,160,23,0.3)', margin: '4px 0' }} />
+          <div style={{ color: '#9CA3AF', fontSize: '20px' }}>أنا بكون مليونير خلال</div>
+          <div style={{ color: '#D4A017', fontSize: '54px', fontWeight: 800, lineHeight: 1.15, maxWidth: '1080px' }}>{years}</div>
 
-          <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: '18px', margin: '6px 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '16px', padding: '12px 26px' }}>
-              <div style={{ color: '#D4A017', fontSize: '38px', fontWeight: 800 }}>{totalMonths.toLocaleString('ar-SA')}</div>
-              <div style={{ color: '#8b93a1', fontSize: '18px' }}>شهر</div>
+          <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: '16px', margin: '6px 0' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '14px', padding: '10px 24px' }}>
+              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{totalMonths.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#8b93a1', fontSize: '15px' }}>شهر</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '16px', padding: '12px 26px' }}>
-              <div style={{ color: '#D4A017', fontSize: '38px', fontWeight: 800 }}>{days.toLocaleString('ar-SA')}</div>
-              <div style={{ color: '#8b93a1', fontSize: '18px' }}>يوم</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '14px', padding: '10px 24px' }}>
+              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{days.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#8b93a1', fontSize: '15px' }}>يوم</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '16px', padding: '12px 26px' }}>
-              <div style={{ color: '#D4A017', fontSize: '38px', fontWeight: 800 }}>{weeks.toLocaleString('ar-SA')}</div>
-              <div style={{ color: '#8b93a1', fontSize: '18px' }}>أسبوع</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '14px', padding: '10px 24px' }}>
+              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{weeks.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#8b93a1', fontSize: '15px' }}>أسبوع</div>
             </div>
           </div>
 
-          <div style={{ width: '560px', height: '1px', background: 'rgba(212,160,23,0.3)', margin: '6px 0' }} />
-          <div style={{ color: '#F5C842', fontSize: '30px', fontWeight: 800 }}>وأنت؟ احسب متى بتصير مليونير 👇</div>
-          <div style={{ color: '#6B7280', fontSize: '20px' }}>تحدّ أصدقائك — من يصير مليونير أول؟</div>
-          {date && <div style={{ color: '#9CA3AF', fontSize: '20px' }}>📅 التاريخ المتوقع: {date}</div>}
-          <div style={{ background: 'rgba(212,160,23,0.15)', borderRadius: '10px', padding: '6px 20px', color: '#D4A017', fontSize: '22px', fontWeight: 700 }}>
+          <div style={{ width: '520px', height: '1px', background: 'rgba(212,160,23,0.3)', margin: '4px 0' }} />
+          <div style={{ color: '#F5C842', fontSize: '24px', fontWeight: 800 }}>وأنت؟ احسب متى بتصير مليونير 👇</div>
+          <div style={{ color: '#6B7280', fontSize: '16px' }}>تحدّ أصدقائك — من يصير مليونير أول؟</div>
+          {date && <div style={{ color: '#9CA3AF', fontSize: '15px' }}>📅 التاريخ المتوقع: {date}</div>}
+          <div style={{ background: 'rgba(212,160,23,0.15)', borderRadius: '9px', padding: '5px 18px', color: '#D4A017', fontSize: '18px', fontWeight: 700 }}>
             saudimillion.com
           </div>
         </div>
