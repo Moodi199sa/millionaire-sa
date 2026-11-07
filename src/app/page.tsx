@@ -42,12 +42,12 @@ function QuickPreview({ salary, expenses }: { salary: string; expenses: string }
   const faster = rough < AVG_MONTHS
   return (
     <div className="mt-3 p-4 bg-gold/10 border border-gold/30 rounded-xl text-center animate-fade-up">
-      <p className="text-xs text-ink-muted mb-1">توقّع أوّلي بادخار {formatNumber(saving)} ريال/شهر</p>
-      <p className="text-2xl font-extrabold text-gold-deep leading-tight">{monthsToLabel(rough)}</p>
-      <p className={`text-xs font-bold mt-2 ${faster ? 'text-green-700' : 'text-orange-600'}`}>
+      <p className="text-xs text-gray-400 mb-1">توقّع أوّلي بادخار {formatNumber(saving)} ريال/شهر</p>
+      <p className="text-2xl font-extrabold text-gold leading-tight">{monthsToLabel(rough)}</p>
+      <p className={`text-xs font-bold mt-2 ${faster ? 'text-green-400' : 'text-orange-400'}`}>
         {faster ? '⚡ أسرع من المتوسط (١٤ سنة)' : '🐢 أبطأ من المتوسط (١٤ سنة) — كمّل نشوف وش يسرّعك'}
       </p>
-      <p className="text-[11px] text-ink-muted mt-1">كمّل ٣ أسئلة وتطلع لك النتيجة الدقيقة</p>
+      <p className="text-[11px] text-gray-500 mt-1">كمّل ٣ أسئلة وتطلع لك النتيجة الدقيقة</p>
     </div>
   )
 }
@@ -160,7 +160,7 @@ export default function Home() {
   const progressPercent = (step / 4) * 100
 
   return (
-    <main className="min-h-screen bg-cream text-ink font-tajawal" dir="rtl">
+    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
       <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
 
         {/* Social Proof */}
@@ -171,31 +171,31 @@ export default function Home() {
                 <span key={i} className="text-lg">{e}</span>
               ))}
             </div>
-            <span className="text-sm text-ink-muted">
-              <span className="text-gold-deep font-bold">{usersCount.toLocaleString('ar-SA')}</span> شخص قبلوا التحدي
+            <span className="text-sm text-gray-400">
+              <span className="text-gold font-bold">{usersCount.toLocaleString('ar-SA')}</span> شخص قبلوا التحدي
             </span>
           </div>
-          <div className="flex gap-3 text-xs text-ink-muted">
-            <span>⚡ أسرع نتيجة: <span className="text-green-700 font-bold">6 سنوات</span></span>
+          <div className="flex gap-3 text-xs text-gray-500">
+            <span>⚡ أسرع نتيجة: <span className="text-green-400 font-bold">6 سنوات</span></span>
             <span>·</span>
-            <span>📊 المتوسط: <span className="text-gold-deep font-bold">14 سنة</span></span>
+            <span>📊 المتوسط: <span className="text-gold font-bold">14 سنة</span></span>
           </div>
         </div>
 
         {/* Hero */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3 leading-tight">
-            متى تصير <span className="text-gold-deep">مليونير</span>؟
+            متى تصير <span className="text-gold">مليونير</span>؟
           </h1>
           {!result && step === 1 ? (
             <div className="inline-flex flex-col items-center gap-1 mt-1 animate-fade-up">
-              <p className="text-ink-muted text-base">
-                المتوسط يحتاج <span className="text-gold-deep font-extrabold">١٤ سنة</span> عشان يوصل لأول مليون…
+              <p className="text-gray-400 text-base">
+                المتوسط يحتاج <span className="text-gold font-extrabold">١٤ سنة</span> عشان يوصل لأول مليون…
               </p>
-              <p className="text-xl font-extrabold">وأنت؟ <span className="text-ink-muted text-base font-bold">اكتب راتبك وشوف فوراً 👇</span></p>
+              <p className="text-xl font-extrabold">وأنت؟ <span className="text-gray-400 text-base font-bold">اكتب راتبك وشوف فوراً 👇</span></p>
             </div>
           ) : (
-            <p className="text-ink-muted text-base">
+            <p className="text-gray-400 text-base">
               أجب على {4} أسئلة بسيطة واعرف متى ستصل لأول مليون ريال
             </p>
           )}
@@ -204,11 +204,11 @@ export default function Home() {
         {/* Progress Bar */}
         {!result && (
           <div className="mb-6">
-            <div className="flex justify-between text-xs text-ink-muted mb-2">
+            <div className="flex justify-between text-xs text-gray-500 mb-2">
               <span>السؤال {step} من 4</span>
               <span>{Math.round(progressPercent)}٪</span>
             </div>
-            <div className="w-full bg-white rounded-full h-2">
+            <div className="w-full bg-white/10 rounded-full h-2">
               <div
                 className="bg-gold h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
@@ -219,7 +219,7 @@ export default function Home() {
 
         {/* Form Steps */}
         {!result && (
-          <div className="bg-white/70 border border-gold/20 rounded-2xl p-6 mb-6">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
 
             {/* Step 1 - الراتب والمصروف */}
             {step === 1 && (
@@ -235,9 +235,9 @@ export default function Home() {
                       onChange={e => setSalary(e.target.value)}
                       placeholder=""
                       autoFocus
-                      className="w-full bg-white border border-gold/30 rounded-xl px-4 py-3 text-ink text-lg focus:outline-none focus:border-gold transition-colors"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
                     />
-                    <span className="absolute left-4 top-3.5 text-ink-muted text-sm">ريال</span>
+                    <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
                   </div>
                 </div>
                 <div>
@@ -250,17 +250,17 @@ export default function Home() {
                       value={expenses}
                       onChange={e => setExpenses(e.target.value)}
                       placeholder=""
-                      className="w-full bg-white border border-gold/30 rounded-xl px-4 py-3 text-ink text-lg focus:outline-none focus:border-gold transition-colors"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
                     />
-                    <span className="absolute left-4 top-3.5 text-ink-muted text-sm">ريال</span>
+                    <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
                   </div>
                   {salary && expenses && Number(salary) > Number(expenses) && (
-                    <p className="text-green-700 text-sm mt-2">
+                    <p className="text-green-400 text-sm mt-2">
                       ✅ تدخر {formatNumber(Number(salary) - Number(expenses))} ريال شهرياً
                     </p>
                   )}
                   {salary && expenses && Number(salary) <= Number(expenses) && (
-                    <p className="text-red-600 text-sm mt-2">
+                    <p className="text-red-400 text-sm mt-2">
                       ⚠️ مصروفك أكثر من راتبك
                     </p>
                   )}
@@ -278,13 +278,13 @@ export default function Home() {
                   <button
                     onClick={() => setHasSavings(true)}
                     className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasSavings === true ? 'bg-gradient-to-l from-gold to-gold-deep text-white' : 'bg-white text-ink-soft hover:bg-gold/15'
+                      hasSavings === true ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                   >نعم ✅</button>
                   <button
                     onClick={() => { setHasSavings(false); setSavings('') }}
                     className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasSavings === false ? 'bg-gradient-to-l from-gold to-gold-deep text-white' : 'bg-white text-ink-soft hover:bg-gold/15'
+                      hasSavings === false ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                   >لا ❌</button>
                 </div>
@@ -298,13 +298,13 @@ export default function Home() {
                       onChange={e => setSavings(e.target.value)}
                       placeholder="أكتب قيمة مدخراتك"
                       autoFocus
-                      className="w-full bg-white border border-gold/30 rounded-xl px-4 py-3 text-ink text-lg focus:outline-none focus:border-gold transition-colors"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
                     />
-                    <span className="absolute left-4 top-3.5 text-ink-muted text-sm">ريال</span>
+                    <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
                   </div>
                 )}
                 {hasSavings === false && (
-                  <p className="text-ink-muted text-sm text-center">لا بأس — الادخار يبدأ من اليوم 💪</p>
+                  <p className="text-gray-500 text-sm text-center">لا بأس — الادخار يبدأ من اليوم 💪</p>
                 )}
               </div>
             )}
@@ -317,13 +317,13 @@ export default function Home() {
                   <button
                     onClick={() => setHasInvestments(true)}
                     className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasInvestments === true ? 'bg-gradient-to-l from-gold to-gold-deep text-white' : 'bg-white text-ink-soft hover:bg-gold/15'
+                      hasInvestments === true ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                   >نعم ✅</button>
                   <button
                     onClick={() => { setHasInvestments(false); setInvestments('') }}
                     className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasInvestments === false ? 'bg-gradient-to-l from-gold to-gold-deep text-white' : 'bg-white text-ink-soft hover:bg-gold/15'
+                      hasInvestments === false ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                   >لا ❌</button>
                 </div>
@@ -338,11 +338,11 @@ export default function Home() {
                         onChange={e => setInvestments(e.target.value)}
                         placeholder="أكتب قيمة استثماراتك"
                         autoFocus
-                        className="w-full bg-white border border-gold/30 rounded-xl px-4 py-3 text-ink text-lg focus:outline-none focus:border-gold transition-colors"
+                        className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
                       />
-                      <span className="absolute left-4 top-3.5 text-ink-muted text-sm">ريال</span>
+                      <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
                     </div>
-                    <p className="text-sm text-ink-muted">ما نوع استثمارك؟</p>
+                    <p className="text-sm text-gray-400">ما نوع استثمارك؟</p>
                     <div className="grid grid-cols-3 gap-2">
                       {rateOptions.map((opt) => (
                         <button
@@ -350,20 +350,20 @@ export default function Home() {
                           onClick={() => setRate(opt.value)}
                           className={`py-2.5 px-2 rounded-xl text-center transition-all border ${
                             rate === opt.value
-                              ? 'border-gold bg-gold/20 text-gold-deep'
-                              : 'border-gold/20 bg-white/70 text-ink-soft hover:bg-gold/10'
+                              ? 'border-gold bg-gold/20 text-gold'
+                              : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
                           }`}
                         >
                           <div className="font-bold text-sm">{opt.label}</div>
-                          <div className="text-xs text-ink-muted mt-0.5">{opt.sub}</div>
-                          <div className="text-xs font-bold mt-1 text-gold-deep">{opt.value}%</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{opt.sub}</div>
+                          <div className="text-xs font-bold mt-1 text-gold">{opt.value}%</div>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
                 {hasInvestments === false && (
-                  <p className="text-ink-muted text-sm text-center">ممتاز — سنحسب لك أفضل طريقة للبدء 📊</p>
+                  <p className="text-gray-500 text-sm text-center">ممتاز — سنحسب لك أفضل طريقة للبدء 📊</p>
                 )}
               </div>
             )}
@@ -373,25 +373,25 @@ export default function Home() {
               <div className="text-center space-y-4">
                 <div className="text-5xl mb-2">🎯</div>
                 <h2 className="text-xl font-bold">جاهز لتعرف النتيجة؟</h2>
-                <div className="text-right bg-white/70 rounded-xl p-4 space-y-2 text-sm">
+                <div className="text-right bg-white/5 rounded-xl p-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-ink-muted">الراتب</span>
+                    <span className="text-gray-400">الراتب</span>
                     <span className="font-bold">{formatNumber(Number(salary))} ريال</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-ink-muted">المصروف</span>
+                    <span className="text-gray-400">المصروف</span>
                     <span className="font-bold">{formatNumber(Number(expenses))} ريال</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-ink-muted">الادخار الشهري</span>
-                    <span className="font-bold text-green-700">{formatNumber(Number(salary) - Number(expenses))} ريال</span>
+                    <span className="text-gray-400">الادخار الشهري</span>
+                    <span className="font-bold text-green-400">{formatNumber(Number(salary) - Number(expenses))} ريال</span>
                   </div>
                   {hasSavings && <div className="flex justify-between">
-                    <span className="text-ink-muted">المدخرات</span>
+                    <span className="text-gray-400">المدخرات</span>
                     <span className="font-bold">{formatNumber(Number(savings))} ريال</span>
                   </div>}
                   {hasInvestments && <div className="flex justify-between">
-                    <span className="text-ink-muted">الاستثمارات</span>
+                    <span className="text-gray-400">الاستثمارات</span>
                     <span className="font-bold">{formatNumber(Number(investments))} ريال ({rate}%)</span>
                   </div>}
                 </div>
@@ -403,7 +403,7 @@ export default function Home() {
               {step > 1 && (
                 <button
                   onClick={() => setStep(step - 1)}
-                  className="px-5 py-3 rounded-xl bg-white text-ink-soft font-bold hover:bg-gold/15 transition-all"
+                  className="px-5 py-3 rounded-xl bg-white/10 text-gray-300 font-bold hover:bg-white/20 transition-all"
                 >
                   ← رجوع
                 </button>
@@ -413,8 +413,8 @@ export default function Home() {
                 disabled={step !== 4 && !canGoNext()}
                 className={`flex-1 py-3.5 font-bold text-lg rounded-xl transition-all active:scale-95 ${
                   step === 4 || canGoNext()
-                    ? 'bg-gradient-to-l from-gold to-gold-deep hover:brightness-110 text-white'
-                    : 'bg-white text-ink-muted cursor-not-allowed'
+                    ? 'bg-gold hover:bg-yellow-600 text-white'
+                    : 'bg-white/10 text-gray-500 cursor-not-allowed'
                 }`}
               >
                 {step === 4 ? '🚀 احسب النتيجة' : 'التالي →'}
@@ -431,41 +431,41 @@ export default function Home() {
             {result.monthlySaving <= 0 ? (
               <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center">
                 <div className="text-5xl mb-4">⚠️</div>
-                <h2 className="text-xl font-extrabold text-red-600 mb-3">مصروفك أكثر من راتبك</h2>
-                <p className="text-ink-soft text-sm mb-4 leading-relaxed">
+                <h2 className="text-xl font-extrabold text-red-400 mb-3">مصروفك أكثر من راتبك</h2>
+                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
                   للأسف لا يمكن الوصول للمليون بهذا الوضع. الخطوة الأولى هي تقليل المصاريف أو زيادة الدخل.
                 </p>
                 <div className="space-y-3 text-right mb-5">
                   {['قلل مصاريفك ولو 200 ريال كل شهر', 'ابحث عن مصدر دخل إضافي ولو صغير', 'راجع اشتراكاتك الشهرية وألغِ غير الضروري'].map((tip, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-white/70 rounded-xl p-3 text-sm">
-                      <span className="text-gold-deep">💡</span>
-                      <span className="text-ink-soft">{tip}</span>
+                    <div key={i} className="flex items-center gap-3 bg-white/5 rounded-xl p-3 text-sm">
+                      <span className="text-gold">💡</span>
+                      <span className="text-gray-300">{tip}</span>
                     </div>
                   ))}
                 </div>
                 <button
                   onClick={() => { setResult(null); setStep(1) }}
-                  className="w-full py-3 bg-gradient-to-l from-gold to-gold-deep text-white font-bold rounded-xl hover:brightness-110 transition-all"
+                  className="w-full py-3 bg-gold text-white font-bold rounded-xl hover:bg-yellow-600 transition-all"
                 >
                   أعد الحساب بأرقام مختلفة ←
                 </button>
               </div>
             ) : (
               <>
-            <div className="bg-white/70 border border-gold/20 rounded-2xl p-6 text-center">
-              <div className="inline-block bg-red-500/20 border border-red-500/30 text-red-600 text-xs font-bold px-3 py-1 rounded-full mb-3">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+              <div className="inline-block bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold px-3 py-1 rounded-full mb-3">
                 🔥 نتيجة تحدي المليون
               </div>
-              <p className="text-ink-muted text-sm mb-2">ستصل لأول مليون ريال خلال</p>
-              <div className="text-5xl font-extrabold text-gold-deep leading-tight">
+              <p className="text-gray-400 text-sm mb-2">ستصل لأول مليون ريال خلال</p>
+              <div className="text-5xl font-extrabold text-gold leading-tight">
                 {monthsToLabel(result.totalMonths)}
               </div>
               {result.totalMonths < 99999 && (
                 <div className="text-lg font-bold mt-3">📅 {targetDate(result.totalMonths)}</div>
               )}
               <div className="mt-4 bg-gold/10 border border-gold/20 rounded-xl p-3">
-                <p className="text-sm text-gold-deep font-bold">تحدّ أصدقائك — من يصل أسرع؟ 🏆</p>
-                <p className="text-xs text-ink-muted mt-1">شارك نتيجتك وشوف ردودهم</p>
+                <p className="text-sm text-gold font-bold">تحدّ أصدقائك — من يصل أسرع؟ 🏆</p>
+                <p className="text-xs text-gray-500 mt-1">شارك نتيجتك وشوف ردودهم</p>
               </div>
             </div>
 
@@ -474,9 +474,9 @@ export default function Home() {
                 { label: 'صافي ثروتك الآن', value: formatNumber(result.netWorth) + ' ريال', gold: true },
                 { label: 'الادخار الشهري', value: formatNumber(result.monthlySaving) + ' ريال', gold: false },
               ].map((m) => (
-                <div key={m.label} className="bg-white/70 rounded-xl p-4">
-                  <div className="text-xs text-ink-muted mb-1">{m.label}</div>
-                  <div className={`text-lg font-bold ${m.gold ? 'text-gold-deep' : 'text-ink'}`}>{m.value}</div>
+                <div key={m.label} className="bg-white/5 rounded-xl p-4">
+                  <div className="text-xs text-gray-500 mb-1">{m.label}</div>
+                  <div className={`text-lg font-bold ${m.gold ? 'text-gold' : 'text-white'}`}>{m.value}</div>
                 </div>
               ))}
             </div>
@@ -522,7 +522,7 @@ export default function Home() {
 
             <button
               onClick={() => { setResult(null); setStep(1) }}
-              className="w-full py-3 text-ink-muted text-sm hover:text-ink transition-colors"
+              className="w-full py-3 text-gray-400 text-sm hover:text-white transition-colors"
             >
               ← أعد الحساب بأرقام مختلفة
             </button>

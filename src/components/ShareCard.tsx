@@ -291,8 +291,8 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
 
       {/* عنوان */}
       <div className="text-center">
-        <p className="text-sm font-bold text-ink mb-1">🔥 تحدّ ٣ من أصدقائك الحين!</p>
-        <p className="text-xs text-ink-muted">شارك نتيجتك ومنشنهم — من يصير مليونير أول؟</p>
+        <p className="text-sm font-bold text-white mb-1">🔥 تحدّ ٣ من أصدقائك الحين!</p>
+        <p className="text-xs text-gray-400">شارك نتيجتك ومنشنهم — من يصير مليونير أول؟</p>
       </div>
 
       {/* أزرار المشاركة */}
@@ -300,25 +300,25 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
         <button
           onClick={downloadCard}
           disabled={downloading}
-          className="py-3 bg-gold/20 border border-gold/40 text-gold-deep text-sm font-bold rounded-xl hover:bg-gold/30 transition-all disabled:opacity-50"
+          className="py-3 bg-gold/20 border border-gold/40 text-gold text-sm font-bold rounded-xl hover:bg-gold/30 transition-all disabled:opacity-50"
         >
           {downloading ? '⏳ جاري...' : '📥 حمّل الصورة'}
         </button>
         <button
           onClick={copyChallenge}
-          className="py-3 bg-white/70 border border-gold/30 text-ink-soft text-sm font-bold rounded-xl hover:bg-gold/10 transition-all"
+          className="py-3 bg-white/5 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/10 transition-all"
         >
           {copied ? '✅ تم النسخ!' : '📋 نسخ التحدي'}
         </button>
         <button
           onClick={shareWhatsapp}
-          className="py-3 bg-green-500/20 border border-green-500/30 text-green-700 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all"
+          className="py-3 bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all"
         >
           📱 تحدّ على واتساب
         </button>
         <button
           onClick={shareX}
-          className="py-3 bg-white border border-gold/30 text-ink-soft text-sm font-bold rounded-xl hover:bg-gold/15 transition-all"
+          className="py-3 bg-white/10 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/20 transition-all"
         >
           𝕏 تحدّ على X
         </button>

@@ -367,7 +367,7 @@ export default function ReportPage() {
       // html-to-image يحافظ على تشكيل الحروف العربية بعكس html2canvas
       const canvas = await toCanvas(element, {
         pixelRatio: 2,
-        backgroundColor: '#FBF7EE',
+        backgroundColor: '#f8fbff',
         cacheBust: true,
       })
 
@@ -405,7 +405,7 @@ export default function ReportPage() {
 
   return (
     <main className="min-h-screen font-tajawal" dir="rtl"
-      style={{background:'linear-gradient(135deg,#F3EAD6 0%,#FBF7EE 50%,#F6F0E3 100%)'}}>
+      style={{background:'linear-gradient(135deg,#e2f5ec 0%,#f8fbff 50%,#e8f0fb 100%)'}}>
 
       {/* Header */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-100">
@@ -550,7 +550,7 @@ export default function ReportPage() {
                   {label:'الفائض الشهري', value:`${formatNumber(data.monthlySaving)} ر`, max:10},
                 ].map(m => (
                   <div key={m.label} className="p-3 rounded-2xl text-center"
-                    style={{background:'#FBF7EE', border:'1px solid #EFE4CC'}}>
+                    style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
                     <p className="text-xs text-gray-400 mb-0.5">{m.label}</p>
                     <p className="text-sm font-bold" style={{color:'#0d1b3e'}}>{m.value}</p>
                   </div>
@@ -664,7 +664,7 @@ export default function ReportPage() {
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 rounded-2xl text-center" style={{background:'#FBF7EE', border:'1px solid #EFE4CC'}}>
+                <div className="p-4 rounded-2xl text-center" style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
                   <p className="text-xs text-gray-400 mb-1">تحتاج شهرياً</p>
                   <p className="text-xl font-extrabold" style={{color:'#0d1b3e'}}>
                     {formatNumber(requiredMonthly)} ر
@@ -760,7 +760,7 @@ export default function ReportPage() {
                     </button>
                     {openIdea===i && (
                       <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
-                        <div className="p-3 rounded-xl" style={{background:'#FBF7EE', border:'1px solid #EFE4CC'}}>
+                        <div className="p-3 rounded-xl" style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
                           <p className="text-xs font-bold mb-2" style={{color:'#3b82f6'}}>📊 نظرة على السوق</p>
                           <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{idea.description}</p>
                         </div>
@@ -847,7 +847,7 @@ export default function ReportPage() {
                   {label:'موعدك المتوقع', value:monthsToLabel(data.totalMonths), color:'#0d1b3e'},
                 ].map((goal, i) => (
                   <div key={i} className="flex justify-between items-center p-4 rounded-2xl"
-                    style={{background:'#FBF7EE', border:'1px solid #EFE4CC'}}>
+                    style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
                     <span className="text-sm text-gray-500">{goal.label}</span>
                     <span className="text-sm font-extrabold" style={{color:goal.color}}>{goal.value}</span>
                   </div>
@@ -962,7 +962,7 @@ export default function ReportPage() {
                           style={{background: isMillionaire ? '#B8860B' : '#10b981'}}>
                           {isMillionaire ? '🏆' : m.year}
                         </div>
-                        <div className="p-3 rounded-2xl" style={{background:isMillionaire?'rgba(184,134,11,0.06)':'#FBF7EE', border:`1px solid ${isMillionaire?'rgba(184,134,11,0.2)':'#EFE4CC'}`}}>
+                        <div className="p-3 rounded-2xl" style={{background:isMillionaire?'rgba(184,134,11,0.06)':'#f8fbff', border:`1px solid ${isMillionaire?'rgba(184,134,11,0.2)':'#e8f0fb'}`}}>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-sm font-bold" style={{color:'#0d1b3e'}}>بعد {m.year} {m.year === 1 ? 'سنة' : 'سنوات'}</span>
                             <span className="text-sm font-extrabold" style={{color:isMillionaire?'#B8860B':'#10b981'}}>{formatNumber(m.amount)} ر</span>
@@ -989,7 +989,7 @@ export default function ReportPage() {
               {(report as any).emergency_fund && (
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-4 rounded-2xl text-center" style={{background:'#FBF7EE', border:'1px solid #EFE4CC'}}>
+                    <div className="p-4 rounded-2xl text-center" style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
                       <p className="text-xs text-gray-400 mb-1">عندك الآن</p>
                       <p className="text-lg font-extrabold" style={{color:'#0d1b3e'}}>{formatNumber((report as any).emergency_fund.current)} ر</p>
                     </div>
@@ -1147,7 +1147,7 @@ export default function ReportPage() {
                     </div>
                   ))}
                   <div className="p-3 rounded-2xl text-center text-xs text-gray-500 mt-2"
-                    style={{background:'#FBF7EE', border:'1px solid #EFE4CC'}}>
+                    style={{background:'#f8fbff', border:'1px solid #e8f0fb'}}>
                     💡 أفضل استراتيجية: ابدأ بصندوق الطوارئ ← ثم ادخار بنكي ← ثم استثمار تدريجي
                   </div>
                 </div>

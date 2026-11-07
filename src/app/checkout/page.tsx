@@ -40,48 +40,48 @@ export default function CheckoutPage() {
   )
 
   return (
-    <main className="min-h-screen bg-cream text-ink font-tajawal" dir="rtl">
+    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
       <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10">
 
         {/* Header */}
-        <button onClick={() => router.back()} className="text-ink-muted text-sm mb-6 hover:text-ink transition-colors flex items-center gap-2">
+        <button onClick={() => router.back()} className="text-gray-400 text-sm mb-6 hover:text-white transition-colors flex items-center gap-2">
           ← رجوع
         </button>
 
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">📊</div>
           <h1 className="text-2xl font-extrabold mb-2">تقرير تسريع الثروة</h1>
-          <p className="text-ink-muted text-sm">مخصص لوضعك المالي الحالي</p>
+          <p className="text-gray-400 text-sm">مخصص لوضعك المالي الحالي</p>
         </div>
 
         {/* ملخص الوضع */}
-        <div className="bg-white/70 border border-gold/20 rounded-2xl p-5 mb-4">
-          <p className="text-xs text-ink-muted mb-3 font-bold">وضعك الحالي</p>
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-4">
+          <p className="text-xs text-gray-500 mb-3 font-bold">وضعك الحالي</p>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-ink-muted">الادخار الشهري</span>
+              <span className="text-gray-400">الادخار الشهري</span>
               <span className="font-bold">{formatNumber(data.monthlySaving)} ريال</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-ink-muted">صافي الثروة</span>
+              <span className="text-gray-400">صافي الثروة</span>
               <span className="font-bold">{formatNumber(data.netWorth)} ريال</span>
             </div>
-            <div className="flex justify-between border-t border-gold/20 pt-2 mt-2">
-              <span className="text-ink-muted">ستصل للمليون خلال</span>
-              <span className="font-bold text-red-600">{monthsToLabel(data.totalMonths)}</span>
+            <div className="flex justify-between border-t border-white/10 pt-2 mt-2">
+              <span className="text-gray-400">ستصل للمليون خلال</span>
+              <span className="font-bold text-red-400">{monthsToLabel(data.totalMonths)}</span>
             </div>
           </div>
         </div>
 
         {/* وعد التقرير */}
         <div className="bg-gold/10 border border-gold/30 rounded-2xl p-5 mb-6 text-center">
-          <p className="text-sm text-ink-soft mb-2">بعد التقرير يمكنك الوصول خلال</p>
-          <div className="text-3xl font-extrabold text-gold-deep">{monthsToLabel(bestMonths)}</div>
-          <p className="text-xs text-ink-muted mt-1">بناءً على أفضل سيناريو لوضعك</p>
+          <p className="text-sm text-gray-300 mb-2">بعد التقرير يمكنك الوصول خلال</p>
+          <div className="text-3xl font-extrabold text-gold">{monthsToLabel(bestMonths)}</div>
+          <p className="text-xs text-gray-400 mt-1">بناءً على أفضل سيناريو لوضعك</p>
         </div>
 
         {/* ما يشمله التقرير */}
-        <div className="bg-white/70 border border-gold/20 rounded-2xl p-5 mb-6">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6">
           <p className="text-sm font-bold mb-3">التقرير يشمل:</p>
           <div className="space-y-2.5">
             {[
@@ -93,7 +93,7 @@ export default function CheckoutPage() {
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-sm">
                 <span className="text-lg">{item.icon}</span>
-                <span className="text-ink-soft">{item.text}</span>
+                <span className="text-gray-300">{item.text}</span>
               </div>
             ))}
           </div>
@@ -101,31 +101,31 @@ export default function CheckoutPage() {
 
         {/* السعر والدفع */}
         <div className="text-center mb-4">
-          <div className="inline-block bg-green-500/20 border border-green-500/40 text-green-700 text-xs font-bold px-4 py-1.5 rounded-full mb-3">
+          <div className="inline-block bg-green-500/20 border border-green-500/40 text-green-400 text-xs font-bold px-4 py-1.5 rounded-full mb-3">
             🎁 مجاني لفترة الإطلاق
           </div>
-          <div className="text-2xl text-ink-muted line-through mb-1">9 ريال</div>
-          <div className="text-4xl font-extrabold text-gold-deep mb-1">مجاناً</div>
-          <p className="text-xs text-ink-muted mb-5">احصل على تقريرك الكامل الآن بدون أي رسوم</p>
+          <div className="text-2xl text-gray-500 line-through mb-1">9 ريال</div>
+          <div className="text-4xl font-extrabold text-gold mb-1">مجاناً</div>
+          <p className="text-xs text-gray-500 mb-5">احصل على تقريرك الكامل الآن بدون أي رسوم</p>
 
           {/* الإيميل */}
           <div className="mb-4">
-            <label className="block text-sm text-ink-muted mb-2">📧 أرسل التقرير لبريدك الإلكتروني</label>
+            <label className="block text-sm text-gray-400 mb-2">📧 أرسل التقرير لبريدك الإلكتروني</label>
             <input
               type="email"
               value={email}
               onChange={e => { setEmail(e.target.value); setEmailError('') }}
               placeholder="بريدك الإلكتروني"
-              className="w-full bg-white border border-gold/30 rounded-xl px-4 py-3 text-ink text-base focus:outline-none focus:border-gold transition-colors text-right"
+              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-gold transition-colors text-right"
             />
-            {emailError && <p className="text-red-600 text-xs mt-2">{emailError}</p>}
-            <p className="text-xs text-ink-muted mt-1">لن نشارك إيميلك مع أحد</p>
+            {emailError && <p className="text-red-400 text-xs mt-2">{emailError}</p>}
+            <p className="text-xs text-gray-600 mt-1">لن نشارك إيميلك مع أحد</p>
           </div>
 
           <button
             onClick={handlePay}
             disabled={loading}
-            className="w-full py-4 bg-gradient-to-l from-gold to-gold-deep hover:brightness-110 text-white font-bold text-xl rounded-xl transition-all active:scale-95 shadow-lg shadow-gold/20 disabled:opacity-70"
+            className="w-full py-4 bg-gold hover:bg-yellow-600 text-white font-bold text-xl rounded-xl transition-all active:scale-95 shadow-lg shadow-gold/20 disabled:opacity-70"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -136,7 +136,7 @@ export default function CheckoutPage() {
             )}
           </button>
 
-          <p className="mt-3 text-xs text-ink-muted">
+          <p className="mt-3 text-xs text-gray-500">
             لا حاجة لبطاقة دفع — التقرير مجاني بالكامل حالياً
           </p>
         </div>
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
           ].map((t, i) => (
             <div key={i} className="text-center">
               <div className="text-xl">{t.icon}</div>
-              <div className="text-xs text-ink-muted mt-1">{t.text}</div>
+              <div className="text-xs text-gray-500 mt-1">{t.text}</div>
             </div>
           ))}
         </div>

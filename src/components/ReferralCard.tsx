@@ -33,21 +33,21 @@ export default function ReferralCard() {
   }
 
   return (
-    <div className="bg-white/70 border border-gold/20 rounded-2xl p-5">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">🎁</span>
         <div>
           <p className="text-sm font-bold">شارك واحصل على خصم</p>
-          <p className="text-xs text-ink-muted">كل صديق يسجل عبر رابطك = خصم 20% على تقريرك القادم</p>
+          <p className="text-xs text-gray-400">كل صديق يسجل عبر رابطك = خصم 20% على تقريرك القادم</p>
         </div>
       </div>
 
       {/* الرابط */}
-      <div className="bg-white border border-gold/30 rounded-xl px-4 py-3 flex justify-between items-center mb-3 gap-2">
-        <span className="text-xs text-ink-muted truncate flex-1">{referralLink}</span>
+      <div className="bg-white/10 border border-white/20 rounded-xl px-4 py-3 flex justify-between items-center mb-3 gap-2">
+        <span className="text-xs text-gray-400 truncate flex-1">{referralLink}</span>
         <button
           onClick={copyLink}
-          className="text-xs text-gold-deep font-bold shrink-0 hover:text-gold transition-colors"
+          className="text-xs text-gold font-bold shrink-0 hover:text-yellow-400 transition-colors"
         >
           {copied ? '✓ تم' : 'نسخ'}
         </button>
@@ -57,20 +57,20 @@ export default function ReferralCard() {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={shareWhatsapp}
-          className="py-2.5 bg-green-500/20 border border-green-500/30 text-green-700 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all"
+          className="py-2.5 bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-bold rounded-xl hover:bg-green-500/30 transition-all"
         >
           📱 واتساب
         </button>
         <button
           onClick={shareX}
-          className="py-2.5 bg-white border border-gold/30 text-ink-soft text-sm font-bold rounded-xl hover:bg-gold/15 transition-all"
+          className="py-2.5 bg-white/10 border border-white/20 text-gray-300 text-sm font-bold rounded-xl hover:bg-white/20 transition-all"
         >
           𝕏 تويتر
         </button>
       </div>
 
-      <p className="text-xs text-ink-muted text-center mt-3">
-        كودك: <span className="text-gold-deep font-bold">{code}</span>
+      <p className="text-xs text-gray-600 text-center mt-3">
+        كودك: <span className="text-gold font-bold">{code}</span>
       </p>
     </div>
   )

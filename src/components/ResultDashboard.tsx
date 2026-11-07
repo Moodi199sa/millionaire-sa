@@ -45,7 +45,7 @@ export default function ResultDashboard({
       <div className="flex items-center gap-5">
         <div className="relative flex-shrink-0" style={{ width: 130, height: 130 }}>
           <svg width="130" height="130" viewBox="0 0 130 130">
-            <circle cx="65" cy="65" r={R} fill="none" stroke="rgba(212,160,23,0.15)" strokeWidth="10" />
+            <circle cx="65" cy="65" r={R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
             <circle
               cx="65" cy="65" r={R} fill="none"
               stroke="url(#goldGrad)" strokeWidth="10" strokeLinecap="round"
@@ -61,16 +61,16 @@ export default function ResultDashboard({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="gold-shimmer text-3xl font-extrabold leading-none">{startPct}%</span>
-            <span className="text-[10px] text-ink-muted mt-1">من المليون</span>
+            <span className="text-[10px] text-gray-400 mt-1">من المليون</span>
           </div>
         </div>
         <div className="flex-1 text-right">
-          <p className="text-sm text-ink-muted mb-1">أنت الآن على بُعد</p>
-          <p className="text-2xl font-extrabold text-ink leading-tight">{yearsToGoal} {yearsToGoal <= 10 ? 'سنوات' : 'سنة'}</p>
-          <p className="text-sm text-ink-muted mt-1">من أول مليون ريال</p>
+          <p className="text-sm text-gray-400 mb-1">أنت الآن على بُعد</p>
+          <p className="text-2xl font-extrabold text-white leading-tight">{yearsToGoal} {yearsToGoal <= 10 ? 'سنوات' : 'سنة'}</p>
+          <p className="text-sm text-gray-400 mt-1">من أول مليون ريال</p>
           {targetYear && (
             <div className="inline-block mt-2 bg-gold/10 border border-gold/20 rounded-full px-3 py-1">
-              <span className="text-xs text-gold-deep font-bold">الوصول المتوقع: {targetYear}</span>
+              <span className="text-xs text-gold font-bold">الوصول المتوقع: {targetYear}</span>
             </div>
           )}
         </div>
@@ -84,19 +84,19 @@ export default function ResultDashboard({
           { label: 'ادخارك اليومي', value: formatNumber(Math.round(monthlySaving / 30)), unit: 'ريال/يوم' },
         ].map((c) => (
           <div key={c.label} className="glass-card rounded-xl p-3 text-center">
-            <div className="text-[10px] text-ink-muted mb-1">{c.label}</div>
-            <div className="text-base font-extrabold text-gold-deep leading-none">{c.value}</div>
-            <div className="text-[10px] text-ink-muted mt-1">{c.unit}</div>
+            <div className="text-[10px] text-gray-500 mb-1">{c.label}</div>
+            <div className="text-base font-extrabold text-gold leading-none">{c.value}</div>
+            <div className="text-[10px] text-gray-500 mt-1">{c.unit}</div>
           </div>
         ))}
       </div>
 
       {/* الخط الزمني للمحطات */}
       <div>
-        <p className="text-xs text-ink-muted mb-4 text-center">محطات رحلتك للمليون</p>
+        <p className="text-xs text-gray-400 mb-4 text-center">محطات رحلتك للمليون</p>
         <div className="relative px-2">
           {/* الخط الخلفي */}
-          <div className="absolute top-[7px] right-2 left-2 h-1 rounded-full bg-white" />
+          <div className="absolute top-[7px] right-2 left-2 h-1 rounded-full bg-white/10" />
           {/* الخط المعبّأ حتى نقطة الانطلاق */}
           <div
             className="absolute top-[7px] right-2 h-1 rounded-full"
@@ -113,14 +113,14 @@ export default function ResultDashboard({
                   <div
                     className="w-4 h-4 rounded-full border-2 z-10"
                     style={{
-                      background: reached ? '#D4A017' : '#FFFCF5',
-                      borderColor: reached ? '#F5C842' : 'rgba(156,116,16,0.3)',
+                      background: reached ? '#D4A017' : '#2A3A5C',
+                      borderColor: reached ? '#F5C842' : 'rgba(255,255,255,0.2)',
                     }}
                   />
-                  <span className={`text-[9px] mt-2 text-center leading-tight ${reached ? 'text-gold-deep font-bold' : 'text-ink-muted'}`}>
+                  <span className={`text-[9px] mt-2 text-center leading-tight ${reached ? 'text-gold font-bold' : 'text-gray-500'}`}>
                     {m.label}
                   </span>
-                  <span className="text-[9px] text-ink-muted mt-0.5">{formatNumber(m.amount / 1000)}ك</span>
+                  <span className="text-[9px] text-gray-600 mt-0.5">{formatNumber(m.amount / 1000)}ك</span>
                 </div>
               )
             })}

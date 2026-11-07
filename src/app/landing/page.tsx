@@ -52,15 +52,15 @@ export default function LandingPage() {
   const router = useRouter()
 
   return (
-    <main className="min-h-screen bg-cream text-ink font-tajawal" dir="rtl">
+    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
 
       {/* Nav */}
-      <nav className="border-b border-gold/20 px-4 py-4">
+      <nav className="border-b border-white/10 px-4 py-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="text-gold-deep font-extrabold text-lg">💰 متى تصير مليونير؟</div>
+          <div className="text-gold font-extrabold text-lg">💰 متى تصير مليونير؟</div>
           <button
             onClick={() => router.push('/')}
-            className="px-4 py-2 bg-gradient-to-l from-gold to-gold-deep text-white text-sm font-bold rounded-xl hover:brightness-110 transition-all"
+            className="px-4 py-2 bg-gold text-white text-sm font-bold rounded-xl hover:bg-yellow-600 transition-all"
           >
             ابدأ مجاناً
           </button>
@@ -69,24 +69,24 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <div className="inline-block bg-gold/20 border border-gold/40 text-gold-deep text-xs font-bold px-4 py-1.5 rounded-full mb-6">
+        <div className="inline-block bg-gold/20 border border-gold/40 text-gold text-xs font-bold px-4 py-1.5 rounded-full mb-6">
           🎯 أداة مجانية للتخطيط المالي
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-          متى تصير<br /><span className="text-gold-deep">مليونير</span>؟
+          متى تصير<br /><span className="text-gold">مليونير</span>؟
         </h1>
-        <p className="text-ink-muted text-lg md:text-xl mb-4 max-w-xl mx-auto leading-relaxed">
+        <p className="text-gray-400 text-lg md:text-xl mb-4 max-w-xl mx-auto leading-relaxed">
           أجب على 4 أسئلة بسيطة واكتشف متى ستصل لأول مليون ريال — ومشاريع وأفكار تساعدك تصل أسرع
         </p>
-        <p className="text-ink-muted text-sm mb-10">انضم لأكثر من 5,000 شخص استخدموا الحاسبة هذا الشهر</p>
+        <p className="text-gray-600 text-sm mb-10">انضم لأكثر من 5,000 شخص استخدموا الحاسبة هذا الشهر</p>
 
         <button
           onClick={() => router.push('/')}
-          className="px-10 py-4 bg-gradient-to-l from-gold to-gold-deep hover:brightness-110 text-white font-extrabold text-xl rounded-2xl transition-all active:scale-95 shadow-xl shadow-gold/20 mb-4"
+          className="px-10 py-4 bg-gold hover:bg-yellow-600 text-white font-extrabold text-xl rounded-2xl transition-all active:scale-95 shadow-xl shadow-gold/20 mb-4"
         >
           احسب متى تصير مليونير 🚀
         </button>
-        <p className="text-ink-muted text-xs">مجاني تماماً · لا تسجيل · 30 ثانية</p>
+        <p className="text-gray-600 text-xs">مجاني تماماً · لا تسجيل · 30 ثانية</p>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mt-14 max-w-lg mx-auto">
@@ -96,15 +96,15 @@ export default function LandingPage() {
             { num: '100%', label: 'مجاني ومحمي' },
           ].map((s, i) => (
             <div key={i} className="text-center">
-              <div className="text-2xl font-extrabold text-gold-deep">{s.num}</div>
-              <div className="text-xs text-ink-muted mt-1">{s.label}</div>
+              <div className="text-2xl font-extrabold text-gold">{s.num}</div>
+              <div className="text-xs text-gray-500 mt-1">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* How it works */}
-      <section className="bg-white/70 border-y border-gold/20 py-16 px-4">
+      <section className="bg-white/3 border-y border-white/10 py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-extrabold text-center mb-10">كيف يعمل الموقع؟</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -113,13 +113,13 @@ export default function LandingPage() {
               { step: '2', icon: '🤖', title: 'الذكاء الاصطناعي يحلل', desc: 'يحسب المدة ويقارن السيناريوهات المختلفة' },
               { step: '3', icon: '🎯', title: 'خطتك جاهزة', desc: 'تعرف بالضبط متى تصل وكيف تصل أسرع' },
             ].map((item, i) => (
-              <div key={i} className="text-center p-6 bg-white/70 border border-gold/20 rounded-2xl">
-                <div className="w-10 h-10 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-gold-deep font-extrabold text-lg mx-auto mb-4">
+              <div key={i} className="text-center p-6 bg-white/5 border border-white/10 rounded-2xl">
+                <div className="w-10 h-10 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center text-gold font-extrabold text-lg mx-auto mb-4">
                   {item.step}
                 </div>
                 <div className="text-3xl mb-3">{item.icon}</div>
                 <h3 className="font-bold mb-2">{item.title}</h3>
-                <p className="text-sm text-ink-muted">{item.desc}</p>
+                <p className="text-sm text-gray-400">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -136,11 +136,11 @@ export default function LandingPage() {
             { icon: '🎴', title: 'بطاقة مشاركة', desc: 'شارك نتيجتك على واتساب وتيك توك' },
             { icon: '🎯', title: 'مقارنة السيناريوهات', desc: 'اعرف كيف توصل أسرع بتغييرات بسيطة' },
           ].map((item, i) => (
-            <div key={i} className="flex gap-4 p-4 bg-white/70 border border-gold/20 rounded-xl">
+            <div key={i} className="flex gap-4 p-4 bg-white/5 border border-white/10 rounded-xl">
               <span className="text-3xl shrink-0">{item.icon}</span>
               <div>
                 <p className="font-bold text-sm">{item.title}</p>
-                <p className="text-xs text-ink-muted mt-1">{item.desc}</p>
+                <p className="text-xs text-gray-400 mt-1">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -148,26 +148,26 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-white/70 border-y border-gold/20 py-16 px-4">
+      <section className="bg-white/3 border-y border-white/10 py-16 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-extrabold text-center mb-2">قالوا عن الموقع</h2>
-          <p className="text-ink-muted text-sm text-center mb-10">آراء حقيقية من مستخدمين</p>
+          <p className="text-gray-500 text-sm text-center mb-10">آراء حقيقية من مستخدمين</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {testimonials.map((t, i) => (
-              <div key={i} className="bg-white/70 border border-gold/20 rounded-2xl p-5">
+              <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-5">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center font-extrabold text-ink`}>
+                  <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center font-extrabold text-white`}>
                     {t.avatar}
                   </div>
                   <div>
                     <p className="text-sm font-bold">{t.name}</p>
-                    <p className="text-xs text-ink-muted">{t.job}</p>
+                    <p className="text-xs text-gray-500">{t.job}</p>
                   </div>
                 </div>
-                <p className="text-sm text-ink-soft leading-relaxed mb-3">"{t.text}"</p>
-                <div className="text-xs text-gold-deep font-bold">🎯 سيصل خلال: {t.years}</div>
+                <p className="text-sm text-gray-300 leading-relaxed mb-3">"{t.text}"</p>
+                <div className="text-xs text-gold font-bold">🎯 سيصل خلال: {t.years}</div>
                 <div className="flex gap-1 mt-2">
-                  {[1,2,3,4,5].map(s => <span key={s} className="text-gold-deep text-xs">★</span>)}
+                  {[1,2,3,4,5].map(s => <span key={s} className="text-gold text-xs">★</span>)}
                 </div>
               </div>
             ))}
@@ -180,9 +180,9 @@ export default function LandingPage() {
         <h2 className="text-2xl font-extrabold text-center mb-10">أسئلة شائعة</h2>
         <div className="space-y-4">
           {faqs.map((faq, i) => (
-            <div key={i} className="bg-white/70 border border-gold/20 rounded-xl p-5">
+            <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5">
               <p className="font-bold text-sm mb-2">❓ {faq.q}</p>
-              <p className="text-sm text-ink-muted leading-relaxed">{faq.a}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">{faq.a}</p>
             </div>
           ))}
         </div>
@@ -191,26 +191,26 @@ export default function LandingPage() {
       {/* Final CTA */}
       <section className="bg-gold/10 border-y border-gold/20 py-16 px-4 text-center">
         <h2 className="text-2xl font-extrabold mb-3">تحدّ أصدقائك — من يصير مليونير أول؟</h2>
-        <p className="text-ink-muted text-sm mb-8">30 ثانية بس — ومجاني تماماً</p>
+        <p className="text-gray-400 text-sm mb-8">30 ثانية بس — ومجاني تماماً</p>
         <button
           onClick={() => router.push('/')}
-          className="px-10 py-4 bg-gradient-to-l from-gold to-gold-deep hover:brightness-110 text-white font-extrabold text-xl rounded-2xl transition-all active:scale-95 shadow-xl shadow-gold/20"
+          className="px-10 py-4 bg-gold hover:bg-yellow-600 text-white font-extrabold text-xl rounded-2xl transition-all active:scale-95 shadow-xl shadow-gold/20"
         >
           ابدأ الحساب مجاناً 🚀
         </button>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 text-center border-t border-gold/20">
-        <div className="text-gold-deep font-extrabold mb-2">💰 متى تصير مليونير؟</div>
-        <div className="flex justify-center gap-5 text-xs text-ink-muted mb-3">
+      <footer className="py-8 px-4 text-center border-t border-white/10">
+        <div className="text-gold font-extrabold mb-2">💰 متى تصير مليونير؟</div>
+        <div className="flex justify-center gap-5 text-xs text-gray-500 mb-3">
           <a href="/privacy" className="hover:text-gold transition-colors">سياسة الخصوصية</a>
           <span>·</span>
           <a href="/terms" className="hover:text-gold transition-colors">الشروط والأحكام</a>
           <span>·</span>
           <a href="mailto:hello@millionaire-sa.com" className="hover:text-gold transition-colors">تواصل معنا</a>
         </div>
-        <p className="text-ink-muted text-xs">© {new Date().getFullYear()} متى تصير مليونير — للتوعية المالية فقط، ليست استشارة مالية</p>
+        <p className="text-gray-600 text-xs">© {new Date().getFullYear()} متى تصير مليونير — للتوعية المالية فقط، ليست استشارة مالية</p>
       </footer>
 
     </main>

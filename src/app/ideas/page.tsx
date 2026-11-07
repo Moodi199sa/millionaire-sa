@@ -38,10 +38,10 @@ function LoadingIdeas() {
     <div className="text-center py-16">
       <div className="text-6xl mb-6 animate-pulse">💡</div>
       <h2 className="text-xl font-bold mb-2">يتم تجهيز أفكار المشاريع</h2>
-      <p className="text-ink-muted text-sm mb-8">نبحث في أحدث الأسواق والفرص...</p>
-      <div className="text-5xl font-extrabold text-gold-deep mb-2">{count}</div>
-      <p className="text-ink-muted text-sm mb-6">فكرة مشروع تم توليدها</p>
-      <div className="w-full bg-white rounded-full h-3 max-w-xs mx-auto">
+      <p className="text-gray-400 text-sm mb-8">نبحث في أحدث الأسواق والفرص...</p>
+      <div className="text-5xl font-extrabold text-gold mb-2">{count}</div>
+      <p className="text-gray-400 text-sm mb-6">فكرة مشروع تم توليدها</p>
+      <div className="w-full bg-white/10 rounded-full h-3 max-w-xs mx-auto">
         <div className="bg-gold h-3 rounded-full transition-all duration-300" style={{ width: `${count}%` }} />
       </div>
     </div>
@@ -86,10 +86,10 @@ export default function IdeasPage() {
   }
 
   const capitalColor = (color: string) => {
-    if (color === 'green') return 'text-green-700 bg-green-400/10 border-green-400/30'
-    if (color === 'yellow') return 'text-gold-deep bg-yellow-400/10 border-yellow-400/30'
-    if (color === 'orange') return 'text-orange-600 bg-orange-400/10 border-orange-400/30'
-    return 'text-red-600 bg-red-400/10 border-red-400/30'
+    if (color === 'green') return 'text-green-400 bg-green-400/10 border-green-400/30'
+    if (color === 'yellow') return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
+    if (color === 'orange') return 'text-orange-400 bg-orange-400/10 border-orange-400/30'
+    return 'text-red-400 bg-red-400/10 border-red-400/30'
   }
 
   const filtered = ideas.filter(idea => {
@@ -100,29 +100,29 @@ export default function IdeasPage() {
   })
 
   return (
-    <main className="min-h-screen bg-cream text-ink font-tajawal" dir="rtl">
+    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
       <div className="max-w-xl mx-auto px-4 py-8">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => router.push('/report')} className="text-ink-muted text-sm hover:text-ink">
+          <button onClick={() => router.push('/report')} className="text-gray-400 text-sm hover:text-white">
             ← التقرير
           </button>
-          <div className="text-xs bg-gold/20 text-gold-deep px-3 py-1 rounded-full font-bold border border-gold/30">
+          <div className="text-xs bg-gold/20 text-gold px-3 py-1 rounded-full font-bold border border-gold/30">
             ✓ دليل مدفوع
           </div>
         </div>
 
         <div className="text-center mb-6">
           <h1 className="text-2xl font-extrabold mb-1">💡 100 فكرة مشروع ناجح</h1>
-          <p className="text-ink-muted text-sm">محدّث بأحدث فرص السوق السعودي</p>
+          <p className="text-gray-400 text-sm">محدّث بأحدث فرص السوق السعودي</p>
         </div>
 
         {loading && <LoadingIdeas />}
         {error && (
           <div className="text-center py-10">
-            <p className="text-red-600 mb-4">{error}</p>
-            <button onClick={generateIdeas} className="px-6 py-3 bg-gradient-to-l from-gold to-gold-deep text-white rounded-xl font-bold">
+            <p className="text-red-400 mb-4">{error}</p>
+            <button onClick={generateIdeas} className="px-6 py-3 bg-gold text-white rounded-xl font-bold">
               أعد المحاولة
             </button>
           </div>
@@ -137,9 +137,9 @@ export default function IdeasPage() {
                 { label: 'بدون رأس مال', value: ideas.filter(i => i.capital === 'بدون رأس مال').length },
                 { label: 'فئات مختلفة', value: ideas.reduce((acc: string[], i) => acc.includes(i.category) ? acc : [...acc, i.category], []).length },
               ].map((stat, i) => (
-                <div key={i} className="bg-white/70 rounded-xl p-3 text-center">
-                  <div className="text-2xl font-extrabold text-gold-deep">{stat.value}</div>
-                  <div className="text-xs text-ink-muted mt-1">{stat.label}</div>
+                <div key={i} className="bg-white/5 rounded-xl p-3 text-center">
+                  <div className="text-2xl font-extrabold text-gold">{stat.value}</div>
+                  <div className="text-xs text-gray-400 mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -151,9 +151,9 @@ export default function IdeasPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="ابحث عن فكرة..."
-                className="w-full bg-white border border-gold/30 rounded-xl px-4 py-3 text-ink text-sm focus:outline-none focus:border-gold transition-colors"
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold transition-colors"
               />
-              <span className="absolute left-4 top-3 text-ink-muted">🔍</span>
+              <span className="absolute left-4 top-3 text-gray-400">🔍</span>
             </div>
 
             {/* Category Filter */}
@@ -164,8 +164,8 @@ export default function IdeasPage() {
                   onClick={() => setActiveCategory(cat)}
                   className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
                     activeCategory === cat
-                      ? 'bg-gradient-to-l from-gold to-gold-deep border-gold text-white'
-                      : 'border-gold/30 text-ink-muted hover:border-gold/50'
+                      ? 'bg-gold border-gold text-white'
+                      : 'border-white/20 text-gray-400 hover:border-white/40'
                   }`}
                 >
                   {cat}
@@ -181,8 +181,8 @@ export default function IdeasPage() {
                   onClick={() => setActiveCapital(cap)}
                   className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
                     activeCapital === cap
-                      ? 'bg-gradient-to-l from-gold to-gold-deep border-gold text-white'
-                      : 'border-gold/30 text-ink-muted hover:border-gold/50'
+                      ? 'bg-gold border-gold text-white'
+                      : 'border-white/20 text-gray-400 hover:border-white/40'
                   }`}
                 >
                   {cap}
@@ -190,59 +190,59 @@ export default function IdeasPage() {
               ))}
             </div>
 
-            <p className="text-xs text-ink-muted mb-4">{filtered.length} فكرة</p>
+            <p className="text-xs text-gray-500 mb-4">{filtered.length} فكرة</p>
 
             {/* Ideas List */}
             <div className="space-y-3">
               {filtered.map((idea) => (
                 <div
                   key={idea.id}
-                  className="border border-gold/20 rounded-2xl overflow-hidden"
+                  className="border border-white/10 rounded-2xl overflow-hidden"
                 >
                   {/* Header */}
                   <button
                     onClick={() => setExpanded(expanded === idea.id ? null : idea.id)}
-                    className="w-full p-4 bg-white/70 hover:bg-gold/10 transition-all text-right"
+                    className="w-full p-4 bg-white/5 hover:bg-white/10 transition-all text-right"
                   >
                     <div className="flex justify-between items-start gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-xs bg-white text-ink-muted px-2 py-0.5 rounded-full">{idea.category}</span>
+                          <span className="text-xs bg-white/10 text-gray-400 px-2 py-0.5 rounded-full">{idea.category}</span>
                           <span className={`text-xs px-2 py-0.5 rounded-full border font-bold ${capitalColor(idea.capital_color)}`}>
                             {idea.capital}
                           </span>
                         </div>
                         <p className="text-sm font-bold text-right">{idea.title}</p>
-                        <p className="text-xs text-gold-deep mt-1">{idea.monthly_profit}</p>
+                        <p className="text-xs text-gold mt-1">{idea.monthly_profit}</p>
                       </div>
-                      <span className="text-ink-muted text-lg shrink-0">{expanded === idea.id ? '▲' : '▼'}</span>
+                      <span className="text-gray-400 text-lg shrink-0">{expanded === idea.id ? '▲' : '▼'}</span>
                     </div>
                   </button>
 
                   {/* Details */}
                   {expanded === idea.id && (
-                    <div className="p-4 space-y-3 border-t border-gold/20">
-                      <p className="text-sm text-ink-soft leading-relaxed">{idea.description}</p>
+                    <div className="p-4 space-y-3 border-t border-white/10">
+                      <p className="text-sm text-gray-300 leading-relaxed">{idea.description}</p>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white/70 rounded-xl p-3">
-                          <p className="text-xs text-ink-muted mb-1">⏱️ وقت الربح</p>
-                          <p className="text-sm font-bold text-gold-deep">{idea.time_to_profit}</p>
+                        <div className="bg-white/5 rounded-xl p-3">
+                          <p className="text-xs text-gray-500 mb-1">⏱️ وقت الربح</p>
+                          <p className="text-sm font-bold text-gold">{idea.time_to_profit}</p>
                         </div>
-                        <div className="bg-white/70 rounded-xl p-3">
-                          <p className="text-xs text-ink-muted mb-1">💰 الربح المتوقع</p>
-                          <p className="text-sm font-bold text-green-700">{idea.monthly_profit}</p>
+                        <div className="bg-white/5 rounded-xl p-3">
+                          <p className="text-xs text-gray-500 mb-1">💰 الربح المتوقع</p>
+                          <p className="text-sm font-bold text-green-400">{idea.monthly_profit}</p>
                         </div>
                       </div>
 
-                      <div className="bg-white/70 rounded-xl p-3">
-                        <p className="text-xs text-ink-muted mb-2">📋 كيف تبدأ</p>
-                        <p className="text-sm text-ink-soft">{idea.how_to_start}</p>
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <p className="text-xs text-gray-500 mb-2">📋 كيف تبدأ</p>
+                        <p className="text-sm text-gray-300">{idea.how_to_start}</p>
                       </div>
 
                       <div className="bg-gold/10 border border-gold/30 rounded-xl p-3">
-                        <p className="text-xs text-gold-deep font-bold mb-1">⚡ خطوتك الأولى اليوم</p>
-                        <p className="text-sm text-ink-soft">{idea.first_step}</p>
+                        <p className="text-xs text-gold font-bold mb-1">⚡ خطوتك الأولى اليوم</p>
+                        <p className="text-sm text-gray-200">{idea.first_step}</p>
                       </div>
                     </div>
                   )}
@@ -251,7 +251,7 @@ export default function IdeasPage() {
             </div>
 
             {filtered.length === 0 && (
-              <div className="text-center py-10 text-ink-muted">
+              <div className="text-center py-10 text-gray-500">
                 <div className="text-4xl mb-3">🔍</div>
                 <p>ما في نتائج — جرب فلتر مختلف</p>
               </div>
@@ -260,7 +260,7 @@ export default function IdeasPage() {
             {/* Refresh */}
             <button
               onClick={generateIdeas}
-              className="w-full mt-6 py-3 bg-white/70 border border-gold/20 rounded-xl text-sm text-ink-muted hover:bg-gold/10 transition-all"
+              className="w-full mt-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-400 hover:bg-white/10 transition-all"
             >
               🔄 حدّث الأفكار بأحدث السوق
             </button>

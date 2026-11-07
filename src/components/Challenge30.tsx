@@ -51,19 +51,19 @@ export default function Challenge30({ monthlySaving }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl">🗓️</span>
-          <h3 className="text-base font-extrabold text-ink">تحدّي ٣٠ يوم</h3>
+          <h3 className="text-base font-extrabold text-white">تحدّي ٣٠ يوم</h3>
         </div>
-        {state && <span className="text-xs text-gold-deep font-bold">اليوم {day} من ٣٠</span>}
+        {state && <span className="text-xs text-gold font-bold">اليوم {day} من ٣٠</span>}
       </div>
 
       {!state ? (
         <>
-          <p className="text-sm text-ink-soft leading-relaxed">
+          <p className="text-sm text-gray-300 leading-relaxed">
             ٤ خطوات صغيرة، وحدة كل أسبوع. نهاية الشهر بتشوف كم قرّبت من المليون.
           </p>
           <button
             onClick={start}
-            className="w-full py-3 bg-gradient-to-l from-gold to-gold-deep text-white font-bold rounded-xl shadow-lg shadow-gold/20 hover:brightness-105 transition-all active:scale-95"
+            className="w-full py-3 bg-gradient-to-l from-gold-light to-gold text-white font-bold rounded-xl shadow-lg shadow-gold/20 hover:brightness-105 transition-all active:scale-95"
           >
             ابدأ التحدّي 💪
           </button>
@@ -88,10 +88,10 @@ export default function Challenge30({ monthlySaving }: Props) {
                 </defs>
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-extrabold text-gold-deep">{completed}/4</span>
+                <span className="text-lg font-extrabold text-gold">{completed}/4</span>
               </div>
             </div>
-            <p className="text-sm text-ink-soft leading-relaxed">
+            <p className="text-sm text-gray-300 leading-relaxed">
               {completed === 0 ? 'بداية قوية — علّم كل خطوة لما تخلّصها.' : completed < 4 ? 'كمّل — كل خطوة تقرّبك.' : 'خلّصت الأربع خطوات 👏'}
             </p>
           </div>
@@ -101,25 +101,25 @@ export default function Challenge30({ monthlySaving }: Props) {
                 key={i}
                 onClick={() => toggle(i)}
                 className={`w-full flex items-center gap-3 text-right p-3 rounded-xl border transition-all ${
-                  state.done[i] ? 'bg-green-500/10 border-green-500/30' : 'glass-card hover:bg-gold/10'
+                  state.done[i] ? 'bg-green-500/10 border-green-500/30' : 'glass-card hover:bg-white/10'
                 }`}
               >
                 <span
                   className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                    state.done[i] ? 'bg-green-500 text-white' : 'border border-gold/30 text-transparent'
+                    state.done[i] ? 'bg-green-500 text-white' : 'border border-white/20 text-transparent'
                   }`}
                 >
                   ✓
                 </span>
                 <span className="flex-1">
-                  <span className="block text-xs text-gold-deep font-bold">{s.title}</span>
-                  <span className={`block text-sm ${state.done[i] ? 'text-ink-muted line-through' : 'text-ink-soft'}`}>{s.text}</span>
+                  <span className="block text-xs text-gold font-bold">{s.title}</span>
+                  <span className={`block text-sm ${state.done[i] ? 'text-gray-400 line-through' : 'text-gray-200'}`}>{s.text}</span>
                 </span>
               </button>
             ))}
           </div>
           {completed === 4 && (
-            <p className="text-center text-sm font-bold text-green-700">🏆 خلّصت التحدّي! احسب من جديد وشوف تقدّمك</p>
+            <p className="text-center text-sm font-bold text-green-400">🏆 خلّصت التحدّي! احسب من جديد وشوف تقدّمك</p>
           )}
         </>
       )}
