@@ -53,41 +53,41 @@ const articles = [
 ]
 
 const tagColors: Record<string, string> = {
-  'ادخار': 'text-blue-400 bg-blue-400/10',
-  'استثمار': 'text-green-400 bg-green-400/10',
-  'مشاريع': 'text-gold bg-gold/10',
-  'تخطيط': 'text-purple-400 bg-purple-400/10',
+  'ادخار': 'text-blue-700 bg-blue-400/10',
+  'استثمار': 'text-green-700 bg-green-400/10',
+  'مشاريع': 'text-gold-deep bg-gold/10',
+  'تخطيط': 'text-purple-700 bg-purple-400/10',
   'حرية مالية': 'text-pink-400 bg-pink-400/10',
-  'نصائح': 'text-orange-400 bg-orange-400/10',
+  'نصائح': 'text-orange-600 bg-orange-400/10',
 }
 
 export default function BlogPage() {
   return (
-    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
+    <main className="min-h-screen bg-cream text-ink font-tajawal" dir="rtl">
       <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10">
 
         {/* Nav */}
         <div className="flex justify-between items-center mb-10">
-          <Link href="/" className="text-gold font-extrabold text-lg">💰 متى تصير مليونير؟</Link>
-          <Link href="/" className="text-sm text-gray-400 hover:text-white transition-colors">← الرئيسية</Link>
+          <Link href="/" className="text-gold-deep font-extrabold text-lg">💰 متى تصير مليونير؟</Link>
+          <Link href="/" className="text-sm text-ink-muted hover:text-ink transition-colors">← الرئيسية</Link>
         </div>
 
         <h1 className="text-2xl font-extrabold mb-2">📚 مدونة الثروة الشخصية</h1>
-        <p className="text-gray-400 text-sm mb-8">مقالات عملية لمساعدتك على الوصول للمليون أسرع</p>
+        <p className="text-ink-muted text-sm mb-8">مقالات عملية لمساعدتك على الوصول للمليون أسرع</p>
 
         {/* Articles */}
         <div className="space-y-4 mb-10">
           {articles.map((article, i) => (
-            <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+            <div key={i} className="bg-white/70 border border-gold/20 rounded-2xl p-5">
               <div className="flex justify-between items-start mb-2">
                 <span className={`text-xs px-2 py-1 rounded-full font-bold ${tagColors[article.tag]}`}>
                   {article.tag}
                 </span>
-                <span className="text-xs text-gray-500">{article.readTime}</span>
+                <span className="text-xs text-ink-muted">{article.readTime}</span>
               </div>
               <h2 className="text-base font-bold mb-2">{article.title}</h2>
-              <p className="text-sm text-gray-400">{article.desc}</p>
-              <p className="text-xs text-gray-600 mt-3 font-bold">قريباً 🔜</p>
+              <p className="text-sm text-ink-muted">{article.desc}</p>
+              <p className="text-xs text-ink-muted mt-3 font-bold">قريباً 🔜</p>
             </div>
           ))}
         </div>
@@ -95,10 +95,10 @@ export default function BlogPage() {
         {/* CTA */}
         <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 text-center">
           <h3 className="text-lg font-extrabold mb-2">تحدّ أصدقائك الحين!</h3>
-          <p className="text-gray-400 text-sm mb-4">30 ثانية فقط — مجاناً</p>
+          <p className="text-ink-muted text-sm mb-4">30 ثانية فقط — مجاناً</p>
           <Link
             href="/"
-            className="inline-block px-8 py-3 bg-gold hover:bg-yellow-600 text-white font-bold rounded-xl transition-all"
+            className="inline-block px-8 py-3 bg-gradient-to-l from-gold to-gold-deep hover:brightness-110 text-white font-bold rounded-xl transition-all"
           >
             ابدأ الحساب 🚀
           </Link>

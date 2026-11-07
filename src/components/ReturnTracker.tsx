@@ -35,8 +35,8 @@ export default function ReturnTracker({ currentMonths, netWorth }: Props) {
         <span className="text-xl">📌</span>
         </div>
         <div>
-          <p className="text-sm font-bold text-white">حفظنا نتيجتك على جهازك</p>
-          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+          <p className="text-sm font-bold text-ink">حفظنا نتيجتك على جهازك</p>
+          <p className="text-xs text-ink-muted mt-1 leading-relaxed">
             ارجع بعد شهر وأدخل أرقامك الجديدة — بنقولك كم قرّبت من المليون من آخر مرة.
           </p>
         </div>
@@ -50,20 +50,20 @@ export default function ReturnTracker({ currentMonths, netWorth }: Props) {
 
   const tone =
     diff > 0
-      ? { icon: '🚀', color: 'text-green-400', border: 'border-green-500/30', title: `قرّبت ${monthsSavedLabel(diff)} من المليون!` }
+      ? { icon: '🚀', color: 'text-green-700', border: 'border-green-500/30', title: `قرّبت ${monthsSavedLabel(diff)} من المليون!` }
       : diff < 0
-      ? { icon: '⚠️', color: 'text-orange-400', border: 'border-orange-500/30', title: `تأخّرت ${monthsSavedLabel(-diff)} عن آخر مرة` }
-      : { icon: '⏸️', color: 'text-gold', border: 'border-gold/30', title: 'نفس مكانك من آخر مرة' }
+      ? { icon: '⚠️', color: 'text-orange-600', border: 'border-orange-500/30', title: `تأخّرت ${monthsSavedLabel(-diff)} عن آخر مرة` }
+      : { icon: '⏸️', color: 'text-gold-deep', border: 'border-gold/30', title: 'نفس مكانك من آخر مرة' }
 
   return (
     <div className={`glass-card border ${tone.border} rounded-2xl p-5 animate-fade-up`}>
-      <p className="text-xs text-gray-400 mb-2">مقارنة مع زيارتك قبل {since}</p>
+      <p className="text-xs text-ink-muted mb-2">مقارنة مع زيارتك قبل {since}</p>
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl flex-shrink-0">{tone.icon}</div>
+        <div className="w-12 h-12 rounded-2xl bg-white/70 flex items-center justify-center text-2xl flex-shrink-0">{tone.icon}</div>
         <p className={`text-lg font-extrabold ${tone.color}`}>{tone.title}</p>
       </div>
       {diff <= 0 && (
-        <p className="text-xs text-gray-400 mt-2">جرّب &quot;أقرب حركة&quot; فوق — خطوة وحدة ترجّعك للمسار.</p>
+        <p className="text-xs text-ink-muted mt-2">جرّب &quot;أقرب حركة&quot; فوق — خطوة وحدة ترجّعك للمسار.</p>
       )}
     </div>
   )

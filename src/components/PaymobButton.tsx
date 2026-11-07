@@ -37,7 +37,7 @@ export default function PaymobButton({ amount, product, label, className }: Prop
 
   return (
     <button onClick={handlePay} disabled={loading}
-      className={className || 'w-full py-4 bg-gold hover:bg-yellow-600 text-white font-extrabold rounded-2xl transition-all active:scale-95'}>
+      className={className || 'w-full py-4 bg-gradient-to-l from-gold to-gold-deep hover:brightness-110 text-white font-extrabold rounded-2xl transition-all active:scale-95'}>
       {loading ? '⏳ جاري التحضير...' : label}
     </button>
   )

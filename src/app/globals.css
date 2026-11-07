@@ -9,8 +9,8 @@
 html, body {
   direction: rtl;
   font-family: 'Tajawal', sans-serif;
-  background-color: #0A0F1C;
-  color: #ffffff;
+  background-color: #F6F0E3;
+  color: #3A2E1A;
 }
 
 :root {
@@ -25,13 +25,13 @@ html, body {
 .gold-border-gradient {
   border: 1.5px solid transparent;
   background:
-    linear-gradient(#0f1626, #0f1626) padding-box,
+    linear-gradient(#FFFCF5, #FFFCF5) padding-box,
     linear-gradient(135deg, #F5C842, rgba(212, 160, 23, 0.15) 45%, #D4A017) border-box;
 }
 
 /* لمعان متحرّك على الأرقام */
 .gold-shimmer {
-  background: linear-gradient(100deg, #D4A017 20%, #FFE08A 40%, #D4A017 60%);
+  background: linear-gradient(100deg, #9C7410 20%, #D4A017 40%, #9C7410 60%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -44,8 +44,8 @@ html, body {
 
 /* زجاجية */
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(212, 160, 23, 0.18);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -54,7 +54,7 @@ html, body {
 .animate-glow { animation: glow 4s ease-in-out infinite; }
 @keyframes glow {
   0%, 100% { box-shadow: 0 0 0 rgba(212, 160, 23, 0); }
-  50% { box-shadow: 0 0 28px rgba(212, 160, 23, 0.18); }
+  50% { box-shadow: 0 6px 30px rgba(184, 134, 11, 0.16); }
 }
 
 /* ظهور ناعم */
@@ -73,5 +73,5 @@ html, body {
 
 @media (prefers-reduced-motion: reduce) {
   .gold-shimmer, .animate-glow, .animate-fade-up, .animate-pulse-dot { animation: none; }
-  .gold-shimmer { color: #D4A017; }
+  .gold-shimmer { color: #9C7410; }
 }

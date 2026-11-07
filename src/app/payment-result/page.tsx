@@ -33,28 +33,28 @@ function Result() {
   }, [params, router])
 
   return (
-    <main className="min-h-screen bg-dark flex items-center justify-center font-tajawal" dir="rtl">
+    <main className="min-h-screen bg-cream flex items-center justify-center font-tajawal" dir="rtl">
       <div className="text-center px-4">
         {state === 'checking' && (
           <>
             <div className="text-6xl mb-4 animate-pulse">⏳</div>
-            <h1 className="text-2xl font-extrabold text-white mb-2">جاري تأكيد الدفع...</h1>
-            <p className="text-gray-400">لحظات من فضلك</p>
+            <h1 className="text-2xl font-extrabold text-ink mb-2">جاري تأكيد الدفع...</h1>
+            <p className="text-ink-muted">لحظات من فضلك</p>
           </>
         )}
         {state === 'success' && (
           <>
             <div className="text-6xl mb-4">🎉</div>
-            <h1 className="text-2xl font-extrabold text-white mb-2">تم الدفع بنجاح!</h1>
-            <p className="text-gray-400">جاري تحويلك...</p>
+            <h1 className="text-2xl font-extrabold text-ink mb-2">تم الدفع بنجاح!</h1>
+            <p className="text-ink-muted">جاري تحويلك...</p>
           </>
         )}
         {state === 'failed' && (
           <>
             <div className="text-6xl mb-4">❌</div>
-            <h1 className="text-2xl font-extrabold text-white mb-2">لم يتم تأكيد الدفع</h1>
-            <p className="text-gray-400 mb-4 text-sm">إذا خُصم المبلغ ولم يظهر المحتوى، تواصل معنا</p>
-            <button onClick={() => router.push('/')} className="mt-2 px-6 py-3 bg-gold text-white rounded-xl font-bold">
+            <h1 className="text-2xl font-extrabold text-ink mb-2">لم يتم تأكيد الدفع</h1>
+            <p className="text-ink-muted mb-4 text-sm">إذا خُصم المبلغ ولم يظهر المحتوى، تواصل معنا</p>
+            <button onClick={() => router.push('/')} className="mt-2 px-6 py-3 bg-gradient-to-l from-gold to-gold-deep text-white rounded-xl font-bold">
               العودة للرئيسية
             </button>
           </>

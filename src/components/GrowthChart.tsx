@@ -50,7 +50,7 @@ export default function GrowthChart({ labels, data, goal }: Props) {
     },
     scales: {
       x: {
-        grid: { color: 'rgba(255,255,255,0.06)' },
+        grid: { color: 'rgba(58,46,26,0.08)' },
         ticks: {
           color: '#888',
           font: { size: 11, family: 'Tajawal' },
@@ -58,7 +58,7 @@ export default function GrowthChart({ labels, data, goal }: Props) {
         },
       },
       y: {
-        grid: { color: 'rgba(255,255,255,0.06)' },
+        grid: { color: 'rgba(58,46,26,0.08)' },
         ticks: {
           color: '#888',
           font: { size: 11, family: 'Tajawal' },
