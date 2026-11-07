@@ -8,7 +8,6 @@ import {
   formatNumber,
   buildChartData,
 } from '@/lib/calculator'
-import ResultDashboard from '@/components/ResultDashboard'
 import NearestLever from '@/components/NearestLever'
 import ReturnTracker from '@/components/ReturnTracker'
 import Challenge30 from '@/components/Challenge30'
@@ -452,43 +451,16 @@ export default function Home() {
               </div>
             ) : (
               <>
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
-              <div className="inline-block bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-bold px-3 py-1 rounded-full mb-3">
-                🔥 نتيجة تحدي المليون
-              </div>
-              <p className="text-gray-400 text-sm mb-2">ستصل لأول مليون ريال خلال</p>
-              <div className="text-5xl font-extrabold text-gold leading-tight">
-                {monthsToLabel(result.totalMonths)}
-              </div>
-              {result.totalMonths < 99999 && (
-                <div className="text-lg font-bold mt-3">📅 {targetDate(result.totalMonths)}</div>
-              )}
-              <div className="mt-4 bg-gold/10 border border-gold/20 rounded-xl p-3">
-                <p className="text-sm text-gold font-bold">تحدّ أصدقائك — من يصل أسرع؟ 🏆</p>
-                <p className="text-xs text-gray-500 mt-1">شارك نتيجتك وشوف ردودهم</p>
-              </div>
-            </div>
+            <ShareCard
+              years={monthsToLabel(result.totalMonths)}
+              totalMonths={result.totalMonths}
+              date={targetDate(result.totalMonths)}
+              goal="مليون ريال"
+            />
 
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: 'صافي ثروتك الآن', value: formatNumber(result.netWorth) + ' ريال', gold: true },
-                { label: 'الادخار الشهري', value: formatNumber(result.monthlySaving) + ' ريال', gold: false },
-              ].map((m) => (
-                <div key={m.label} className="bg-white/5 rounded-xl p-4">
-                  <div className="text-xs text-gray-500 mb-1">{m.label}</div>
-                  <div className={`text-lg font-bold ${m.gold ? 'text-gold' : 'text-white'}`}>{m.value}</div>
-                </div>
-              ))}
-            </div>
-
+            {/* الرفيق المتابع — يظهر بس لما يرجع المستخدم (مقارنة مع آخر زيارة) */}
             {result.totalMonths < 99999 && (
-              <ResultDashboard
-                netWorth={result.netWorth}
-                monthlySaving={result.monthlySaving}
-                totalMonths={result.totalMonths}
-                targetDate={targetDate(result.totalMonths)}
-                goal={1000000}
-              />
+              <ReturnTracker currentMonths={result.totalMonths} netWorth={result.netWorth} />
             )}
 
             {/* من تنبؤ إلى تحكّم — أقرب رافعة قابلة للتنفيذ (مجانية) */}
@@ -501,18 +473,6 @@ export default function Home() {
                 goal={1000000}
               />
             )}
-
-            {/* الرفيق المتابع — مقارنة مع آخر زيارة */}
-            {result.totalMonths < 99999 && (
-              <ReturnTracker currentMonths={result.totalMonths} netWorth={result.netWorth} />
-            )}
-
-            <ShareCard
-              years={monthsToLabel(result.totalMonths)}
-              totalMonths={result.totalMonths}
-              date={targetDate(result.totalMonths)}
-              goal="مليون ريال"
-            />
 
             <UpsellCard scenarios={result.scenarios} userData={{ salary: Number(salary), expenses: Number(expenses), savings: Number(savings), investments: Number(investments), rate: result.effectiveRate ?? rate, monthlySaving: result.monthlySaving, netWorth: result.netWorth, totalMonths: result.totalMonths }} />
 

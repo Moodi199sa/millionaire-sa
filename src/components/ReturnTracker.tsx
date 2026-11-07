@@ -26,23 +26,9 @@ export default function ReturnTracker({ currentMonths, netWorth }: Props) {
 
   if (!ready) return null
 
-  // زيارة أولى (أو نفس الجلسة خلال دقائق) — نعطيه سبب يرجع
+  // زيارة أولى (أو نفس الجلسة خلال دقائق) — ما نعرض شي، بس نحفظ النتيجة بصمت
   const minutesAgo = prev ? (Date.now() - prev.at) / 60000 : Infinity
-  if (!prev || minutesAgo < 10) {
-    return (
-      <div className="glass-card rounded-2xl p-5 flex items-start gap-3 animate-fade-up">
-        <div className="w-10 h-10 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0">
-        <span className="text-xl">📌</span>
-        </div>
-        <div>
-          <p className="text-sm font-bold text-white">حفظنا نتيجتك على جهازك</p>
-          <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-            ارجع بعد شهر وأدخل أرقامك الجديدة — بنقولك كم قرّبت من المليون من آخر مرة.
-          </p>
-        </div>
-      </div>
-    )
-  }
+  if (!prev || minutesAgo < 10) return null
 
   const diff = prev.months - currentMonths // موجب = تقدّم
   const days = Math.max(1, Math.round((Date.now() - prev.at) / 86400000))
