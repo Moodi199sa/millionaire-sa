@@ -51,7 +51,7 @@ export default function SharePage({ params }: { params: { months: string } }) {
         <p className="text-gray-400 mb-6">احسب خلال 30 ثانية متى بتصل لأول مليون</p>
       )}
       <p className="text-white font-bold mb-4">وأنت؟ متى بتصير مليونير؟</p>
-      <Link href="/"
+      <Link href="/calculator"
         className="px-8 py-4 rounded-2xl font-extrabold text-lg"
         style={{ background: '#D4A017', color: '#0a0f1c' }}>
         احسب نتيجتي الآن ←

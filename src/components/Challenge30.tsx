@@ -8,7 +8,7 @@ interface Props {
   monthlySaving: number
 }
 
-// تحدّي ٣٠ يوم — ٤ خطوات أسبوعية، التقدّم محفوظ محلياً على جهاز المستخدم.
+// تحدّي 30 يوم — 4 خطوات أسبوعية، التقدّم محفوظ محلياً على جهاز المستخدم.
 export default function Challenge30({ monthlySaving }: Props) {
   const [state, setState] = useState<ChallengeState | null>(null)
   const [mounted, setMounted] = useState(false)
@@ -22,10 +22,10 @@ export default function Challenge30({ monthlySaving }: Props) {
 
   const weekly = Math.max(50, Math.round((monthlySaving * 0.1) / 4 / 10) * 10)
   const steps = [
-    { title: 'الأسبوع ١', text: 'اكتب كل مصاريفك ٧ أيام — بدون ما تغيّر شي' },
-    { title: 'الأسبوع ٢', text: 'ألغِ اشتراك ما تستخدمه' },
-    { title: 'الأسبوع ٣', text: `حوّل ${formatNumber(weekly)} ريال لحساب الادخار` },
-    { title: 'الأسبوع ٤', text: 'ارجع للحاسبة بأرقامك الجديدة وشوف الفرق' },
+    { title: 'الأسبوع 1', text: 'اكتب كل مصاريفك 7 أيام — بدون ما تغيّر شي' },
+    { title: 'الأسبوع 2', text: 'ألغِ اشتراك ما تستخدمه' },
+    { title: 'الأسبوع 3', text: `حوّل ${formatNumber(weekly)} ريال لحساب الادخار` },
+    { title: 'الأسبوع 4', text: 'ارجع للحاسبة بأرقامك الجديدة وشوف الفرق' },
   ]
 
   const start = () => {
@@ -51,15 +51,15 @@ export default function Challenge30({ monthlySaving }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl">🗓️</span>
-          <h3 className="text-base font-extrabold text-white">تحدّي ٣٠ يوم</h3>
+          <h3 className="text-base font-extrabold text-white">تحدّي 30 يوم</h3>
         </div>
-        {state && <span className="text-xs text-gold font-bold">اليوم {day} من ٣٠</span>}
+        {state && <span className="text-xs text-gold font-bold">اليوم {day} من 30</span>}
       </div>
 
       {!state ? (
         <>
           <p className="text-sm text-gray-300 leading-relaxed">
-            ٤ خطوات صغيرة، وحدة كل أسبوع. نهاية الشهر بتشوف كم قرّبت من المليون.
+            4 خطوات صغيرة، وحدة كل أسبوع. نهاية الشهر بتشوف كم قرّبت من المليون.
           </p>
           <button
             onClick={start}

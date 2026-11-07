@@ -44,7 +44,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
     if (!cardRef.current) return null
     await document.fonts.ready
     await new Promise((r) => setTimeout(r, 150))
-    return toPng(cardRef.current, { backgroundColor: '#22304F', pixelRatio: 3, cacheBust: true })
+    return toPng(cardRef.current, { backgroundColor: '#1A212B', pixelRatio: 3, cacheBust: true })
   }
 
   // نسخة أفقية بنفس الألوان والنصوص والعناصر بالضبط (نفس عناصر DOM حقيقية عبر
@@ -56,7 +56,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
     if (!ogCardRef.current) return null
     await document.fonts.ready
     await new Promise((r) => setTimeout(r, 150))
-    return toPng(ogCardRef.current, { backgroundColor: '#1B2742', pixelRatio: 2, cacheBust: true })
+    return toPng(ogCardRef.current, { backgroundColor: '#12171F', pixelRatio: 2, cacheBust: true })
   }
 
   // رفع الصورة في الخلفية بمجرد جهوزية الكرت — لا ينتظره أي زر مشاركة لاحقاً.
@@ -121,7 +121,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
       <div
         ref={cardRef}
         style={{
-          background: '#22304F',
+          background: '#1A212B',
           border: '2px solid #D4A017',
           borderRadius: '20px',
           padding: '28px 24px',
@@ -140,7 +140,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
         <div style={{
           display: 'inline-block',
           background: '#D4A017',
-          color: '#1B2742',
+          color: '#12171F',
           fontSize: '11px',
           fontWeight: 900,
           padding: '5px 16px',
@@ -179,11 +179,11 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
             <div style={{ color: '#6B7280', fontSize: '10px' }}>شهر</div>
           </div>
           <div style={{ textAlign: 'center', background: 'rgba(212,160,23,0.1)', border: '1px solid rgba(212,160,23,0.2)', borderRadius: '10px', padding: '8px 14px' }}>
-            <div style={{ color: '#D4A017', fontSize: '20px', fontWeight: 900 }}>{days.toLocaleString('ar-SA')}</div>
+            <div style={{ color: '#D4A017', fontSize: '20px', fontWeight: 900 }}>{days.toLocaleString('en-US')}</div>
             <div style={{ color: '#6B7280', fontSize: '10px' }}>يوم</div>
           </div>
           <div style={{ textAlign: 'center', background: 'rgba(212,160,23,0.1)', border: '1px solid rgba(212,160,23,0.2)', borderRadius: '10px', padding: '8px 14px' }}>
-            <div style={{ color: '#D4A017', fontSize: '20px', fontWeight: 900 }}>{weeks.toLocaleString('ar-SA')}</div>
+            <div style={{ color: '#D4A017', fontSize: '20px', fontWeight: 900 }}>{weeks.toLocaleString('en-US')}</div>
             <div style={{ color: '#6B7280', fontSize: '10px' }}>أسبوع</div>
           </div>
         </div>
@@ -239,7 +239,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
           left: '-99999px',
           width: '1200px',
           height: '630px',
-          background: '#1B2742',
+          background: '#12171F',
           padding: '28px',
           fontFamily: 'Tajawal, sans-serif',
           direction: 'rtl',
@@ -247,14 +247,14 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
       >
         <div style={{
           width: '100%', height: '100%', position: 'relative', overflow: 'hidden', boxSizing: 'border-box',
-          background: '#22304F', border: '2px solid #D4A017', borderRadius: '24px',
+          background: '#1A212B', border: '2px solid #D4A017', borderRadius: '24px',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: '55px 44px', gap: '9px', textAlign: 'center',
         }}>
           <div style={{ position: 'absolute', fontSize: '150px', opacity: 0.05, top: '-10px', right: '20px', lineHeight: 1 }}>💰</div>
           <div style={{ position: 'absolute', fontSize: '150px', opacity: 0.05, bottom: '-20px', left: '20px', lineHeight: 1 }}>🏆</div>
 
-          <div style={{ background: '#D4A017', color: '#1B2742', fontSize: '20px', fontWeight: 800, padding: '5px 20px', borderRadius: '18px' }}>
+          <div style={{ background: '#D4A017', color: '#12171F', fontSize: '20px', fontWeight: 800, padding: '5px 20px', borderRadius: '18px' }}>
             تحدي المليونير 🔥
           </div>
           <div style={{ color: '#F5C842', fontSize: '19px', fontWeight: 700, maxWidth: '1020px' }}>
@@ -266,15 +266,15 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
 
           <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: '16px', margin: '6px 0' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '14px', padding: '10px 24px' }}>
-              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{totalMonths.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{totalMonths.toLocaleString('en-US')}</div>
               <div style={{ color: '#8b93a1', fontSize: '15px' }}>شهر</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '14px', padding: '10px 24px' }}>
-              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{days.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{days.toLocaleString('en-US')}</div>
               <div style={{ color: '#8b93a1', fontSize: '15px' }}>يوم</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(212,160,23,0.08)', border: '1px solid rgba(212,160,23,0.25)', borderRadius: '14px', padding: '10px 24px' }}>
-              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{weeks.toLocaleString('ar-SA')}</div>
+              <div style={{ color: '#D4A017', fontSize: '30px', fontWeight: 800 }}>{weeks.toLocaleString('en-US')}</div>
               <div style={{ color: '#8b93a1', fontSize: '15px' }}>أسبوع</div>
             </div>
           </div>

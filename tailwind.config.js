@@ -11,7 +11,16 @@ module.exports = {
         gold: '#D4A017',
         'gold-light': '#F5C842',
         'gold-pale': '#FDF6DC',
-        dark: '#1B2742',
+        dark: '#12171F',
+        // نظام التصميم الجديد — فحمي داكن + كهرماني + أخضر
+        ink: {
+          950: '#0D1117',
+          900: '#12171F',
+          850: '#161C25',
+          800: '#1A212B',
+          700: '#222A36',
+          600: '#2E3846',
+        },
       },
       fontFamily: {
         tajawal: ['Tajawal', 'sans-serif'],

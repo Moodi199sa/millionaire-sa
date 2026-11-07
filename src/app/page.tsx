@@ -1,498 +1,271 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import {
-  calcMonthsToGoal,
-  monthsToLabel,
-  targetDate,
-  formatNumber,
-  buildChartData,
-} from '@/lib/calculator'
-import NearestLever from '@/components/NearestLever'
-import ReturnTracker from '@/components/ReturnTracker'
-import Challenge30 from '@/components/Challenge30'
-import ShareCard from '@/components/ShareCard'
-import UpsellCard from '@/components/UpsellCard'
-import Footer from '@/components/Footer'
-import EmailGate from '@/components/EmailGate'
-import ReferralCard from '@/components/ReferralCard'
+  Rocket, PlayCircle, Calculator, Zap, MapPin, Lock, Gift, Timer, ShieldCheck,
+  ClipboardList, LineChart, Flag, CheckCircle2, ChevronDown, Sparkles, Map as MapIcon,
+} from 'lucide-react'
+import SiteShell from '@/components/site/SiteShell'
+import GrowthSvg from '@/components/site/GrowthSvg'
+import { calcMonthsToGoal, monthsToLabel, formatNumber, buildProjection } from '@/lib/calculator'
 import { saveReferral, getReferralFromURL } from '@/lib/store'
-import { UserData } from '@/lib/store'
 
-interface Result {
-  totalMonths: number
-  netWorth: number
-  monthlySaving: number
-  effectiveRate?: number
-  chartLabels: string[]
-  chartData: number[]
-  scenarios: { label: string; months: number }[]
+const RISKS = [
+  { v: 4, l: 'محافظ' },
+  { v: 7, l: 'متوازن' },
+  { v: 12, l: 'جريء' },
+]
+
+const FAQS = [
+  { q: 'هل الحاسبة دقيقة؟', a: 'الحاسبة تعتمد على معادلة العائد المركب المعيارية. النتائج تقديرية وتفترض ثبات أرقامك، وهي مناسبة للتخطيط المالي الشخصي وليست استشارة مالية.' },
+  { q: 'هل لازم أسجّل أو أعطيكم بياناتي؟', a: 'لا. الحساب كله يتم على جهازك بدون تسجيل. أرقامك ما تنحفظ عندنا، وتُستخدم بس لما تطلب التقرير المدفوع عشان نجهّزه لك.' },
+  { q: 'وش الفرق بين محافظ ومتوازن وجريء؟', a: 'هو العائد السنوي المتوقع على ادخارك: محافظ (4%) مثل الصكوك والودائع، متوازن (7%) مثل صناديق المؤشرات، وجريء (12%) مثل الأسهم مع تقلبات أعلى.' },
+  { q: 'وش يعطيني التقرير بـ 9 ريال؟', a: 'تحليل مخصص لأرقامك: مقارنة سيناريوهات، تشخيص وضعك ودرجة جاهزيتك، أفكار دخل إضافي، وخطة أسبوعية وأهداف واضحة.' },
+  { q: 'ما عندي مدخرات، يفيدني الموقع؟', a: 'أكيد. الموقع مصمم للي يبدأ من الصفر — بتعرف متى توصل، ووش أسرع حركة تختصر عليك الطريق.' },
+]
+
+export default function HomePage() {
+  const [saving, setSaving] = useState(3000)
+  const [balance, setBalance] = useState(20000)
+  const [risk, setRisk] = useState(7)
+
+  useEffect(() => {
+    const ref = getReferralFromURL()
+    if (ref) saveReferral(ref)
+  }, [])
+
+  const months = calcMonthsToGoal(balance, saving, risk, 1000000)
+  const years = Math.round((months / 12) * 10) / 10
+  const points = buildProjection(balance, saving, risk, months, 30)
+
+  return (
+    <SiteShell>
+      <main>
+        {/* ═══ الواجهة ═══ */}
+        <section className="relative overflow-hidden">
+          <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full opacity-30 blur-3xl"
+            style={{ background: 'radial-gradient(closest-side,rgba(245,158,11,0.35),transparent)' }} />
+          <div className="relative max-w-7xl mx-auto px-4 lg:px-8 pt-10 lg:pt-16 pb-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_440px] gap-10 items-center">
+            <div className="text-center lg:text-right">
+              <span className="chip bg-amber-400/10 text-amber-400 border border-amber-400/20 mb-5"><Sparkles size={13} /> مجاني بالكامل · بدون تسجيل</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.2] mb-4">
+                متى بتصير <span className="text-amber-grad">مليونير؟</span> 💰
+              </h1>
+              <p className="text-xl lg:text-2xl font-bold text-gray-200 mb-3">اكتشف خطتك المالية للوصول لأول مليون ريال</p>
+              <p className="text-gray-400 leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
+                أجب على 4 أسئلة بسيطة، وشوف متى توصل للمليون، ووش أسرع الحركات اللي تختصر عليك سنين — والحساب كله على جهازك.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
+                <Link href="/calculator" className="btn-primary px-8 py-4 text-lg">احسب موعد ثروتك الآن <Rocket size={20} /></Link>
+                <a href="#how" className="btn-ghost px-6 py-4"><PlayCircle size={20} /> شوف كيف يشتغل</a>
+              </div>
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3">
+                <div className="card-soft px-4 py-3 text-center min-w-[120px]">
+                  <p className="text-xl font-extrabold text-amber-400">14 سنة</p>
+                  <p className="text-xs text-gray-400">متوسط الوصول</p>
+                </div>
+                <div className="card-soft px-4 py-3 text-center min-w-[120px]">
+                  <p className="text-xl font-extrabold text-emerald-400">30 ثانية</p>
+                  <p className="text-xs text-gray-400">للحصول على النتيجة</p>
+                </div>
+                <div className="card-soft px-4 py-3 text-center min-w-[120px]">
+                  <p className="text-xl font-extrabold">100%</p>
+                  <p className="text-xs text-gray-400">مجاني وخاص</p>
+                </div>
+              </div>
+            </div>
+
+            {/* المحاكي الحي */}
+            <div className="rounded-3xl border border-white/[0.07] p-5 lg:p-6 shadow-2xl shadow-black/40"
+              style={{ background: 'linear-gradient(160deg,#1E2631 0%,#18202A 60%,#152623 100%)' }}>
+              <div className="flex items-center justify-between mb-5">
+                <p className="font-extrabold flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot" /> محاكي المليون الحي</p>
+                <span className="chip bg-white/[0.05] text-gray-400">جرّب الأرقام</span>
+              </div>
+
+              <div className="rounded-2xl bg-ink-950/70 p-4 mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gray-400">توصل للمليون بعد</p>
+                  <p className="text-sm text-gray-300 font-bold">{monthsToLabel(months)}</p>
+                </div>
+                <p className="text-4xl font-extrabold text-amber-grad">{months >= 99999 ? '—' : `${years} سنة`}</p>
+              </div>
+
+              <Slider label="ادخارك الشهري" value={saving} min={500} max={30000} step={500} onChange={setSaving} />
+              <Slider label="رصيدك الحالي (مدخرات + استثمار)" value={balance} min={0} max={500000} step={5000} onChange={setBalance} />
+
+              <p className="text-sm font-bold text-gray-300 mb-2">نوع الاستثمار</p>
+              <div className="grid grid-cols-3 gap-2 mb-5">
+                {RISKS.map((r) => (
+                  <button key={r.v} onClick={() => setRisk(r.v)}
+                    className={`py-2.5 rounded-xl text-sm font-extrabold border transition-all ${risk === r.v ? 'bg-amber-400 text-ink-950 border-amber-400' : 'bg-ink-850 text-gray-300 border-white/[0.06]'}`}>
+                    {r.l} ({r.v}%)
+                  </button>
+                ))}
+              </div>
+
+              <div className="rounded-2xl bg-ink-950/50 p-3 mb-5">
+                <GrowthSvg points={points} height={150} />
+              </div>
+
+              <Link href="/calculator" className="btn-primary w-full py-3.5">خصّص خطتك الكاملة <Rocket size={18} /></Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ شريط الثقة ═══ */}
+        <section className="border-y border-white/[0.06] bg-ink-950/60">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { icon: Gift, t: 'مجاني 100%', s: 'الحاسبة والخارطة بدون مقابل' },
+              { icon: Timer, t: 'نتيجة فورية', s: 'خلال 30 ثانية بس' },
+              { icon: MapPin, t: 'مصمم للسعودية', s: 'بالريال ولهجتنا' },
+              { icon: ShieldCheck, t: 'خصوصيتك محفوظة', s: 'الحساب على جهازك' },
+            ].map((f) => (
+              <div key={f.t} className="flex items-center gap-3">
+                <span className="w-11 h-11 rounded-xl bg-amber-400/10 text-amber-400 flex items-center justify-center shrink-0"><f.icon size={22} /></span>
+                <div><p className="font-extrabold text-sm">{f.t}</p><p className="text-xs text-gray-500">{f.s}</p></div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ تجربة رقمية ═══ */}
+        <section className="max-w-7xl mx-auto px-4 lg:px-8 py-16">
+          <div className="text-center mb-10">
+            <p className="text-sm font-extrabold text-amber-400 mb-2">أدوات تشتغل معك</p>
+            <h2 className="text-2xl lg:text-4xl font-extrabold">تجربة ترافقك من أول ريال لين المليون</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <FeatureCard icon={Calculator} title="الحاسبة التفاعلية المباشرة" desc="تشوف نتيجتك تتغير لحظياً مع كل رقم تكتبه، مع مقارنة بالمتوسط." href="/calculator">
+              <div className="rounded-xl bg-ink-950/70 p-4 text-center">
+                <p className="text-xs text-gray-400">توصل لأول مليون خلال</p>
+                <p className="text-2xl font-extrabold text-amber-grad">تسع سنوات وشهرين</p>
+                <p className="text-xs text-emerald-400 font-bold mt-1">⚡ أسرع من المتوسط بـ 4.8 سنة</p>
+              </div>
+            </FeatureCard>
+            <FeatureCard icon={MapIcon} title="خارطة تسريع الوصول" desc="موعد وصولك بالشهر والسنة، وأقوى 3 حركات تختصر عليك الطريق." href="/result">
+              <div className="rounded-xl bg-ink-950/70 p-4 grid grid-cols-3 gap-2 text-center">
+                {[['ادخار +500', 'سنة'], ['دخل إضافي', 'سنتين'], ['عائد 10%', '3 سنين']].map(([a, b]) => (
+                  <div key={a} className="rounded-lg bg-white/[0.04] p-2"><p className="text-[11px] text-gray-400">{a}</p><p className="text-sm font-extrabold text-emerald-400">−{b}</p></div>
+                ))}
+              </div>
+            </FeatureCard>
+          </div>
+        </section>
+
+        {/* ═══ كيف يشتغل ═══ */}
+        <section id="how" className="max-w-7xl mx-auto px-4 lg:px-8 pb-16 scroll-mt-24">
+          <div className="text-center mb-10">
+            <p className="text-sm font-extrabold text-emerald-400 mb-2">3 خطوات بس</p>
+            <h2 className="text-2xl lg:text-4xl font-extrabold">كيف يشتغل &quot;متى تصير مليونير؟&quot;</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { n: '01', icon: ClipboardList, t: 'اكتب أرقامك', d: 'راتبك، مصروفك، مدخراتك، ونوع استثمارك — 4 أسئلة سريعة.' },
+              { n: '02', icon: LineChart, t: 'شوف التحليل والسيناريوهات', d: 'نحسب مسارك بالعائد المركب ونقارنك بالمتوسط لحظياً.' },
+              { n: '03', icon: Flag, t: 'خارطة وصولك للمليون', d: 'موعد وصولك، وأسرع الحركات اللي توفّر عليك سنين.' },
+            ].map((s) => (
+              <div key={s.n} className="card p-6 relative overflow-hidden">
+                <span className="absolute top-4 left-5 text-5xl font-extrabold text-white/[0.05]">{s.n}</span>
+                <span className="w-12 h-12 rounded-xl bg-amber-400/10 text-amber-400 flex items-center justify-center mb-5"><s.icon size={24} /></span>
+                <h3 className="font-extrabold text-lg mb-2">{s.t}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ وش تحصل ═══ */}
+        <section className="max-w-5xl mx-auto px-4 lg:px-8 pb-16">
+          <div className="text-center mb-10">
+            <p className="text-sm font-extrabold text-amber-400 mb-2">بوضوح</p>
+            <h2 className="text-2xl lg:text-4xl font-extrabold">وش تحصل عليه؟</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="card p-6 lg:p-8 flex flex-col">
+              <p className="text-sm text-gray-400 font-bold">الحساب الفوري</p>
+              <p className="text-4xl font-extrabold my-3">مجاني</p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['موعد وصولك لأول مليون بالشهر والسنة', 'مقارنة نتيجتك بالمتوسط', 'رسم نمو ثروتك بالعائد المركب', 'أسرع 3 حركات تختصر عليك الطريق', 'بطاقة تحدّي تشاركها مع أصدقائك'].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-gray-300"><CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> {f}</li>
+                ))}
+              </ul>
+              <Link href="/calculator" className="btn-ghost w-full py-3.5">ابدأ الحساب المجاني</Link>
+            </div>
+            <div className="rounded-2xl p-6 lg:p-8 flex flex-col border border-amber-400/40 relative"
+              style={{ background: 'linear-gradient(160deg,#2A2418 0%,#1A212B 70%)' }}>
+              <span className="absolute -top-3 right-6 chip bg-amber-400 text-ink-950">الأكثر فائدة</span>
+              <p className="text-sm text-amber-400 font-bold">تقرير تسريع الثروة الشامل</p>
+              <p className="text-4xl font-extrabold my-3">9 <span className="text-lg text-gray-300">ريال</span></p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {['كل مزايا الحساب المجاني', 'مقارنة 5 سيناريوهات مخصصة لأرقامك', 'درجة جاهزيتك المالية وتشخيص وضعك', 'أفكار دخل إضافي تناسبك', 'خطة أسبوعية وأهداف واضحة'].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-gray-200"><CheckCircle2 size={18} className="text-amber-400 shrink-0" /> {f}</li>
+                ))}
+              </ul>
+              <Link href="/checkout" className="btn-primary w-full py-3.5">احصل على تقريرك <Rocket size={18} /></Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ الأسئلة ═══ */}
+        <section className="max-w-3xl mx-auto px-4 lg:px-8 pb-16">
+          <h2 className="text-2xl lg:text-4xl font-extrabold text-center mb-8">الأسئلة الشائعة</h2>
+          <div className="space-y-3">
+            {FAQS.map((f) => (
+              <details key={f.q} className="card group">
+                <summary className="flex items-center justify-between gap-3 cursor-pointer list-none p-5 font-extrabold">
+                  {f.q}
+                  <ChevronDown size={20} className="text-gray-400 transition-transform group-open:rotate-180 shrink-0" />
+                </summary>
+                <p className="px-5 pb-5 -mt-1 text-sm text-gray-400 leading-relaxed">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* ═══ الدعوة الأخيرة ═══ */}
+        <section className="max-w-5xl mx-auto px-4 lg:px-8">
+          <div className="rounded-3xl border border-white/[0.07] p-8 lg:p-14 text-center"
+            style={{ background: 'radial-gradient(120% 120% at 50% 0%,#2A2418 0%,#1A212B 55%,#151B23 100%)' }}>
+            <span className="w-14 h-14 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center mx-auto mb-5"><Zap size={28} /></span>
+            <h2 className="text-2xl lg:text-4xl font-extrabold mb-3">رحلة المليون تبدأ بحساب رقم واحد اليوم</h2>
+            <p className="text-gray-400 mb-8">30 ثانية بس — وتعرف وين أنت ووين رايح.</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/calculator" className="btn-primary px-8 py-4 text-lg">ابدأ الحساب مجاناً <Rocket size={20} /></Link>
+              <Link href="/result" className="btn-ghost px-6 py-4">استعرض خارطة ثروتك</Link>
+            </div>
+            <p className="text-xs text-gray-500 mt-5 flex items-center justify-center gap-1.5"><Lock size={12} /> بدون تسجيل · حساباتك على جهازك</p>
+          </div>
+        </section>
+      </main>
+    </SiteShell>
+  )
 }
 
-// نتيجة تيزر فورية — تظهر لحظة إدخال الرقمين، مع مقارنة بالمتوسط
-const AVG_MONTHS = 14 * 12
-
-function QuickPreview({ salary, expenses }: { salary: string; expenses: string }) {
-  const s = Number(salary) || 0
-  const e = Number(expenses) || 0
-  if (!salary || !expenses || s <= e) return null
-  const saving = s - e
-  const rough = calcMonthsToGoal(0, saving, 4, 1000000)
-  const faster = rough < AVG_MONTHS
+function Slider({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
   return (
-    <div className="mt-3 p-4 bg-gold/10 border border-gold/30 rounded-xl text-center animate-fade-up">
-      <p className="text-xs text-gray-400 mb-1">لو تدّخر {formatNumber(saving)} ريال بالشهر، توصل تقريباً بعد</p>
-      <p className="text-2xl font-extrabold text-gold leading-tight">{monthsToLabel(rough)}</p>
-      <p className={`text-xs font-bold mt-2 ${faster ? 'text-green-400' : 'text-orange-400'}`}>
-        {faster ? '⚡ أسرع من المتوسط (١٤ سنة)' : '🐢 أبطأ من المتوسط (١٤ سنة) — كمّل نشوف وش يسرّعك'}
-      </p>
-      <p className="text-[11px] text-gray-500 mt-1">كمّل ٣ أسئلة وتطلع لك النتيجة الدقيقة</p>
+    <div className="mb-5">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-bold text-gray-300">{label}</span>
+        <span className="font-extrabold">{formatNumber(value)} <span className="text-xs text-gray-400">ر.س</span></span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))}
+        className="range w-full" style={{ ['--fill' as string]: `${((value - min) / (max - min)) * 100}%` }} aria-label={label} />
     </div>
   )
 }
 
-export default function Home() {
-  const [step, setStep] = useState(1)
-  const [salary, setSalary] = useState('')
-  const [expenses, setExpenses] = useState('')
-  const [hasSavings, setHasSavings] = useState<null | boolean>(null)
-  const [savings, setSavings] = useState('')
-  const [hasInvestments, setHasInvestments] = useState<null | boolean>(null)
-  const [investments, setInvestments] = useState('')
-  const [rate, setRate] = useState<number>(7)
-  const [result, setResult] = useState<Result | null>(null)
-  const [pendingResult, setPendingResult] = useState<Result | null>(null)
-  const [emailSubmitted, setEmailSubmitted] = useState(false)
-  const [usersCount, setUsersCount] = useState(1247)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setUsersCount(prev => prev + Math.floor(Math.random() * 3))
-    }, 8000)
-    const ref = getReferralFromURL()
-    if (ref) saveReferral(ref)
-    return () => clearInterval(interval)
-  }, [])
-
-  const handleEmailSubmit = (email: string) => {
-    setEmailSubmitted(true)
-    if (pendingResult) {
-      setResult(pendingResult)
-      setPendingResult(null)
-      setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-    }
-  }
-
-  const calculate = () => {
-    const s = Number(salary) || 0
-    const e = Number(expenses) || 0
-    const sv = hasSavings ? (Number(savings) || 0) : 0
-    const inv = hasInvestments ? (Number(investments) || 0) : 0
-    // حتى لو ما عنده استثمار حالي، ادخاره الشهري واقعياً ينمو بعائد محافظ
-    // (حساب ادخار/صكوك ~4%). حساب المليون بعائد صفر متشائم وغير واقعي
-    // ويناقض رسالة "الاستثمار يسرّعك". نفترض 4% كحد أدنى واقعي.
-    const r = hasInvestments ? rate : 4
-    const goal = 1000000
-    const netWorth = sv + inv
-    const monthlySaving = s - e
-
-    const totalMonths = calcMonthsToGoal(netWorth, monthlySaving, r, goal)
-    const { labels, data } = buildChartData(netWorth, monthlySaving, r, totalMonths)
-
-    const scenarios = [
-      { label: 'وضعك الحالي', months: totalMonths },
-      { label: '+ ادخار 500 ريال/شهر', months: calcMonthsToGoal(netWorth, monthlySaving + 500, r, goal) },
-      { label: '+ ادخار 1000 ريال/شهر', months: calcMonthsToGoal(netWorth, monthlySaving + 1000, r, goal) },
-      { label: '+ دخل إضافي 2000 ريال', months: calcMonthsToGoal(netWorth, monthlySaving + 2000, r, goal) },
-      { label: '🌟 استثمار بعائد 10%', months: calcMonthsToGoal(netWorth, monthlySaving, 10, goal) },
-    ]
-
-    // لو الادخار سالب — نوقف ونعطي نصيحة
-    if (monthlySaving <= 0) {
-      const negResult = { totalMonths: 99999, netWorth, monthlySaving, chartLabels: [], chartData: [], scenarios: [] }
-      setResult(negResult)
-      setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-      return
-    }
-
-    const newResult = { totalMonths, netWorth, monthlySaving, effectiveRate: r, chartLabels: labels, chartData: data, scenarios }
-    setResult(newResult)
-    setTimeout(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }), 100)
-  }
-
-  const canGoNext = () => {
-    // فريق ضمان الجودة: تحقق فعلي من القيم وليس فقط HTML min/max (الذي
-    // لا يمنع كتابة قيم سالبة يدوياً عبر لوحة المفاتيح) — اكتُشف أن مصروفاً
-    // سالباً كان يكسر معادلة الادخار الشهري (salary - expenses) بشكل كامل
-    if (step === 1) {
-      const s = Number(salary)
-      const e = Number(expenses)
-      return salary !== '' && expenses !== '' && s > 0 && s <= 10_000_000 && e >= 0 && e <= 10_000_000
-    }
-    if (step === 2) {
-      if (hasSavings === null) return false
-      if (hasSavings === false) return true
-      const sv = Number(savings)
-      return savings !== '' && sv >= 0 && sv <= 100_000_000
-    }
-    if (step === 3) {
-      if (hasInvestments === null) return false
-      if (hasInvestments === false) return true
-      const inv = Number(investments)
-      return investments !== '' && inv >= 0 && inv <= 100_000_000
-    }
-    if (step === 4) return true
-    return false
-  }
-
-  const nextStep = () => {
-    if (step < 4) setStep(step + 1)
-    else calculate()
-  }
-
-  const rateOptions = [
-    { label: 'محافظ', sub: 'ودائع وصكوك', value: 4 },
-    { label: 'متوسط', sub: 'صناديق استثمار', value: 7 },
-    { label: 'جريء', sub: 'أسهم وعقارات', value: 12 },
-  ]
-
-  const progressPercent = (step / 4) * 100
-
+function FeatureCard({ icon: Icon, title, desc, href, children }: { icon: React.ElementType; title: string; desc: string; href: string; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
-      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-8">
-
-        {/* Social Proof */}
-        <div className="flex flex-col items-center gap-2 mb-6">
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              {['👨','👩','👨🏻','👩🏻','👨🏽'].map((e, i) => (
-                <span key={i} className="text-lg">{e}</span>
-              ))}
-            </div>
-            <span className="text-sm text-gray-400">
-              <span className="text-gold font-bold">{usersCount.toLocaleString('ar-SA')}</span> شخص قبلوا التحدي
-            </span>
-          </div>
-          <div className="flex gap-3 text-xs text-gray-500">
-            <span>⚡ أسرع نتيجة: <span className="text-green-400 font-bold">6 سنوات</span></span>
-            <span>·</span>
-            <span>📊 المتوسط: <span className="text-gold font-bold">14 سنة</span></span>
-          </div>
-        </div>
-
-        {/* Hero */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 leading-tight">
-            متى تصير <span className="text-gold">مليونير</span>؟
-          </h1>
-          {!result && step === 1 ? (
-            <div className="inline-flex flex-col items-center gap-1 mt-1 animate-fade-up">
-              <p className="text-gray-400 text-base">
-                المتوسط يحتاج <span className="text-gold font-extrabold">١٤ سنة</span> عشان يوصل لأول مليون…
-              </p>
-              <p className="text-xl font-extrabold">وأنت؟ <span className="text-gray-400 text-base font-bold">اكتب راتبك وشوف فوراً 👇</span></p>
-            </div>
-          ) : (
-            <p className="text-gray-400 text-base">
-              أجب على {4} أسئلة بسيطة واعرف متى ستصل لأول مليون ريال
-            </p>
-          )}
-        </div>
-
-        {/* Progress Bar */}
-        {!result && (
-          <div className="mb-6">
-            <div className="flex justify-between text-xs text-gray-500 mb-2">
-              <span>السؤال {step} من 4</span>
-              <span>{Math.round(progressPercent)}٪</span>
-            </div>
-            <div className="w-full bg-white/10 rounded-full h-2">
-              <div
-                className="bg-gold h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Form Steps */}
-        {!result && (
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
-
-            {/* Step 1 - الراتب والمصروف */}
-            {step === 1 && (
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-base font-bold mb-2">💰 كم راتبك الشهري؟</label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="10000000"
-                      value={salary}
-                      onChange={e => setSalary(e.target.value)}
-                      placeholder=""
-                      autoFocus
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
-                    />
-                    <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-base font-bold mb-2">🛒 كم مصروفك الشهري؟</label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="10000000"
-                      value={expenses}
-                      onChange={e => setExpenses(e.target.value)}
-                      placeholder=""
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
-                    />
-                    <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
-                  </div>
-                  {salary && expenses && Number(salary) > Number(expenses) && (
-                    <p className="text-green-400 text-sm mt-2">
-                      ✅ تدخر {formatNumber(Number(salary) - Number(expenses))} ريال شهرياً
-                    </p>
-                  )}
-                  {salary && expenses && Number(salary) <= Number(expenses) && (
-                    <p className="text-red-400 text-sm mt-2">
-                      ⚠️ مصروفك أكثر من راتبك
-                    </p>
-                  )}
-                </div>
-                {/* تيزر فوري */}
-                <QuickPreview salary={salary} expenses={expenses} />
-              </div>
-            )}
-
-            {/* Step 2 - المدخرات */}
-            {step === 2 && (
-              <div className="space-y-4">
-                <label className="block text-base font-bold mb-3">🏦 عندك مدخرات حالية؟</label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setHasSavings(true)}
-                    className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasSavings === true ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                    }`}
-                  >نعم ✅</button>
-                  <button
-                    onClick={() => { setHasSavings(false); setSavings('') }}
-                    className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasSavings === false ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                    }`}
-                  >لا ❌</button>
-                </div>
-                {hasSavings === true && (
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100000000"
-                      value={savings}
-                      onChange={e => setSavings(e.target.value)}
-                      placeholder="أكتب قيمة مدخراتك"
-                      autoFocus
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
-                    />
-                    <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
-                  </div>
-                )}
-                {hasSavings === false && (
-                  <p className="text-gray-500 text-sm text-center">لا بأس — الادخار يبدأ من اليوم 💪</p>
-                )}
-              </div>
-            )}
-
-            {/* Step 3 - الاستثمارات */}
-            {step === 3 && (
-              <div className="space-y-4">
-                <label className="block text-base font-bold mb-3">📈 عندك استثمارات حالية؟</label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setHasInvestments(true)}
-                    className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasInvestments === true ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                    }`}
-                  >نعم ✅</button>
-                  <button
-                    onClick={() => { setHasInvestments(false); setInvestments('') }}
-                    className={`flex-1 py-4 rounded-xl font-bold text-base transition-all ${
-                      hasInvestments === false ? 'bg-gold text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                    }`}
-                  >لا ❌</button>
-                </div>
-                {hasInvestments === true && (
-                  <div className="space-y-3">
-                    <div className="relative">
-                      <input
-                        type="number"
-                        min="0"
-                        max="100000000"
-                        value={investments}
-                        onChange={e => setInvestments(e.target.value)}
-                        placeholder="أكتب قيمة استثماراتك"
-                        autoFocus
-                        className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-gold transition-colors"
-                      />
-                      <span className="absolute left-4 top-3.5 text-gray-400 text-sm">ريال</span>
-                    </div>
-                    <p className="text-sm text-gray-400">ما نوع استثمارك؟</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {rateOptions.map((opt) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setRate(opt.value)}
-                          className={`py-2.5 px-2 rounded-xl text-center transition-all border ${
-                            rate === opt.value
-                              ? 'border-gold bg-gold/20 text-gold'
-                              : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'
-                          }`}
-                        >
-                          <div className="font-bold text-sm">{opt.label}</div>
-                          <div className="text-xs text-gray-400 mt-0.5">{opt.sub}</div>
-                          <div className="text-xs font-bold mt-1 text-gold">{opt.value}%</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {hasInvestments === false && (
-                  <p className="text-gray-500 text-sm text-center">ممتاز — سنحسب لك أفضل طريقة للبدء 📊</p>
-                )}
-              </div>
-            )}
-
-            {/* Step 4 - تأكيد */}
-            {step === 4 && (
-              <div className="text-center space-y-4">
-                <div className="text-5xl mb-2">🎯</div>
-                <h2 className="text-xl font-bold">جاهز لتعرف النتيجة؟</h2>
-                <div className="text-right bg-white/5 rounded-xl p-4 space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">الراتب</span>
-                    <span className="font-bold">{formatNumber(Number(salary))} ريال</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">المصروف</span>
-                    <span className="font-bold">{formatNumber(Number(expenses))} ريال</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">الادخار الشهري</span>
-                    <span className="font-bold text-green-400">{formatNumber(Number(salary) - Number(expenses))} ريال</span>
-                  </div>
-                  {hasSavings && <div className="flex justify-between">
-                    <span className="text-gray-400">المدخرات</span>
-                    <span className="font-bold">{formatNumber(Number(savings))} ريال</span>
-                  </div>}
-                  {hasInvestments && <div className="flex justify-between">
-                    <span className="text-gray-400">الاستثمارات</span>
-                    <span className="font-bold">{formatNumber(Number(investments))} ريال ({rate}%)</span>
-                  </div>}
-                </div>
-              </div>
-            )}
-
-            {/* Navigation */}
-            <div className={`flex gap-3 mt-6 ${step > 1 ? 'justify-between' : ''}`}>
-              {step > 1 && (
-                <button
-                  onClick={() => setStep(step - 1)}
-                  className="px-5 py-3 rounded-xl bg-white/10 text-gray-300 font-bold hover:bg-white/20 transition-all"
-                >
-                  ← رجوع
-                </button>
-              )}
-              <button
-                onClick={step === 4 ? calculate : nextStep}
-                disabled={step !== 4 && !canGoNext()}
-                className={`flex-1 py-3.5 font-bold text-lg rounded-xl transition-all active:scale-95 ${
-                  step === 4 || canGoNext()
-                    ? 'bg-gold hover:bg-yellow-600 text-white'
-                    : 'bg-white/10 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {step === 4 ? '🚀 احسب النتيجة' : 'التالي →'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Results */}
-        {result && (
-          <div id="results" className="space-y-4">
-
-            {/* لما الادخار سالب */}
-            {result.monthlySaving <= 0 ? (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center">
-                <div className="text-5xl mb-4">⚠️</div>
-                <h2 className="text-xl font-extrabold text-red-400 mb-3">مصروفك أكثر من راتبك</h2>
-                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-                  للأسف لا يمكن الوصول للمليون بهذا الوضع. الخطوة الأولى هي تقليل المصاريف أو زيادة الدخل.
-                </p>
-                <div className="space-y-3 text-right mb-5">
-                  {['قلل مصاريفك ولو 200 ريال كل شهر', 'ابحث عن مصدر دخل إضافي ولو صغير', 'راجع اشتراكاتك الشهرية وألغِ غير الضروري'].map((tip, i) => (
-                    <div key={i} className="flex items-center gap-3 bg-white/5 rounded-xl p-3 text-sm">
-                      <span className="text-gold">💡</span>
-                      <span className="text-gray-300">{tip}</span>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => { setResult(null); setStep(1) }}
-                  className="w-full py-3 bg-gold text-white font-bold rounded-xl hover:bg-yellow-600 transition-all"
-                >
-                  أعد الحساب بأرقام مختلفة ←
-                </button>
-              </div>
-            ) : (
-              <>
-            <ShareCard
-              years={monthsToLabel(result.totalMonths)}
-              totalMonths={result.totalMonths}
-              date={targetDate(result.totalMonths)}
-              goal="مليون ريال"
-            />
-
-            {/* الرفيق المتابع — يظهر بس لما يرجع المستخدم (مقارنة مع آخر زيارة) */}
-            {result.totalMonths < 99999 && (
-              <ReturnTracker currentMonths={result.totalMonths} netWorth={result.netWorth} />
-            )}
-
-            {/* من تنبؤ إلى تحكّم — أقرب رافعة قابلة للتنفيذ (مجانية) */}
-            {result.totalMonths < 99999 && (
-              <NearestLever
-                netWorth={result.netWorth}
-                monthlySaving={result.monthlySaving}
-                annualRate={result.effectiveRate ?? rate}
-                totalMonths={result.totalMonths}
-                goal={1000000}
-              />
-            )}
-
-            <UpsellCard scenarios={result.scenarios} userData={{ salary: Number(salary), expenses: Number(expenses), savings: Number(savings), investments: Number(investments), rate: result.effectiveRate ?? rate, monthlySaving: result.monthlySaving, netWorth: result.netWorth, totalMonths: result.totalMonths }} />
-
-            <Challenge30 monthlySaving={result.monthlySaving} />
-
-            <ReferralCard />
-
-            <button
-              onClick={() => { setResult(null); setStep(1) }}
-              className="w-full py-3 text-gray-400 text-sm hover:text-white transition-colors"
-            >
-              ← أعد الحساب بأرقام مختلفة
-            </button>
-            </>
-            )}
-          </div>
-        )}
-
-        <Footer />
+    <Link href={href} className="card p-6 hover:border-amber-400/30 transition-colors block">
+      <div className="flex items-center gap-3 mb-3">
+        <span className="w-11 h-11 rounded-xl bg-amber-400/10 text-amber-400 flex items-center justify-center"><Icon size={22} /></span>
+        <h3 className="font-extrabold text-lg">{title}</h3>
       </div>
-    </main>
+      <p className="text-sm text-gray-400 mb-5">{desc}</p>
+      {children}
+    </Link>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import SiteShell from '@/components/site/SiteShell'
 
 export const metadata: Metadata = {
   title: 'سياسة الخصوصية | متى تصير مليونير؟',
@@ -8,10 +9,11 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-dark text-white font-tajawal" dir="rtl">
-      <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10">
+    <SiteShell>
+    <main>
+      <div className="max-w-3xl mx-auto px-4 lg:px-8 py-10 lg:py-14">
 
-        <Link href="/" className="text-gold text-sm hover:underline mb-8 block">
+        <Link href="/" className="text-amber-400 text-sm hover:underline mb-8 inline-block">
           ← العودة للرئيسية
         </Link>
 
@@ -67,5 +69,6 @@ export default function PrivacyPage() {
 
       </div>
     </main>
+    </SiteShell>
   )
 }

@@ -52,7 +52,7 @@ export function targetDate(months: number): string {
 }
 
 export function formatNumber(n: number): string {
-  return Math.round(n).toLocaleString('ar-SA')
+  return Math.round(n).toLocaleString('en-US')
 }
 
 // ─── أقرب رافعة: من تنبؤ "ميت" إلى خطوة قابلة للتنفيذ ───────────────────────
@@ -157,3 +157,55 @@ export function buildChartData(
 
   return { labels, data }
 }
+
+// ─── أدوات العرض للتصميم الجديد ───────────────────────────────────────────
+
+const AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+
+// "سبتمبر 2034" — شهر وسنة الوصول
+export function arrivalMonthYear(months: number, from: Date = new Date()): { month: string; year: number } | null {
+  if (months >= 99999) return null
+  const d = new Date(from)
+  d.setMonth(d.getMonth() + months)
+  return { month: AR_MONTHS[d.getMonth()], year: d.getFullYear() }
+}
+
+export interface ProjectionPoint {
+  m: number // الشهر
+  compound: number // الثروة مع العائد المركب
+  plain: number // الثروة بالادخار فقط (بدون عائد)
+}
+
+// مسار نمو الثروة للرسم البياني — عيّنات خفيفة (حوالي ٤٠ نقطة)
+export function buildProjection(
+  startWealth: number,
+  monthlySaving: number,
+  annualRate: number,
+  totalMonths: number,
+  samples = 40
+): ProjectionPoint[] {
+  const horizon = Math.max(12, Math.min(totalMonths >= 99999 ? 600 : totalMonths, 600))
+  const r = annualRate / 100 / 12
+  const step = Math.max(1, Math.round(horizon / samples))
+  const pts: ProjectionPoint[] = []
+  let w = startWealth
+  for (let m = 0; m <= horizon; m++) {
+    if (m % step === 0 || m === horizon) {
+      pts.push({ m, compound: Math.round(w), plain: Math.round(startWealth + monthlySaving * m) })
+    }
+    w = w * (1 + r) + monthlySaving
+  }
+  return pts
+}
+
+// كم من المليون من جيبك وكم من العائد المركب
+export function contributionSplit(startWealth: number, monthlySaving: number, totalMonths: number, goal = 1000000) {
+  if (totalMonths >= 99999) return { contributions: 0, gains: 0, contribPct: 0, gainsPct: 0 }
+  const contributions = Math.min(goal, Math.round(startWealth + monthlySaving * totalMonths))
+  const gains = Math.max(0, goal - contributions)
+  const contribPct = Math.round((contributions / goal) * 1000) / 10
+  return { contributions, gains, contribPct, gainsPct: Math.round((100 - contribPct) * 10) / 10 }
+}
+
+// متوسط الوصول اللي يعرضه الموقع (١٤ سنة)
+export const AVERAGE_MONTHS = 14 * 12

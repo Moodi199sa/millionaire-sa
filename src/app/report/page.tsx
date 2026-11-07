@@ -1258,7 +1258,7 @@ export default function ReportPage() {
               📤 شارك تقريرك مع أصدقائك
             </button>
 
-            <button onClick={() => router.push('/')}
+            <button onClick={() => router.push('/calculator')}
               className="w-full py-3 text-sm text-gray-400 hover:text-gray-600 transition-colors no-print">
               ← أعد الحساب بأرقام مختلفة
             </button>

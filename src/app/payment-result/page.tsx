@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import SiteShell from '@/components/site/SiteShell'
 
 function Result() {
   const params = useSearchParams()
@@ -33,8 +34,8 @@ function Result() {
   }, [params, router])
 
   return (
-    <main className="min-h-screen bg-dark flex items-center justify-center font-tajawal" dir="rtl">
-      <div className="text-center px-4">
+    <main className="min-h-[65vh] flex items-center justify-center">
+      <div className="card text-center px-6 py-10 mx-4 max-w-md w-full">
         {state === 'checking' && (
           <>
             <div className="text-6xl mb-4 animate-pulse">⏳</div>
@@ -54,7 +55,7 @@ function Result() {
             <div className="text-6xl mb-4">❌</div>
             <h1 className="text-2xl font-extrabold text-white mb-2">لم يتم تأكيد الدفع</h1>
             <p className="text-gray-400 mb-4 text-sm">إذا خُصم المبلغ ولم يظهر المحتوى، تواصل معنا</p>
-            <button onClick={() => router.push('/')} className="mt-2 px-6 py-3 bg-gold text-white rounded-xl font-bold">
+            <button onClick={() => router.push('/')} className="btn-primary mt-2 px-6 py-3">
               العودة للرئيسية
             </button>
           </>
@@ -65,5 +66,5 @@ function Result() {
 }
 
 export default function Page() {
-  return <Suspense><Result /></Suspense>
+  return <SiteShell><Suspense><Result /></Suspense></SiteShell>
 }
