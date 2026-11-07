@@ -30,8 +30,10 @@ export default function ReturnTracker({ currentMonths, netWorth }: Props) {
   const minutesAgo = prev ? (Date.now() - prev.at) / 60000 : Infinity
   if (!prev || minutesAgo < 10) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-start gap-3">
-        <span className="text-2xl">📌</span>
+      <div className="glass-card rounded-2xl p-5 flex items-start gap-3 animate-fade-up">
+        <div className="w-10 h-10 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0">
+        <span className="text-xl">📌</span>
+        </div>
         <div>
           <p className="text-sm font-bold text-white">حفظنا نتيجتك على جهازك</p>
           <p className="text-xs text-gray-400 mt-1 leading-relaxed">
@@ -54,10 +56,10 @@ export default function ReturnTracker({ currentMonths, netWorth }: Props) {
       : { icon: '⏸️', color: 'text-gold', border: 'border-gold/30', title: 'نفس مكانك من آخر مرة' }
 
   return (
-    <div className={`bg-white/5 border ${tone.border} rounded-2xl p-5`}>
+    <div className={`glass-card border ${tone.border} rounded-2xl p-5 animate-fade-up`}>
       <p className="text-xs text-gray-400 mb-2">مقارنة مع زيارتك قبل {since}</p>
       <div className="flex items-center gap-3">
-        <span className="text-3xl">{tone.icon}</span>
+        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl flex-shrink-0">{tone.icon}</div>
         <p className={`text-lg font-extrabold ${tone.color}`}>{tone.title}</p>
       </div>
       {diff <= 0 && (

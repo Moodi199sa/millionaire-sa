@@ -40,7 +40,7 @@ export default function ResultDashboard({
   ]
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-6">
+    <div className="gold-border-gradient rounded-3xl p-5 space-y-6 animate-fade-up">
       {/* الحلقة + العنوان */}
       <div className="flex items-center gap-5">
         <div className="relative flex-shrink-0" style={{ width: 130, height: 130 }}>
@@ -60,7 +60,7 @@ export default function ResultDashboard({
             </defs>
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-extrabold text-gold leading-none">{startPct}%</span>
+            <span className="gold-shimmer text-3xl font-extrabold leading-none">{startPct}%</span>
             <span className="text-[10px] text-gray-400 mt-1">من المليون</span>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function ResultDashboard({
           { label: 'تدخر سنوياً', value: formatNumber(yearlySaving), unit: 'ريال' },
           { label: 'ادخارك اليومي', value: formatNumber(Math.round(monthlySaving / 30)), unit: 'ريال/يوم' },
         ].map((c) => (
-          <div key={c.label} className="bg-white/5 rounded-xl p-3 text-center">
+          <div key={c.label} className="glass-card rounded-xl p-3 text-center">
             <div className="text-[10px] text-gray-500 mb-1">{c.label}</div>
             <div className="text-base font-extrabold text-gold leading-none">{c.value}</div>
             <div className="text-[10px] text-gray-500 mt-1">{c.unit}</div>

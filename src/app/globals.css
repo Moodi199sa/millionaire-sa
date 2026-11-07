@@ -18,3 +18,60 @@ html, body {
   --gold-light: #F5C842;
   --gold-pale: #FDF6DC;
 }
+
+/* ─── تأثيرات احترافية للمكوّنات ─────────────────────────────── */
+
+/* إطار ذهبي متدرّج */
+.gold-border-gradient {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#0f1626, #0f1626) padding-box,
+    linear-gradient(135deg, #F5C842, rgba(212, 160, 23, 0.15) 45%, #D4A017) border-box;
+}
+
+/* لمعان متحرّك على الأرقام */
+.gold-shimmer {
+  background: linear-gradient(100deg, #D4A017 20%, #FFE08A 40%, #D4A017 60%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3.5s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: -200% center; }
+}
+
+/* زجاجية */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* توهّج ناعم */
+.animate-glow { animation: glow 4s ease-in-out infinite; }
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 rgba(212, 160, 23, 0); }
+  50% { box-shadow: 0 0 28px rgba(212, 160, 23, 0.18); }
+}
+
+/* ظهور ناعم */
+.animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* نقطة نابضة */
+.animate-pulse-dot { animation: pulseDot 1.6s ease-in-out infinite; }
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gold-shimmer, .animate-glow, .animate-fade-up, .animate-pulse-dot { animation: none; }
+  .gold-shimmer { color: #D4A017; }
+}

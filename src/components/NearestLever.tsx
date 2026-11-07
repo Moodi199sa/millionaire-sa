@@ -11,8 +11,8 @@ interface Props {
 }
 
 // "أقرب رافعة" — يحوّل النتيجة من رقم ميت إلى خطوة واحدة قابلة للتنفيذ.
-// مجاني، يظهر قبل الـ paywall. يعرض أقوى حركة + خطوة هذا الأسبوع،
-// ثم تلميح بوجود رافعات أخرى (يغذّي الفضول نحو التقرير الكامل).
+// مجاني، يظهر قبل الـ paywall. تصميم احترافي: إطار ذهبي متدرّج، لمعان
+// على الرقم، وبطاقة خطوة واضحة.
 export default function NearestLever({
   netWorth,
   monthlySaving,
@@ -27,30 +27,43 @@ export default function NearestLever({
   const others = levers.length - 1
 
   return (
-    <div className="bg-gradient-to-br from-green-500/10 to-gold/10 border border-green-500/30 rounded-2xl p-5 space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="text-xl">🎯</span>
-        <h3 className="text-base font-extrabold text-white">أقرب حركة تقرّبك من المليون</h3>
+    <div className="gold-border-gradient animate-glow rounded-3xl p-6 space-y-5 animate-fade-up overflow-hidden relative">
+      <div className="pointer-events-none absolute -top-16 -left-16 w-48 h-48 rounded-full bg-gold/10 blur-3xl" />
+
+      <div className="relative flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-xl bg-gold/15 flex items-center justify-center text-lg">🎯</div>
+        <div>
+          <h3 className="text-base font-extrabold text-white leading-tight">أقرب حركة تقرّبك من المليون</h3>
+          <p className="text-[11px] text-gray-400">خطوة واحدة — أثر فوري</p>
+        </div>
       </div>
 
-      <div className="bg-black/20 rounded-xl p-4 text-center">
-        <p className="text-sm text-gray-300 mb-2">{top.label}</p>
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-gray-400 text-sm">تقرّبك</span>
-          <span className="text-3xl font-extrabold text-green-400 leading-none">
+      <div className="relative text-center py-2">
+        <p className="text-sm text-gray-300 mb-3">{top.label}</p>
+        <div className="flex items-baseline justify-center gap-2">
+          <span className="text-gray-500 text-lg">تقرّبك</span>
+          <span className="gold-shimmer text-4xl sm:text-5xl font-extrabold leading-none">
             {monthsSavedLabel(top.monthsSaved)}
           </span>
         </div>
-        <p className="text-xs text-gray-400 mt-2">أقرب لهدفك ⚡</p>
+        <div className="mt-3 inline-flex items-center gap-1.5 bg-green-500/15 border border-green-500/30 rounded-full px-3 py-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse-dot" />
+          <span className="text-xs text-green-400 font-bold">أقرب لهدفك</span>
+        </div>
       </div>
 
-      <div className="bg-white/5 rounded-xl p-4">
-        <p className="text-xs text-gold font-bold mb-1">✅ خطوتك هذا الأسبوع</p>
-        <p className="text-sm text-gray-200 leading-relaxed">{top.action}</p>
+      <div className="relative glass-card rounded-2xl p-4 flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center flex-shrink-0 text-white text-sm font-bold shadow-lg shadow-gold/20">
+          ✓
+        </div>
+        <div>
+          <p className="text-xs text-gold font-bold mb-1">خطوتك هذا الأسبوع</p>
+          <p className="text-sm text-gray-100 leading-relaxed">{top.action}</p>
+        </div>
       </div>
 
       {others > 0 && (
-        <p className="text-xs text-gray-400 text-center">
+        <p className="relative text-xs text-gray-400 text-center leading-relaxed">
           وعندك <span className="text-gold font-bold">{others}</span>{' '}
           {others === 1 ? 'رافعة أخرى' : 'رافعات أخرى'} تقدر تجمعها معاً — التقرير الكامل يحسب لك أثرها مجتمعة
         </p>

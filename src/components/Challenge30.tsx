@@ -47,7 +47,7 @@ export default function Challenge30({ monthlySaving }: Props) {
   const day = state ? Math.min(30, Math.floor((Date.now() - state.startedAt) / 86400000) + 1) : 0
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+    <div className="gold-border-gradient rounded-3xl p-5 space-y-4 animate-fade-up">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl">🗓️</span>
@@ -63,15 +63,37 @@ export default function Challenge30({ monthlySaving }: Props) {
           </p>
           <button
             onClick={start}
-            className="w-full py-3 bg-gold/20 border border-gold/40 text-gold font-bold rounded-xl hover:bg-gold/30 transition-all"
+            className="w-full py-3 bg-gradient-to-l from-gold-light to-gold text-white font-bold rounded-xl shadow-lg shadow-gold/20 hover:brightness-105 transition-all active:scale-95"
           >
             ابدأ التحدّي 💪
           </button>
         </>
       ) : (
         <>
-          <div className="w-full bg-white/10 rounded-full h-2">
-            <div className="bg-gold h-2 rounded-full transition-all duration-500" style={{ width: `${(completed / 4) * 100}%` }} />
+          <div className="flex items-center gap-4">
+            <div className="relative flex-shrink-0" style={{ width: 76, height: 76 }}>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <circle cx="38" cy="38" r="31" fill="none" stroke="rgba(212,160,23,0.15)" strokeWidth="7" />
+                <circle
+                  cx="38" cy="38" r="31" fill="none" stroke="url(#c30Grad)" strokeWidth="7" strokeLinecap="round"
+                  strokeDasharray={`${(completed / 4) * 2 * Math.PI * 31} ${2 * Math.PI * 31}`}
+                  transform="rotate(-90 38 38)"
+                  style={{ transition: 'stroke-dasharray .6s ease' }}
+                />
+                <defs>
+                  <linearGradient id="c30Grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#F5C842" />
+                    <stop offset="100%" stopColor="#D4A017" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-extrabold text-gold">{completed}/4</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {completed === 0 ? 'بداية قوية — علّم كل خطوة لما تخلّصها.' : completed < 4 ? 'كمّل — كل خطوة تقرّبك.' : 'خلّصت الأربع خطوات 👏'}
+            </p>
           </div>
           <div className="space-y-2">
             {steps.map((s, i) => (
@@ -79,7 +101,7 @@ export default function Challenge30({ monthlySaving }: Props) {
                 key={i}
                 onClick={() => toggle(i)}
                 className={`w-full flex items-center gap-3 text-right p-3 rounded-xl border transition-all ${
-                  state.done[i] ? 'bg-green-500/10 border-green-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'
+                  state.done[i] ? 'bg-green-500/10 border-green-500/30' : 'glass-card hover:bg-white/10'
                 }`}
               >
                 <span
