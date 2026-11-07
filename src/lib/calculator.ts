@@ -55,6 +55,77 @@ export function formatNumber(n: number): string {
   return Math.round(n).toLocaleString('ar-SA')
 }
 
+// ─── أقرب رافعة: من تنبؤ "ميت" إلى خطوة قابلة للتنفيذ ───────────────────────
+
+export interface Lever {
+  key: 'save' | 'income' | 'invest'
+  label: string
+  action: string
+  months: number
+  monthsSaved: number
+}
+
+function roundTo(n: number, step: number) {
+  return Math.max(step, Math.round(n / step) * step)
+}
+
+// يحسب أثر كل حركة مالية واقعية على مدة الوصول، ويرتّبها من الأقوى للأضعف.
+// كل الحسابات محلية (بدون أي طلب للسيرفر).
+export function buildLevers(
+  netWorth: number,
+  monthlySaving: number,
+  annualRate: number,
+  totalMonths: number,
+  goal = 1000000
+): Lever[] {
+  if (totalMonths <= 0 || totalMonths >= 99999 || monthlySaving <= 0) return []
+
+  // زيادة الادخار ١٠٪ من الادخار الحالي (بحد أدنى ٢٠٠ ريال) — حركة صغيرة واقعية
+  const extraSave = roundTo(Math.max(200, monthlySaving * 0.1), 50)
+  const extraIncome = 1500
+  const investRate = 10
+
+  const candidates: Omit<Lever, 'monthsSaved'>[] = [
+    {
+      key: 'save',
+      label: `ادخر ${formatNumber(extraSave)} ريال زيادة كل شهر`,
+      action: `حوّل ${formatNumber(extraSave)} ريال تلقائياً يوم نزول الراتب لحساب منفصل — قبل ما تصرف أي شي.`,
+      months: calcMonthsToGoal(netWorth, monthlySaving + extraSave, annualRate, goal),
+    },
+    {
+      key: 'income',
+      label: `دخل إضافي ${formatNumber(extraIncome)} ريال شهرياً`,
+      action: 'اكتب ٣ مهارات تقدر تبيعها (تصميم، تدريس، توصيل، استشارة) واعرض وحدة منها على شخص واحد هذا الأسبوع.',
+      months: calcMonthsToGoal(netWorth, monthlySaving + extraIncome, annualRate, goal),
+    },
+  ]
+
+  if (annualRate < investRate) {
+    candidates.push({
+      key: 'invest',
+      label: `استثمر ادخارك بعائد ${investRate}٪ بدل ${annualRate}٪`,
+      action: 'افتح محفظة استثمارية منخفضة التكلفة (صندوق مؤشرات أو صكوك) وحوّل لها أول دفعة هذا الأسبوع.',
+      months: calcMonthsToGoal(netWorth, monthlySaving, investRate, goal),
+    })
+  }
+
+  return candidates
+    .map((c) => ({ ...c, monthsSaved: totalMonths - c.months }))
+    .filter((c) => c.monthsSaved > 0)
+    .sort((a, b) => b.monthsSaved - a.monthsSaved)
+}
+
+// "٣ سنوات و٤ أشهر" — صياغة قصيرة للمدة اللي توفّرها الرافعة
+export function monthsSavedLabel(months: number): string {
+  const years = Math.floor(months / 12)
+  const rem = months % 12
+  const monthsWord = (m: number) => (m === 1 ? 'شهر' : m === 2 ? 'شهرين' : m <= 10 ? `${m} أشهر` : `${m} شهراً`)
+  const yearsWord = (y: number) => (y === 1 ? 'سنة' : y === 2 ? 'سنتين' : y <= 10 ? `${y} سنوات` : `${y} سنة`)
+  if (years === 0) return monthsWord(rem)
+  if (rem === 0) return yearsWord(years)
+  return `${yearsWord(years)} و${monthsWord(rem)}`
+}
+
 export function buildChartData(
   startWealth: number,
   monthlySaving: number,

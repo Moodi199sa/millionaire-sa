@@ -9,6 +9,9 @@ import {
   buildChartData,
 } from '@/lib/calculator'
 import ResultDashboard from '@/components/ResultDashboard'
+import NearestLever from '@/components/NearestLever'
+import ReturnTracker from '@/components/ReturnTracker'
+import Challenge30 from '@/components/Challenge30'
 import ShareCard from '@/components/ShareCard'
 import UpsellCard from '@/components/UpsellCard'
 import Footer from '@/components/Footer'
@@ -472,6 +475,22 @@ export default function Home() {
               />
             )}
 
+            {/* من تنبؤ إلى تحكّم — أقرب رافعة قابلة للتنفيذ (مجانية) */}
+            {result.totalMonths < 99999 && (
+              <NearestLever
+                netWorth={result.netWorth}
+                monthlySaving={result.monthlySaving}
+                annualRate={result.effectiveRate ?? rate}
+                totalMonths={result.totalMonths}
+                goal={1000000}
+              />
+            )}
+
+            {/* الرفيق المتابع — مقارنة مع آخر زيارة */}
+            {result.totalMonths < 99999 && (
+              <ReturnTracker currentMonths={result.totalMonths} netWorth={result.netWorth} />
+            )}
+
             <ShareCard
               years={monthsToLabel(result.totalMonths)}
               totalMonths={result.totalMonths}
@@ -480,6 +499,8 @@ export default function Home() {
             />
 
             <UpsellCard scenarios={result.scenarios} userData={{ salary: Number(salary), expenses: Number(expenses), savings: Number(savings), investments: Number(investments), rate: result.effectiveRate ?? rate, monthlySaving: result.monthlySaving, netWorth: result.netWorth, totalMonths: result.totalMonths }} />
+
+            <Challenge30 monthlySaving={result.monthlySaving} />
 
             <ReferralCard />
 
