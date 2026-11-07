@@ -30,17 +30,24 @@ interface Result {
   scenarios: { label: string; months: number }[]
 }
 
-// نتيجة تيزر فورية
+// نتيجة تيزر فورية — تظهر لحظة إدخال الرقمين، مع مقارنة بالمتوسط
+const AVG_MONTHS = 14 * 12
+
 function QuickPreview({ salary, expenses }: { salary: string; expenses: string }) {
   const s = Number(salary) || 0
   const e = Number(expenses) || 0
   if (!salary || !expenses || s <= e) return null
   const saving = s - e
-  const rough = calcMonthsToGoal(0, saving, 0, 1000000)
+  const rough = calcMonthsToGoal(0, saving, 4, 1000000)
+  const faster = rough < AVG_MONTHS
   return (
-    <div className="mt-3 p-3 bg-gold/10 border border-gold/30 rounded-xl text-sm text-center">
-      💡 بناءً على ادخارك <span className="text-gold font-bold">{formatNumber(saving)} ريال/شهر</span> — ستصل تقريباً خلال{' '}
-      <span className="text-gold font-bold">{monthsToLabel(rough)}</span> — أكمل لنعرف بالدقة
+    <div className="mt-3 p-4 bg-gold/10 border border-gold/30 rounded-xl text-center animate-fade-up">
+      <p className="text-xs text-gray-400 mb-1">توقّع أوّلي بادخار {formatNumber(saving)} ريال/شهر</p>
+      <p className="text-2xl font-extrabold text-gold leading-tight">{monthsToLabel(rough)}</p>
+      <p className={`text-xs font-bold mt-2 ${faster ? 'text-green-400' : 'text-orange-400'}`}>
+        {faster ? '⚡ أسرع من المتوسط (١٤ سنة)' : '🐢 أبطأ من المتوسط (١٤ سنة) — كمّل نشوف وش يسرّعك'}
+      </p>
+      <p className="text-[11px] text-gray-500 mt-1">كمّل ٣ أسئلة وتطلع لك النتيجة الدقيقة</p>
     </div>
   )
 }
@@ -180,9 +187,18 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3 leading-tight">
             متى تصير <span className="text-gold">مليونير</span>؟
           </h1>
-          <p className="text-gray-400 text-base">
-            أجب على {4} أسئلة بسيطة واعرف متى ستصل لأول مليون ريال
-          </p>
+          {!result && step === 1 ? (
+            <div className="inline-flex flex-col items-center gap-1 mt-1 animate-fade-up">
+              <p className="text-gray-400 text-base">
+                المتوسط يحتاج <span className="text-gold font-extrabold">١٤ سنة</span> عشان يوصل لأول مليون…
+              </p>
+              <p className="text-xl font-extrabold">وأنت؟ <span className="text-gray-400 text-base font-bold">اكتب راتبك وشوف فوراً 👇</span></p>
+            </div>
+          ) : (
+            <p className="text-gray-400 text-base">
+              أجب على {4} أسئلة بسيطة واعرف متى ستصل لأول مليون ريال
+            </p>
+          )}
         </div>
 
         {/* Progress Bar */}

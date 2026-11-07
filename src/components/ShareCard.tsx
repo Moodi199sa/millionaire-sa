@@ -30,7 +30,7 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
   const arDigits = (n: number) => String(n).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d])
   const fallbackLink = `https://saudimillion.com/s/${totalMonths}`
   const buildText = (link: string) =>
-    `🏆 تحدي المليونير\n\nأنا بكون مليونير خلال ${years}\nيعني ${arDigits(totalMonths)} شهر فقط 🔥\n\nوأنت؟ احسب متى بتصير مليونير 👇\n${link}`
+    `🏆 تحدي المليونير\n\nأنا بكون مليونير خلال ${years}\nيعني ${arDigits(totalMonths)} شهر فقط 🔥\n\nوأنت؟ احسب متى بتصير مليونير 👇\n${link}\n\n🎯 منشن ٣ أشخاص وتحدّهم — مين يصير مليونير أول؟`
 
   // رابط المشاركة الجاهز (يُرفع تلقائياً في الخلفية عند ظهور الكرت) — بحيث تكون
   // أزرار المشاركة متزامنة تماماً عند الضغط، بلا أي await قبل window.open، تجنّباً
@@ -291,8 +291,8 @@ export default function ShareCard({ years, totalMonths, date, goal }: Props) {
 
       {/* عنوان */}
       <div className="text-center">
-        <p className="text-sm font-bold text-white mb-1">🔥 تحدّ أصدقائك الحين!</p>
-        <p className="text-xs text-gray-400">شارك نتيجتك — من يصير مليونير أول؟</p>
+        <p className="text-sm font-bold text-white mb-1">🔥 تحدّ ٣ من أصدقائك الحين!</p>
+        <p className="text-xs text-gray-400">شارك نتيجتك ومنشنهم — من يصير مليونير أول؟</p>
       </div>
 
       {/* أزرار المشاركة */}

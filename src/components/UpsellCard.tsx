@@ -31,27 +31,59 @@ export default function UpsellCard({ scenarios, userData }: Props) {
         قارن سيناريوهات مختلفة واعرف أفضل خطة لتقليل المدة
       </p>
 
-      {/* السيناريوهات */}
+      {/* السيناريوهات — أول اثنين واضحين (تيزر)، الباقي مموّه خلف القفل */}
       <div className="flex flex-col gap-2 mb-5 text-right">
-        {scenarios.map((s, i) => (
-          <div
-            key={i}
-            className={`flex justify-between items-center px-4 py-2.5 rounded-xl text-sm ${
-              i === 0
-                ? 'bg-white/5 border border-white/10'
-                : i === scenarios.length - 1
-                ? 'bg-yellow-50/10 border border-gold/40'
-                : 'bg-white/5'
-            }`}
-          >
-            <span className={i === scenarios.length - 1 ? 'text-gold' : 'text-gray-300'}>
-              {s.label}
-            </span>
-            <span className={`font-bold ${i === scenarios.length - 1 ? 'text-gold' : 'text-white'}`}>
-              {monthsToLabel(s.months)}
-            </span>
+        {scenarios.map((s, i) => {
+          const locked = i >= 2
+          const best = i === scenarios.length - 1
+          return (
+            <div
+              key={i}
+              className={`relative flex justify-between items-center px-4 py-2.5 rounded-xl text-sm overflow-hidden ${
+                i === 0 ? 'bg-white/5 border border-white/10' : best ? 'bg-gold/5 border border-gold/40' : 'bg-white/5'
+              }`}
+            >
+              <span className={best ? 'text-gold' : 'text-gray-300'}>{s.label}</span>
+              <span
+                className={`font-bold ${best ? 'text-gold' : 'text-white'} ${locked ? 'blur-[6px] select-none' : ''}`}
+                aria-hidden={locked}
+              >
+                {locked ? 'X سنوات و X أشهر' : monthsToLabel(s.months)}
+              </span>
+              {locked && <span className="absolute left-3 text-xs">🔒</span>}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* معاينة التقرير مموّهة — تعرض القيمة قبل الطلب */}
+      <div className="relative mb-5 rounded-xl overflow-hidden border border-white/10" aria-hidden="true">
+        <div className="p-4 space-y-3 text-right select-none">
+          <div className="bg-white/5 rounded-lg p-3">
+            <div className="text-xs text-gold font-bold mb-2">الزبدة 🧈</div>
+            <div className="h-2 w-full bg-white/10 rounded mb-1.5" />
+            <div className="h-2 w-5/6 bg-white/10 rounded" />
           </div>
-        ))}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white/5 rounded-lg p-3 text-center">
+              <div className="text-xs text-gray-400 mb-1">جاهزيتك</div>
+              <div className="text-xl font-extrabold text-gold">٧٢/١٠٠</div>
+            </div>
+            <div className="bg-white/5 rounded-lg p-3 text-center">
+              <div className="text-xs text-gray-400 mb-1">خطتك الأسبوعية</div>
+              <div className="text-xl font-extrabold text-gold">٤ خطوات</div>
+            </div>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3">
+            <div className="h-2 w-full bg-white/10 rounded mb-1.5" />
+            <div className="h-2 w-2/3 bg-white/10 rounded" />
+          </div>
+        </div>
+        <div className="absolute inset-0 backdrop-blur-[5px] bg-dark/40 flex flex-col items-center justify-center">
+          <div className="text-3xl mb-1">🔒</div>
+          <p className="text-sm font-bold text-white">تقريرك الكامل جاهز</p>
+          <p className="text-xs text-gray-300 mt-0.5">افتحه بـ 9 ريال فقط</p>
+        </div>
       </div>
 
       {/* السعر */}
