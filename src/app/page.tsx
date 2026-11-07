@@ -41,7 +41,7 @@ function QuickPreview({ salary, expenses }: { salary: string; expenses: string }
   const faster = rough < AVG_MONTHS
   return (
     <div className="mt-3 p-4 bg-gold/10 border border-gold/30 rounded-xl text-center animate-fade-up">
-      <p className="text-xs text-gray-400 mb-1">توقّع أوّلي بادخار {formatNumber(saving)} ريال/شهر</p>
+      <p className="text-xs text-gray-400 mb-1">لو تدّخر {formatNumber(saving)} ريال بالشهر، توصل تقريباً بعد</p>
       <p className="text-2xl font-extrabold text-gold leading-tight">{monthsToLabel(rough)}</p>
       <p className={`text-xs font-bold mt-2 ${faster ? 'text-green-400' : 'text-orange-400'}`}>
         {faster ? '⚡ أسرع من المتوسط (١٤ سنة)' : '🐢 أبطأ من المتوسط (١٤ سنة) — كمّل نشوف وش يسرّعك'}

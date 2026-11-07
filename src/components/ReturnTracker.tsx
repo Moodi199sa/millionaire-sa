@@ -39,17 +39,17 @@ export default function ReturnTracker({ currentMonths, netWorth }: Props) {
       ? { icon: '🚀', color: 'text-green-400', border: 'border-green-500/30', title: `قرّبت ${monthsSavedLabel(diff)} من المليون!` }
       : diff < 0
       ? { icon: '⚠️', color: 'text-orange-400', border: 'border-orange-500/30', title: `تأخّرت ${monthsSavedLabel(-diff)} عن آخر مرة` }
-      : { icon: '⏸️', color: 'text-gold', border: 'border-gold/30', title: 'نفس مكانك من آخر مرة' }
+      : { icon: '⏸️', color: 'text-gold', border: 'border-gold/30', title: 'مكانك ما تغيّر من آخر مرة' }
 
   return (
     <div className={`glass-card border ${tone.border} rounded-2xl p-5 animate-fade-up`}>
-      <p className="text-xs text-gray-400 mb-2">مقارنة مع زيارتك قبل {since}</p>
+      <p className="text-xs text-gray-400 mb-2">مقارنة بآخر مرة دخلت (قبل {since})</p>
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl flex-shrink-0">{tone.icon}</div>
         <p className={`text-lg font-extrabold ${tone.color}`}>{tone.title}</p>
       </div>
       {diff <= 0 && (
-        <p className="text-xs text-gray-400 mt-2">جرّب &quot;أقرب حركة&quot; فوق — خطوة وحدة ترجّعك للمسار.</p>
+        <p className="text-xs text-gray-400 mt-2">جرّب الحركة اللي تحت — خطوة وحدة ترجّعك للطريق.</p>
       )}
     </div>
   )

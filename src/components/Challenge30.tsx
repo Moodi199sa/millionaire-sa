@@ -22,8 +22,8 @@ export default function Challenge30({ monthlySaving }: Props) {
 
   const weekly = Math.max(50, Math.round((monthlySaving * 0.1) / 4 / 10) * 10)
   const steps = [
-    { title: 'الأسبوع ١', text: 'اكتب كل مصروفاتك ٧ أيام — بدون ما تغيّر شي' },
-    { title: 'الأسبوع ٢', text: 'ألغِ اشتراك واحد ما تستخدمه' },
+    { title: 'الأسبوع ١', text: 'اكتب كل مصاريفك ٧ أيام — بدون ما تغيّر شي' },
+    { title: 'الأسبوع ٢', text: 'ألغِ اشتراك ما تستخدمه' },
     { title: 'الأسبوع ٣', text: `حوّل ${formatNumber(weekly)} ريال لحساب الادخار` },
     { title: 'الأسبوع ٤', text: 'ارجع للحاسبة بأرقامك الجديدة وشوف الفرق' },
   ]

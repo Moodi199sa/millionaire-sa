@@ -81,8 +81,8 @@ export default function UpsellCard({ scenarios, userData }: Props) {
         </div>
         <div className="absolute inset-0 backdrop-blur-[5px] bg-dark/40 flex flex-col items-center justify-center">
           <div className="text-3xl mb-1">🔒</div>
-          <p className="text-sm font-bold text-white">تقريرك الكامل جاهز</p>
-          <p className="text-xs text-gray-300 mt-0.5">افتحه بـ 9 ريال فقط</p>
+          <p className="text-sm font-bold text-white">تقريرك كامل جاهز</p>
+          <p className="text-xs text-gray-300 mt-0.5">افتحه بـ 9 ريال بس</p>
         </div>
       </div>
 

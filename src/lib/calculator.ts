@@ -88,14 +88,14 @@ export function buildLevers(
   const candidates: Omit<Lever, 'monthsSaved'>[] = [
     {
       key: 'save',
-      label: `ادخر ${formatNumber(extraSave)} ريال زيادة كل شهر`,
-      action: `حوّل ${formatNumber(extraSave)} ريال تلقائياً يوم نزول الراتب لحساب منفصل — قبل ما تصرف أي شي.`,
+      label: `لو زدت ادخارك ${formatNumber(extraSave)} ريال بالشهر`,
+      action: `أول ما ينزل راتبك، حوّل ${formatNumber(extraSave)} ريال لحساب ثاني على طول — قبل لا تصرف منه ريال.`,
       months: calcMonthsToGoal(netWorth, monthlySaving + extraSave, annualRate, goal),
     },
     {
       key: 'income',
-      label: `دخل إضافي ${formatNumber(extraIncome)} ريال شهرياً`,
-      action: 'اكتب ٣ مهارات تقدر تبيعها (تصميم، تدريس، توصيل، استشارة) واعرض وحدة منها على شخص واحد هذا الأسبوع.',
+      label: `لو جبت دخل إضافي ${formatNumber(extraIncome)} ريال بالشهر`,
+      action: 'اكتب ٣ أشياء تعرف تسويها (تصميم، تدريس، توصيل، استشارات) واعرض وحدة منها على شخص واحد هالأسبوع.',
       months: calcMonthsToGoal(netWorth, monthlySaving + extraIncome, annualRate, goal),
     },
   ]
@@ -103,8 +103,8 @@ export function buildLevers(
   if (annualRate < investRate) {
     candidates.push({
       key: 'invest',
-      label: `استثمر ادخارك بعائد ${investRate}٪ بدل ${annualRate}٪`,
-      action: 'افتح محفظة استثمارية منخفضة التكلفة (صندوق مؤشرات أو صكوك) وحوّل لها أول دفعة هذا الأسبوع.',
+      label: `لو استثمرت فلوسك بعائد ${investRate}٪ بدل ${annualRate}٪`,
+      action: 'افتح محفظة استثمارية رسومها قليلة (صندوق مؤشرات أو صكوك) وحط فيها أول مبلغ هالأسبوع.',
       months: calcMonthsToGoal(netWorth, monthlySaving, investRate, goal),
     })
   }
@@ -115,15 +115,22 @@ export function buildLevers(
     .sort((a, b) => b.monthsSaved - a.monthsSaved)
 }
 
-// "٣ سنوات و٤ أشهر" — صياغة قصيرة للمدة اللي توفّرها الرافعة
+// صياغة باللهجة للمدة اللي توفّرها الحركة: "سنتين وأربع شهور"
 export function monthsSavedLabel(months: number): string {
   const years = Math.floor(months / 12)
   const rem = months % 12
-  const monthsWord = (m: number) => (m === 1 ? 'شهر' : m === 2 ? 'شهرين' : m <= 10 ? `${m} أشهر` : `${m} شهراً`)
-  const yearsWord = (y: number) => (y === 1 ? 'سنة' : y === 2 ? 'سنتين' : y <= 10 ? `${y} سنوات` : `${y} سنة`)
-  if (years === 0) return monthsWord(rem)
-  if (rem === 0) return yearsWord(years)
-  return `${yearsWord(years)} و${monthsWord(rem)}`
+  const m: Record<number, string> = {
+    1: 'شهر', 2: 'شهرين', 3: 'ثلاث شهور', 4: 'أربع شهور', 5: 'خمس شهور', 6: 'ست شهور',
+    7: 'سبع شهور', 8: 'ثمان شهور', 9: 'تسع شهور', 10: 'عشر شهور', 11: 'إحدعش شهر',
+  }
+  const y: Record<number, string> = {
+    1: 'سنة', 2: 'سنتين', 3: 'ثلاث سنين', 4: 'أربع سنين', 5: 'خمس سنين', 6: 'ست سنين',
+    7: 'سبع سنين', 8: 'ثمان سنين', 9: 'تسع سنين', 10: 'عشر سنين',
+  }
+  const yw = (n: number) => y[n] || `${n} سنة`
+  if (years === 0) return m[rem]
+  if (rem === 0) return yw(years)
+  return `${yw(years)} و${m[rem]}`
 }
 
 export function buildChartData(

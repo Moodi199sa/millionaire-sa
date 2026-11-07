@@ -33,22 +33,20 @@ export default function NearestLever({
       <div className="relative flex items-center gap-2.5">
         <div className="w-9 h-9 rounded-xl bg-gold/15 flex items-center justify-center text-lg">🎯</div>
         <div>
-          <h3 className="text-base font-extrabold text-white leading-tight">أقرب حركة تقرّبك من المليون</h3>
-          <p className="text-[11px] text-gray-400">خطوة واحدة — أثر فوري</p>
+          <h3 className="text-base font-extrabold text-white leading-tight">وش أسرع شي يقرّبك من المليون؟</h3>
+          <p className="text-[11px] text-gray-400">حركة وحدة… وتفرق معك</p>
         </div>
       </div>
 
       <div className="relative text-center py-2">
         <p className="text-sm text-gray-300 mb-3">{top.label}</p>
-        <div className="flex items-baseline justify-center gap-2">
-          <span className="text-gray-500 text-lg">تقرّبك</span>
-          <span className="gold-shimmer text-4xl sm:text-5xl font-extrabold leading-none">
-            {monthsSavedLabel(top.monthsSaved)}
-          </span>
-        </div>
+        <p className="text-gray-400 text-sm mb-1">توصل للمليون أبكر بـ</p>
+        <span className="gold-shimmer text-4xl sm:text-5xl font-extrabold leading-tight">
+          {monthsSavedLabel(top.monthsSaved)}
+        </span>
         <div className="mt-3 inline-flex items-center gap-1.5 bg-green-500/15 border border-green-500/30 rounded-full px-3 py-1">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse-dot" />
-          <span className="text-xs text-green-400 font-bold">أقرب لهدفك</span>
+          <span className="text-xs text-green-400 font-bold">تختصر عليك الطريق</span>
         </div>
       </div>
 
@@ -57,7 +55,7 @@ export default function NearestLever({
           ✓
         </div>
         <div>
-          <p className="text-xs text-gold font-bold mb-1">خطوتك هذا الأسبوع</p>
+          <p className="text-xs text-gold font-bold mb-1">وش تسوي هالأسبوع؟</p>
           <p className="text-sm text-gray-100 leading-relaxed">{top.action}</p>
         </div>
       </div>
@@ -65,7 +63,7 @@ export default function NearestLever({
       {others > 0 && (
         <p className="relative text-xs text-gray-400 text-center leading-relaxed">
           وعندك <span className="text-gold font-bold">{others}</span>{' '}
-          {others === 1 ? 'رافعة أخرى' : 'رافعات أخرى'} تقدر تجمعها معاً — التقرير الكامل يحسب لك أثرها مجتمعة
+          {others === 1 ? 'حركة ثانية' : 'حركات ثانية'} تقدر تجمعها مع بعض — التقرير الكامل يحسب لك أثرها كلها
         </p>
       )}
     </div>
