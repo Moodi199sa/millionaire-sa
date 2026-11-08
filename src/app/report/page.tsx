@@ -10,44 +10,22 @@ import {
   Scale, AlertTriangle, Zap, Calculator, ChevronLeft, Brain, Coffee, Wallet, Gavel, Lock,
 } from 'lucide-react'
 import SiteShell from '@/components/site/SiteShell'
+import { SectionHead, SideTag, Num, Takeaway } from '@/components/report/ui'
+import {
+  TableOfContents, BudgetDetail, PrioritiesAndDebt, SensitivityGrid, TimeAndRisk, ZakatRetirementProtection,
+  MoneyPsychology, KpiReview, GlossaryFaqSources,
+} from '@/components/report/ExtendedSections'
 import { getUserData, UserData } from '@/lib/store'
 import { formatNumber, contributionSplit } from '@/lib/calculator'
 import { ReportData, computeExtras, buildLocalReport } from '@/lib/reportFallback'
 import {
   GOAL, NEVER, dur, yearsShort, reportId, readiness, cashflow, scenarios, yearTable, requiredMonthly,
   BUCKETS, blendedReturn, trackerCsv, reminderIcs, downloadFile, SIDE_INCOME, BALANCED_RATE,
+  sensitivity, delayCost, stressTests, inflationView, saveMoreTomorrow, rule72, budgetLines, priorities,
+  debtView, zakatView, kpis,
 } from '@/lib/reportModel'
 
 const SAR = 'ر.س'
-
-// ─── عناصر واجهة صغيرة ───────────────────────────────────────────────────
-function SectionHead({ icon: Icon, kicker, title, sub, side, tone = 'amber' }: {
-  icon: React.ElementType; kicker: string; title: string; sub: string; side?: React.ReactNode; tone?: 'amber' | 'green'
-}) {
-  const chipCls = tone === 'green'
-    ? 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20'
-    : 'bg-amber-400/10 text-amber-300 border-amber-400/25'
-  return (
-    <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-6">
-      <div>
-        <span className={`chip border mb-3 ${chipCls}`}><Icon size={13} />{kicker}</span>
-        <h2 className="text-2xl lg:text-[34px] font-extrabold leading-tight mb-1.5">{title}</h2>
-        <p className="text-sm lg:text-base text-gray-400">{sub}</p>
-      </div>
-      {side && <div className="shrink-0">{side}</div>}
-    </div>
-  )
-}
-
-function SideTag({ icon: Icon, children, tone = 'green' }: { icon: React.ElementType; children: React.ReactNode; tone?: 'green' | 'amber' | 'gray' }) {
-  const cls = tone === 'green' ? 'border-emerald-400/20 bg-emerald-400/[0.06] text-emerald-300'
-    : tone === 'amber' ? 'border-amber-400/25 bg-amber-400/[0.06] text-amber-200' : 'border-white/10 bg-white/[0.03] text-gray-300'
-  return <div className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs lg:text-sm font-bold ${cls}`}><Icon size={16} className="shrink-0" /><span>{children}</span></div>
-}
-
-function Num({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <span className={`tabular-nums ${className}`} dir="ltr">{children}</span>
-}
 
 function Ring({ score }: { score: number }) {
   const r = 70, c = 2 * Math.PI * r
@@ -104,13 +82,49 @@ function LoadingReport() {
 }
 
 const NAV = [
-  { id: 'flows', label: 'مصفوفة الميزانية' },
+  { id: 'flows', label: 'الميزانية' },
   { id: 'scenarios', label: 'المسار التراكمي' },
+  { id: 'risk', label: 'اختبار الضغط' },
   { id: 'assets', label: 'توزيع الأصول' },
   { id: 'income', label: 'الدخل الجانبي' },
-  { id: 'tools', label: 'صندوق الأدوات' },
   { id: 'plan', label: 'خطة 90 يوم' },
+  { id: 'kpi', label: 'المؤشرات' },
 ]
+
+const TOC = [
+  { id: 'flows', n: '01', title: 'الهندسة العكسية للميزانية', desc: 'توزيع راتبك، التسريبات، وميزانية بند بند' },
+  { id: 'priorities', n: '02', title: 'سلّم الأولويات والديون', desc: 'وش تسوي أول، وحدود الأقساط الصحية' },
+  { id: 'scenarios', n: '03', title: 'محاكاة التراكم المركب', desc: '3 سيناريوهات، جدول سنوي، ومصفوفة حساسية' },
+  { id: 'risk', n: '04', title: 'الوقت والتضخم والمخاطر', desc: 'اختبار الضغط وتكلفة التأجيل' },
+  { id: 'assets', n: '05', title: 'توزيع الأصول', desc: 'محفظة 4 فئات بالمبالغ ووين تنفذ' },
+  { id: 'protect', n: '06', title: 'الزكاة والتقاعد والحماية', desc: 'الأشياء اللي أغلب الخطط تنساها' },
+  { id: 'income', n: '07', title: 'محرك الدخل الجانبي', desc: 'أفكار تناسبك مع خطة انطلاق' },
+  { id: 'mind', n: '08', title: 'علم النفس المالي', desc: '6 فخاخ سلوكية وحلولها' },
+  { id: 'tools', n: '09', title: 'صندوق الأدوات', desc: 'شيت تتبّع، تذكير شهري، رقم الاستقلال' },
+  { id: 'plan', n: '10', title: 'خطة أول 90 يوم', desc: '3 مراحل وتفصيل أسبوعي' },
+  { id: 'kpi', n: '11', title: 'لوحة المؤشرات', desc: '6 أرقام تراقبها كل 3 شهور' },
+  { id: 'glossary', n: '12', title: 'المرجع', desc: 'المسرد، الأسئلة، ومصادر الأرقام' },
+]
+
+// يقص الصفوف الفاضية (لون الخلفية) من أسفل اللقطة
+function trimBottom(c: HTMLCanvasElement): HTMLCanvasElement {
+  const ctx = c.getContext('2d')
+  if (!ctx) return c
+  const { width, height } = c
+  const data = ctx.getImageData(0, 0, width, height).data
+  const isBg = (i: number) => Math.abs(data[i] - 18) < 6 && Math.abs(data[i + 1] - 23) < 6 && Math.abs(data[i + 2] - 31) < 6
+  let last = height - 1
+  outer: for (; last > 0; last--) {
+    const row = last * width * 4
+    for (let x = 0; x < width; x += 3) if (!isBg(row + x * 4)) break outer
+  }
+  const h = Math.min(height, last + 8)
+  if (h >= height) return c
+  const out = document.createElement('canvas')
+  out.width = width; out.height = h
+  out.getContext('2d')!.drawImage(c, 0, 0, width, h, 0, 0, width, h)
+  return out
+}
 
 // ─── الصفحة ─────────────────────────────────────────────────────────────
 export default function ReportPage() {
@@ -121,8 +135,20 @@ export default function ReportPage() {
   const [targetYears, setTargetYears] = useState(10)
   const [calcRate, setCalcRate] = useState(BALANCED_RATE)
   const [pdfBusy, setPdfBusy] = useState(false)
+  const [pdfMode, setPdfMode] = useState(false)
 
   useEffect(() => {
+    // وضع توليد الـPDF داخل إطار مخفي (للجوال): البيانات تجي من الصفحة الأم بدون طلب جديد
+    try {
+      const parent = window.parent as unknown as { __smPdfPayload?: { data: UserData; report: ReportData } }
+      if (new URLSearchParams(window.location.search).get('pdf') === '1' && window.parent !== window && parent.__smPdfPayload) {
+        setData(parent.__smPdfPayload.data)
+        setReport(parent.__smPdfPayload.report)
+        setLoading(false)
+        setPdfMode(true)
+        return
+      }
+    } catch {}
     // حارس الوصول: التقرير محتوى مدفوع — نتحقق من توكن الوصول قبل عرض أي شيء
     fetch('/api/check-access?product=report')
       .then((r) => r.json())
@@ -170,56 +196,165 @@ export default function ReportPage() {
     const best = sc[2]
     const table = yearTable(data.netWorth, best.monthly, best.rate, best.months)
     const split = contributionSplit(data.netWorth, best.monthly, best.months)
-    return { flow, sc, best, table, split, ready: readiness(data), id: reportId(data) }
+    const ext = {
+      grid: sensitivity(data),
+      delay: delayCost(data, best.monthly, best.rate, best.months),
+      stress: stressTests(data, best.monthly, best.rate, best.months),
+      infl: inflationView(data, best.monthly, best.rate, best.months),
+      smt: saveMoreTomorrow(data, best.monthly, best.rate),
+      budget: budgetLines(flow.S, flow.target),
+      steps: priorities(data, flow.emergencyNeed),
+      debt: debtView(data),
+      zakat: zakatView(data),
+      kpi: kpis(data, flow.emergencyNeed),
+    }
+    return { flow, sc, best, table, split, ext, ready: readiness(data), id: reportId(data) }
   }, [data])
 
-  const downloadPDF = async () => {
-    setPdfBusy(true)
+  const [pdfProgress, setPdfProgress] = useState(0)
+
+  // على الجوال: نولّد الـPDF من نسخة بعرض الكمبيوتر داخل إطار مخفي، عشان يطلع بنفس تنسيق التقرير الكامل
+  const downloadViaFrame = () => {
+    const w = window as unknown as Record<string, unknown>
+    setPdfBusy(true); setPdfProgress(0)
+    w.__smPdfPayload = { data, report }
+    const frame = document.createElement('iframe')
+    frame.setAttribute('aria-hidden', 'true')
+    frame.style.cssText = 'position:fixed;top:0;left:-20000px;width:1280px;height:900px;border:0;opacity:0;pointer-events:none'
+    let finished = false
+    const cleanup = () => { finished = true; clearTimeout(timer); frame.remove(); setPdfBusy(false); delete w.__smPdfPayload }
+    w.__smPdfProgress = (p: number) => setPdfProgress(p)
+    w.__smPdfResolve = (buf: ArrayBuffer) => {
+      downloadFile('تقرير-تسريع-الثروة-saudimillion.pdf', '', 'application/pdf', new Blob([buf], { type: 'application/pdf' }))
+      cleanup()
+    }
+    w.__smPdfReject = () => { if (!finished) { cleanup(); window.print() } }
+    const timer = setTimeout(() => (w.__smPdfReject as () => void)(), 120000)
+    frame.src = '/report?pdf=1'
+    document.body.appendChild(frame)
+  }
+
+  const downloadPDF = async (inFrame = false) => {
+    if (!inFrame && window.innerWidth < 1024) return downloadViaFrame()
+    const parentApi = window.parent as unknown as { __smPdfProgress?: (p: number) => void; __smPdfResolve?: (b: ArrayBuffer) => void; __smPdfReject?: () => void }
+    setPdfBusy(true); setPdfProgress(0)
     try {
-      const { toCanvas } = await import('html-to-image')
+      const { toCanvas, getFontEmbedCSS } = await import('html-to-image')
       const { default: jsPDF } = await import('jspdf')
-      const element = document.getElementById('report-content')
-      if (!element) return
+      const root = document.getElementById('report-content')
+      if (!root) return
       await document.fonts.ready
       await new Promise((r) => setTimeout(r, 150))
-      // html-to-image يحافظ على تشكيل الحروف العربية بعكس html2canvas
-      const canvas = await toCanvas(element, {
-        pixelRatio: 2, backgroundColor: '#12171F', cacheBust: true,
-        filter: (node) => !(node instanceof HTMLElement && node.classList.contains('no-print')),
-      })
-      const imgData = canvas.toDataURL('image/jpeg', 0.92)
-      const pdf = new jsPDF('p', 'mm', 'a4')
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = pdf.internal.pageSize.getHeight()
-      const pageImgHeight = pdfWidth / (canvas.width / canvas.height)
-      let heightLeft = pageImgHeight
-      let position = 0
-      pdf.setFillColor(18, 23, 31)
-      pdf.rect(0, 0, pdfWidth, pdfHeight, 'F')
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pageImgHeight)
-      heightLeft -= pdfHeight
-      while (heightLeft > 0) {
-        position = heightLeft - pageImgHeight
-        pdf.addPage()
-        pdf.setFillColor(18, 23, 31)
-        pdf.rect(0, 0, pdfWidth, pdfHeight, 'F')
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pageImgHeight)
-        heightLeft -= pdfHeight
+      // نلتقط بعرض ثابت مناسب للورق (A4) عشان الخط يطلع مقروء والصفحات ممتلئة
+      const prevW = root.style.width, prevMax = root.style.maxWidth
+      if (window.innerWidth >= 1024) { root.style.width = '900px'; root.style.maxWidth = '900px' }
+      await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 120)))
+      const restore = () => { root.style.width = prevW; root.style.maxWidth = prevMax }
+      const sections = Array.from(root.children) as HTMLElement[]
+      let fontEmbedCSS: string | undefined
+      try { fontEmbedCSS = await getFontEmbedCSS(root) } catch {}
+      const opts = {
+        pixelRatio: 2, backgroundColor: '#12171F', cacheBust: true, fontEmbedCSS,
+        filter: (node: HTMLElement) => !(node instanceof HTMLElement && node.classList.contains('no-print')),
       }
-      pdf.save('تقرير-تسريع-الثروة-saudimillion.pdf')
+      // تقسيم احترافي: كل قسم رئيسي يبدأ بصفحة جديدة، والأقسام ما تنقص من النص
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const PW = pdf.internal.pageSize.getWidth(), PH = pdf.internal.pageSize.getHeight()
+      const M = 8, TOP = 10, BOTTOM = 12, GAP = 6
+      const CW = PW - M * 2, CH = PH - TOP - BOTTOM
+      let y = TOP, pageHasContent = false
+      const paint = () => { pdf.setFillColor(18, 23, 31); pdf.rect(0, 0, PW, PH, 'F') }
+      const newPage = () => { pdf.addPage(); paint(); y = TOP; pageHasContent = false }
+      paint()
+      // نقسم الأقسام الطويلة لوحدات (عنوان، بطاقات، خلاصة...) عشان ما ينقص كرت بنص صفحة
+      const pxPerMm = root.getBoundingClientRect().width / CW
+      const maxPx = CH * pxPerMm
+      const isStack = (el: HTMLElement) => {
+        const kids = Array.from(el.children) as HTMLElement[]
+        if (kids.length < 2) return false
+        const w = el.getBoundingClientRect().width
+        return kids.every((k) => k.getBoundingClientRect().width >= w * 0.9)
+      }
+      const units: { el: HTMLElement; brk: boolean }[] = []
+      const expand = (el: HTMLElement, brk: boolean, depth: number) => {
+        if (el.classList.contains('no-print') || el.offsetHeight === 0) return
+        if (el.offsetHeight > maxPx * 0.92 && depth < 3 && isStack(el)) {
+          (Array.from(el.children) as HTMLElement[]).forEach((k, idx) => expand(k, brk && idx === 0, depth + 1))
+        } else units.push({ el, brk })
+      }
+      sections.forEach((sec) => expand(sec, sec.hasAttribute('data-pdf-break'), 0))
+      for (let i = 0; i < units.length; i++) {
+        const { el: sec, brk } = units[i]
+        // نعطي مساحة إضافية تحت (لو الخط في النسخة الملتقطة لفّ أكثر) ثم نقص الفراغ
+        const raw = await toCanvas(sec, { ...opts, height: Math.ceil(sec.offsetHeight * 1.3) + 40, style: { height: 'auto' } })
+        const canvas = trimBottom(raw)
+        setPdfProgress(Math.round(((i + 1) / units.length) * 100))
+        if (inFrame) parentApi.__smPdfProgress?.(Math.round(((i + 1) / units.length) * 100))
+        const mmPerPx = CW / (canvas.width * (root.getBoundingClientRect().width / sec.getBoundingClientRect().width))
+        const wMm = canvas.width * mmPerPx
+        const hMm = canvas.height * mmPerPx
+        const x = PW - M - wMm // محاذاة يمين (RTL)
+        if (brk && pageHasContent) newPage()
+        if (hMm <= CH - (y - TOP)) {
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', x, y, wMm, hMm)
+          y += hMm + GAP; pageHasContent = true
+          continue
+        }
+        if (hMm <= CH) {
+          if (pageHasContent) newPage()
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', x, y, wMm, hMm)
+          y += hMm + GAP; pageHasContent = true
+          continue
+        }
+        // وحدة أطول من صفحة: نقسمها على عدة صفحات
+        if (pageHasContent) newPage()
+        const slicePx = Math.floor(CH / mmPerPx)
+        for (let off = 0; off < canvas.height; off += slicePx) {
+          const h = Math.min(slicePx, canvas.height - off)
+          const part = document.createElement('canvas')
+          part.width = canvas.width; part.height = h
+          part.getContext('2d')!.drawImage(canvas, 0, off, canvas.width, h, 0, 0, canvas.width, h)
+          if (off > 0) newPage()
+          pdf.addImage(part.toDataURL('image/jpeg', 0.9), 'JPEG', x, y, wMm, h * mmPerPx)
+          y += h * mmPerPx + GAP; pageHasContent = true
+        }
+      }
+      restore()
+      // ترقيم الصفحات
+      const total = pdf.getNumberOfPages()
+      for (let p = 1; p <= total; p++) {
+        pdf.setPage(p)
+        pdf.setFontSize(8); pdf.setTextColor(120, 130, 145)
+        pdf.text(`saudimillion.com  |  ${m?.id || ''}`, M, PH - 5)
+        pdf.text(`${p} / ${total}`, PW - M, PH - 5, { align: 'right' })
+      }
+      if (inFrame) parentApi.__smPdfResolve?.(pdf.output('arraybuffer'))
+      else pdf.save('تقرير-تسريع-الثروة-saudimillion.pdf')
     } catch (e) {
       console.error(e)
+      if (inFrame) { parentApi.__smPdfReject?.(); return }
+      const root = document.getElementById('report-content')
+      if (root) { root.style.width = ''; root.style.maxWidth = '' }
       window.print()
     } finally {
       setPdfBusy(false)
     }
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (pdfMode && report && m) {
+      const t = setTimeout(() => downloadPDF(true), 400)
+      return () => clearTimeout(t)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfMode, report, m])
+
   if (!data || !m || loading || !report) {
     return <SiteShell><LoadingReport /></SiteShell>
   }
 
-  const { flow, sc, best, table, split, ready: rd, id } = m
+  const { flow, sc, best, table, split, ext, ready: rd, id } = m
   const A = data.totalMonths
   const C = best.months
   const alreadyMillion = data.netWorth >= GOAL
@@ -249,7 +384,7 @@ export default function ReportPage() {
 
   const weekStep = emergencyGap > 0
     ? `افتح حساب ادخار منفصل اليوم، وفعّل تحويل تلقائي بمبلغ ${formatNumber(Math.max(500, data.monthlySaving))} ${SAR} يوم 27 من كل شهر. أول هدف: تكمّل صندوق الطوارئ (ناقصك ${formatNumber(emergencyGap)} ${SAR}).`
-    : `افتح محفظة استثمارية عند وسيط مرخّص هالأسبوع، وحط أول دفعة ${formatNumber(investMonthly)} ${SAR} موزعة حسب القسم الثالث. وفعّل تحويل تلقائي يوم 27.`
+    : `افتح محفظة استثمارية عند وسيط مرخّص هالأسبوع، وحط أول دفعة ${formatNumber(investMonthly)} ${SAR} موزعة حسب القسم الخامس. وفعّل تحويل تلقائي يوم 27.`
 
   const zubda = [
     { t: `نسبة ادخارك ${flow.savingPct}٪`, s: flow.savingPct >= 20 ? 'فوق القاعدة الذهبية (20٪) — أساسك قوي' : `تحت القاعدة الذهبية (20٪) بـ${20 - flow.savingPct} نقاط — وهذا أسهل شي نصلحه` },
@@ -274,7 +409,7 @@ export default function ReportPage() {
           <span className="lg:hidden text-sm font-extrabold">تقريرك <span className="text-amber-400">الشامل</span></span>
           <div className="flex items-center gap-2">
             <button onClick={() => window.print()} className="btn-ghost px-3 py-2 text-xs"><Printer size={15} /> طباعة</button>
-            <button onClick={downloadPDF} disabled={pdfBusy} className="btn-primary px-4 py-2 text-xs"><Download size={15} /> {pdfBusy ? 'يجهز...' : 'تحميل PDF'}</button>
+            <button onClick={() => downloadPDF()} disabled={pdfBusy} className="btn-primary px-4 py-2 text-xs"><Download size={15} /> {pdfBusy ? `يجهز ${pdfProgress}٪` : 'تحميل PDF'}</button>
           </div>
         </div>
       </div>
@@ -298,7 +433,7 @@ export default function ReportPage() {
               <p className="text-xl lg:text-3xl font-extrabold text-amber-grad leading-snug mb-5">{headline}</p>
               {report.motivational_opener && <p className="text-base lg:text-lg text-white/90 font-bold mb-3 leading-relaxed">{report.motivational_opener}</p>}
               <p className="text-sm lg:text-base text-gray-300 leading-loose mb-6">
-                هالتقرير مبني على أرقامك بالريال، ويشغّل لك ٣ محركات مع بعض:{' '}
+                هالتقرير (12 قسم) مبني على أرقامك بالريال، ويشغّل لك ٣ محركات مع بعض:{' '}
                 <b className="text-amber-300">تسكير التسريبات</b>، <b className="text-emerald-400">استثمار تلقائي كل شهر</b>، و<b className="text-amber-300">قناة دخل جانبية تضيف +{formatNumber(SIDE_INCOME)} {SAR}</b> بالشهر.
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
@@ -349,6 +484,8 @@ export default function ReportPage() {
           </div>
         </section>
 
+        <TableOfContents items={TOC} />
+
         {/* ═══ الزبدة ═══ */}
         <section className="grid lg:grid-cols-[1fr_1.1fr] gap-5">
           <div className="rounded-3xl border border-amber-400/30 p-6 lg:p-8 flex flex-col"
@@ -372,7 +509,7 @@ export default function ReportPage() {
         </section>
 
         {/* ═══ قراءة صريحة ═══ */}
-        <section>
+        <section data-pdf-break>
           <SectionHead icon={Brain} kicker="تشخيصك" title="قراءة صريحة لوضعك المالي" sub="بدون مجاملة وبدون تخويف — وين أنت قوي، ووين تحتاج تشتغل." />
           <div className="grid lg:grid-cols-3 gap-5">
             <div className="card p-6 lg:col-span-2">
@@ -437,7 +574,7 @@ export default function ReportPage() {
         </section>
 
         {/* ═══ القسم الأول: التدفقات ═══ */}
-        <section id="flows" className="scroll-mt-36">
+        <section id="flows" data-pdf-break className="scroll-mt-36">
           <SectionHead icon={PieChart} kicker="القسم الأول: الهندسة العكسية للميزانية"
             title="تشخيص التدفقات وقاعدة الادخار المعدّلة لك"
             sub={`نقارن توزيع راتبك الحالي بالنموذج المستهدف، ونكشف التسريبات اللي تاكل من ثروتك بهدوء.`}
@@ -510,11 +647,14 @@ export default function ReportPage() {
               )}
             </div>
           </div>
+          <BudgetDetail lines={ext.budget} S={flow.S} />
         </section>
 
-        {/* ═══ القسم الثاني: السيناريوهات ═══ */}
-        <section id="scenarios" className="scroll-mt-36">
-          <SectionHead icon={TrendingUp} tone="green" kicker="القسم الثاني: محاكاة التراكم المركب"
+        <PrioritiesAndDebt steps={ext.steps} debt={ext.debt} S={flow.S} />
+
+        {/* ═══ القسم الثالث: السيناريوهات ═══ */}
+        <section id="scenarios" data-pdf-break className="scroll-mt-36">
+          <SectionHead icon={TrendingUp} tone="green" kicker="القسم الثالث: محاكاة التراكم المركب"
             title="مصفوفة السيناريوهات وجدول التدفق السنوي"
             sub="٣ طرق توصلك للمليون — وكم سنة من عمرك توفرها كل وحدة."
             side={<SideTag icon={Calculator} tone="gray">مبنية على الفائدة المركبة شهرياً</SideTag>} />
@@ -584,7 +724,10 @@ export default function ReportPage() {
             </div>
           )}
 
+          <SensitivityGrid grid={ext.grid} userRate={data.rate} bestExtra={best.monthly - Math.max(0, data.monthlySaving)} bestRate={best.rate} />
+
           {/* الحاسبة العكسية */}
+          <div className="h-5" />
           <div className="card p-5 lg:p-7 grid lg:grid-cols-[1fr_1fr] gap-6 items-center">
             <div>
               <h3 className="text-lg font-extrabold mb-1 flex items-center gap-2"><Target size={18} className="text-amber-400" />الحاسبة العكسية: حدد متى تبي توصل</h3>
@@ -609,11 +752,14 @@ export default function ReportPage() {
                 : <p className="text-sm text-emerald-400 font-bold">ادخارك الحالي يكفي — بس لازم يتحول من ادخار إلى استثمار.</p>}
             </div>
           </div>
+          <Takeaway>الفرق بين السيناريو أ وج مو راتب أعلى — هو {formatNumber(flow.recovery)} {SAR} تحررها + {formatNumber(SIDE_INCOME)} {SAR} دخل جانبي + استثمار تلقائي. ثلاث قرارات تاخذها مرة وحدة، والفائدة المركبة تكمل الباقي.</Takeaway>
         </section>
 
-        {/* ═══ القسم الثالث: توزيع الأصول ═══ */}
-        <section id="assets" className="scroll-mt-36">
-          <SectionHead icon={Wallet} kicker="القسم الثالث: توزيع الأصول ومنصات التنفيذ"
+        <TimeAndRisk delay={ext.delay} doubleYears={rule72(best.rate)} rate={best.rate} stress={ext.stress} inflation={ext.infl} base={best.months} smt={ext.smt} netWorth={data.netWorth} />
+
+        {/* ═══ القسم الخامس: توزيع الأصول ═══ */}
+        <section id="assets" data-pdf-break className="scroll-mt-36">
+          <SectionHead icon={Wallet} kicker="القسم الخامس: توزيع الأصول ومنصات التنفيذ"
             title="استراتيجية توزيع محفظتك في السوق السعودي"
             sub="محفظة نمو متوازنة متوافقة مع الضوابط الشرعية، موزعة على ٤ فئات — بالمبالغ من استثمارك الشهري."
             side={<SideTag icon={ShieldCheck}>تأكد إن أي منصة مرخصة من هيئة السوق المالية قبل ما تفتح حساب</SideTag>} />
@@ -675,12 +821,15 @@ export default function ReportPage() {
               </div>
             </div>
           </div>
+          <Takeaway>ابدأ بالبسيط: صندوق مؤشر عالمي متوافق + صندوق مؤشر سعودي + صكوك. أعد التوازن مرة بالسنة، ولا تغيّر الأوزان بسبب الأخبار.</Takeaway>
         </section>
 
-        {/* ═══ القسم الرابع: الدخل الجانبي ═══ */}
+        <ZakatRetirementProtection zakat={ext.zakat} S={flow.S} />
+
+        {/* ═══ القسم السابع: الدخل الجانبي ═══ */}
         {ideas.length > 0 && (
-          <section id="income" className="scroll-mt-36">
-            <SectionHead icon={Rocket} kicker="القسم الرابع: محرك تسريع الدخل"
+          <section id="income" data-pdf-break className="scroll-mt-36">
+            <SectionHead icon={Rocket} kicker="القسم السابع: محرك تسريع الدخل"
               title="أفكار دخل جانبي تناسب وضعك"
               sub="أفكار عملية تقدر تبدأها جنب وظيفتك برأس مال صغير — مع أول خطوة لكل وحدة."
               side={<SideTag icon={Target} tone="green">الهدف: +{formatNumber(SIDE_INCOME)} {SAR} بالشهر تنضاف لمحفظتك</SideTag>} />
@@ -741,9 +890,11 @@ export default function ReportPage() {
           </section>
         )}
 
-        {/* ═══ القسم الخامس: الأدوات ═══ */}
-        <section id="tools" className="scroll-mt-36">
-          <SectionHead icon={Briefcase} kicker="القسم الخامس: الحزمة المرفقة"
+        <MoneyPsychology />
+
+        {/* ═══ القسم التاسع: الأدوات ═══ */}
+        <section id="tools" data-pdf-break className="scroll-mt-36">
+          <SectionHead icon={Briefcase} kicker="القسم التاسع: الحزمة المرفقة"
             title="صندوق أدواتك لتسريع الثروة"
             sub="أدوات جاهزة مفصّلة على أرقامك — حمّلها وابدأ التطبيق اليوم."
             side={<SideTag icon={Sparkles} tone="amber">مضمّنة مع تقريرك بدون أي تكلفة إضافية</SideTag>} />
@@ -779,8 +930,8 @@ export default function ReportPage() {
         </section>
 
         {/* ═══ القسم السادس: خطة ٩٠ يوم ═══ */}
-        <section id="plan" className="scroll-mt-36">
-          <SectionHead icon={Flag} tone="green" kicker="القسم السادس: خارطة التنفيذ"
+        <section id="plan" data-pdf-break className="scroll-mt-36">
+          <SectionHead icon={Flag} tone="green" kicker="القسم العاشر: خارطة التنفيذ"
             title="خطة العمل لأول 90 يوم (خطوة بخطوة)"
             sub="٣ مراحل شهرية واضحة — مهمة وحدة بكل مرة عشان ما تتشتت."
             side={<SideTag icon={Zap} tone="gray">ابدأ من بكرة</SideTag>} />
@@ -802,7 +953,7 @@ export default function ReportPage() {
                 ] },
               { badge: 'الشهر الثالث (الأيام 61–90)', icon: Rocket, color: 'amber', title: 'إطلاق أول قناة دخل جانبي', goal: `أول ${formatNumber(SIDE_INCOME)} ${SAR} إضافية للمحفظة`,
                 items: [
-                  `اختر فكرة وحدة من القسم الرابع${ideas[0] ? ` (مثل: ${ideas[0].title})` : ''}`,
+                  `اختر فكرة وحدة من القسم السابع${ideas[0] ? ` (مثل: ${ideas[0].title})` : ''}`,
                   'جهّز عرض بسيط أو نموذج تجريبي وكلّم أول 10 عملاء محتملين',
                   'كل ريال من الدخل الجانبي يروح للمحفظة مباشرة — مو للمصاريف',
                   'راجع شيت التتبّع: كم سبقت الخطة أو تأخرت؟',
@@ -842,6 +993,7 @@ export default function ReportPage() {
               </div>
             </div>
           )}
+          <Takeaway>لا تحاول تسوي كل شي بأسبوع. مهمة وحدة بكل مرة، وعلّم عليها. بعد 90 يوم بتكون سبقت أغلب الناس اللي حولك.</Takeaway>
         </section>
 
         {/* ═══ عقلية المليون ═══ */}
@@ -853,8 +1005,12 @@ export default function ReportPage() {
           </section>
         )}
 
+        <KpiReview items={ext.kpi} />
+
+        <GlossaryFaqSources />
+
         {/* ═══ الختام ═══ */}
-        <section className="rounded-3xl border border-amber-400/25 p-6 lg:p-10 grid lg:grid-cols-[1fr_340px] gap-8 items-center"
+        <section data-pdf-break className="rounded-3xl border border-amber-400/25 p-6 lg:p-10 grid lg:grid-cols-[1fr_340px] gap-8 items-center"
           style={{ background: 'radial-gradient(90% 100% at 100% 0%, rgba(16,185,129,0.08), transparent 60%), #1A212B' }}>
           <div>
             <p className="flex items-center gap-2 text-emerald-400 text-sm font-bold mb-3"><span className="w-2 h-2 rounded-full bg-emerald-400" />وثيقة خطتك المالية</p>

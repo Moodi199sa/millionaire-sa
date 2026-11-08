@@ -282,11 +282,183 @@ export function reminderIcs(amount: number): string {
   ].join('\r\n')
 }
 
-export function downloadFile(name: string, content: string, type: string) {
-  const blob = new Blob([content], { type })
+export function downloadFile(name: string, content: string, type: string, existing?: Blob) {
+  const blob = existing || new Blob([content], { type })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url; a.download = name
   document.body.appendChild(a); a.click(); a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// الإضافات الموسّعة: الحساسية، التأجيل، اختبار الضغط، التضخم، الميزانية
+// التفصيلية، الأولويات، الديون، الزكاة، ومؤشرات المتابعة.
+// ═══════════════════════════════════════════════════════════════════════
+
+export const INFLATION = 2 // متوسط التضخم السعودي 2025 = 2٪ (الهيئة العامة للإحصاء)
+
+interface SimOpts { shockAt?: number; shockPct?: number; pauseFrom?: number; pauseLen?: number; goalGrowth?: number }
+
+// محاكاة شهرية عامة مع صدمة سوق أو توقف مساهمات أو هدف يكبر مع التضخم
+export function simulate(start: number, monthly: number, rate: number, o: SimOpts = {}): number {
+  const r = rate / 100 / 12
+  const g = (o.goalGrowth || 0) / 100 / 12
+  if (start >= GOAL) return 0
+  let w = start
+  let goal = GOAL
+  for (let m = 1; m <= 1200; m++) {
+    const paused = o.pauseFrom !== undefined && m > o.pauseFrom && m <= o.pauseFrom + (o.pauseLen || 0)
+    w = w * (1 + r) + (paused ? 0 : monthly)
+    if (o.shockAt && m === o.shockAt) w *= 1 - (o.shockPct || 0) / 100
+    goal *= 1 + g
+    if (w >= goal) return m
+  }
+  return NEVER
+}
+
+export function growFor(start: number, monthly: number, rate: number, months: number): number {
+  const r = rate / 100 / 12
+  let w = start
+  for (let m = 0; m < months; m++) w = w * (1 + r) + monthly
+  return w
+}
+
+// مصفوفة الحساسية: زيادة الادخار × العائد
+export const SENS_EXTRA = [0, 500, 1000, 2000, 3000]
+export const SENS_RATES = [4, 6, 7, 8, 10]
+export function sensitivity(d: ReportInput): number[][] {
+  const M = Math.max(0, d.monthlySaving)
+  return SENS_EXTRA.map((e) => SENS_RATES.map((r) => calcMonthsToGoal(d.netWorth, M + e, r, GOAL)))
+}
+
+// تكلفة التأجيل: لو أجّلت تطبيق الخطة سنة/٣/٥ وبقيت على وضعك
+export function delayCost(d: ReportInput, monthly: number, rate: number, base: number) {
+  return [1, 3, 5].map((y) => {
+    const wk = growFor(d.netWorth, Math.max(0, d.monthlySaving), d.rate, y * 12)
+    const after = calcMonthsToGoal(wk, monthly, rate, GOAL)
+    const total = after >= NEVER ? NEVER : y * 12 + after
+    const remaining = base - y * 12
+    const needed = remaining > 12 ? requiredMonthly(wk, rate, remaining / 12) : 0
+    return { years: y, total, lost: total >= NEVER || base >= NEVER ? 0 : total - base, needed: remaining > 12 ? needed : 0 }
+  })
+}
+
+// اختبار الضغط على المسار المسرّع
+export function stressTests(d: ReportInput, monthly: number, rate: number, base: number) {
+  const at = Math.min(36, Math.max(6, Math.floor(base / 2)))
+  const t = [
+    { key: 'crash', title: 'السوق ينزل 30٪ فجأة', when: `في الشهر ${at}`, months: simulate(d.netWorth, monthly, rate, { shockAt: at, shockPct: 30 }),
+      fix: 'لا تبيع وقت النزول. كمّل استثمارك الشهري — أنت فعلياً تشتري بسعر مخفّض، وهذا اللي يرجّعك أسرع.' },
+    { key: 'job', title: 'تفقد دخلك 6 شهور', when: 'بدون أي مساهمة', months: simulate(d.netWorth, monthly, rate, { pauseFrom: Math.min(24, at), pauseLen: 6 }),
+      fix: 'صندوق الطوارئ هو اللي يغطي مصاريفك هنا — عشان كذا ما تلمس استثماراتك.' },
+    { key: 'pause', title: 'توقف عن الاستثمار سنة', when: '"بس هالسنة"', months: simulate(d.netWorth, monthly, rate, { pauseFrom: 12, pauseLen: 12 }),
+      fix: 'التحويل التلقائي يوم 27 يحميك من قرار "أوقف شوي". خله أوتوماتيك وانساه.' },
+    { key: 'lowret', title: 'العائد أقل بـ2٪ من المتوقع', when: `${Math.max(0, rate - 2)}٪ بدل ${rate}٪`, months: calcMonthsToGoal(d.netWorth, monthly, Math.max(0, rate - 2), GOAL),
+      fix: 'ما تتحكم بالسوق، لكن تتحكم بالمبلغ. +500 ريال بالشهر تعوّض جزء كبير من فرق العائد.' },
+  ]
+  return t.map((x) => ({ ...x, delay: x.months >= NEVER || base >= NEVER ? NEVER : Math.max(0, x.months - base) }))
+}
+
+// التضخم: قيمة المليون الحقيقية + متى توصل لمليون "بفلوس اليوم"
+export function inflationView(d: ReportInput, monthly: number, rate: number, base: number) {
+  const real = base >= NEVER ? 0 : Math.round(GOAL / Math.pow(1 + INFLATION / 100, base / 12))
+  const realMonths = simulate(d.netWorth, monthly, rate, { goalGrowth: INFLATION })
+  return { real, realMonths }
+}
+
+// زيادة الادخار التلقائية (Save More Tomorrow): نص كل زيادة راتب تروح للاستثمار
+export function saveMoreTomorrow(d: ReportInput, monthly: number, rate: number, raisePct = 3, share = 0.5): number {
+  const r = rate / 100 / 12
+  let w = d.netWorth
+  if (w >= GOAL) return 0
+  for (let m = 1; m <= 1200; m++) {
+    const y = Math.floor((m - 1) / 12)
+    const extra = share * d.salary * (Math.pow(1 + raisePct / 100, y) - 1)
+    w = w * (1 + r) + monthly + extra
+    if (w >= GOAL) return m
+  }
+  return NEVER
+}
+
+export function rule72(rate: number) { return rate > 0 ? Math.round((72 / rate) * 10) / 10 : 0 }
+
+// الميزانية التفصيلية المقترحة بالريال
+export interface BudgetLine { group: 'needs' | 'wants' | 'save'; name: string; amount: number; tip: string }
+export function budgetLines(S: number, target: { needs: number; wants: number; save: number }): BudgetLine[] {
+  const N = S * target.needs / 100, W = S * target.wants / 100, V = S * target.save / 100
+  const r = (n: number) => Math.round(n / 50) * 50
+  return [
+    { group: 'needs', name: 'السكن (إيجار أو قسط)', amount: r(N * 0.45), tip: 'المريح ما يتعدى 25–30٪ من الراتب' },
+    { group: 'needs', name: 'الأكل والبقالة', amount: r(N * 0.2), tip: 'قائمة مشتريات أسبوعية + الشراء بالجملة للأساسيات' },
+    { group: 'needs', name: 'المواصلات والبنزين والصيانة', amount: r(N * 0.15), tip: 'خصص مبلغ صيانة سنوي وقسّمه على 12' },
+    { group: 'needs', name: 'الفواتير والجوال والإنترنت', amount: r(N * 0.1), tip: 'راجع باقتك كل 6 شهور — غالباً فيه عرض أرخص' },
+    { group: 'needs', name: 'التزامات عائلية', amount: r(N * 0.1), tip: 'حددها مسبقاً بدل ما تفاجئك آخر الشهر' },
+    { group: 'wants', name: 'المطاعم والكوفي والتوصيل', amount: r(W * 0.4), tip: 'سقف أسبوعي ثابت — لما يخلص، يخلص' },
+    { group: 'wants', name: 'التسوق والملابس', amount: r(W * 0.25), tip: 'قاعدة الـ48 ساعة قبل أي شراء فوق 200 ريال' },
+    { group: 'wants', name: 'الترفيه والسفر والمناسبات', amount: r(W * 0.25), tip: 'حساب فرعي للسفر تحوّل له شهرياً' },
+    { group: 'wants', name: 'الاشتراكات الرقمية', amount: r(W * 0.1), tip: 'اشتراكين بالكثير — والباقي بالتناوب' },
+    { group: 'save', name: 'الاستثمار + صندوق الطوارئ', amount: r(V), tip: 'يتحول يوم نزول الراتب — قبل أي صرف' },
+  ]
+}
+
+// سلّم الأولويات المالية (الترتيب المعتمد عالمياً، مكيّف للسعودية)
+export type StepStatus = 'done' | 'now' | 'next' | 'check'
+export function priorities(d: ReportInput, emergencyNeed: number) {
+  const cash = Math.max(0, d.savings)
+  const sr = d.salary > 0 ? d.monthlySaving / d.salary : 0
+  const E = Math.max(1, d.expenses)
+  const raw: { title: string; desc: string; status: StepStatus }[] = [
+    { title: 'ميزانية مكتوبة وفائض شهري موجب', desc: 'تعرف وين يروح كل ريال، ودخلك أكبر من مصروفك.', status: d.monthlySaving > 0 ? 'done' : 'now' },
+    { title: 'احتياط مبدئي = شهر مصاريف', desc: `${formatNumber(E)} ر.س بحساب منفصل — يمنعك من الدين عند أول طارئ.`, status: cash >= E ? 'done' : 'now' },
+    { title: 'سداد الديون الاستهلاكية الغالية', desc: 'بطاقات ائتمانية وقروض شخصية — سدادها عائد مضمون أعلى من أغلب الاستثمارات.', status: 'check' },
+    { title: 'صندوق طوارئ كامل = 6 شهور', desc: `${formatNumber(emergencyNeed)} ر.س بمكان سهل السحب (حساب ادخار أو مرابحة).`, status: cash >= emergencyNeed ? 'done' : 'now' },
+    { title: 'استثمار 20٪ أو أكثر من الراتب', desc: 'بمحفظة متنوعة وبتحويل تلقائي شهري.', status: sr >= 0.2 && d.rate >= 7 ? 'done' : 'now' },
+    { title: 'قناة دخل ثانية', desc: 'تسرّع الوصول وتقلل خطر الاعتماد على راتب واحد.', status: 'next' },
+    { title: 'الاستقلال المالي', desc: 'ثروة عوائدها تغطي مصاريفك بدون راتب.', status: 'next' },
+  ]
+  // أول خطوة غير مكتملة = "الحين"، وما بعدها "التالي"
+  let found = false
+  return raw.map((s) => {
+    if (s.status === 'done' || s.status === 'check') return s
+    if (!found) { found = true; return { ...s, status: 'now' as StepStatus } }
+    return { ...s, status: 'next' as StepStatus }
+  })
+}
+
+// الديون: سقف ساما + مثال تمويل سيارة وتكلفة الفرصة
+export function debtView(d: ReportInput) {
+  const S = Math.max(0, d.salary)
+  const samaCap = Math.round(S / 3)
+  const comfy = Math.round(S * 0.15)
+  const car = Math.max(40000, Math.round((S * 6) / 5000) * 5000)
+  const flat = 5, years = 5
+  const profit = Math.round(car * flat / 100 * years)
+  const installment = Math.round((car + profit) / (years * 12))
+  const fv = Math.round(growFor(0, installment, BALANCED_RATE, years * 12))
+  return { samaCap, comfy, car, flat, years, profit, installment, fv }
+}
+
+// الزكاة التقديرية
+export function zakatView(d: ReportInput) {
+  const cash = Math.max(0, d.savings)
+  const inv = Math.max(0, d.investments)
+  return { onCash: Math.round(cash * 0.025), upper: Math.round((cash + inv) * 0.025), cash, inv }
+}
+
+// مؤشرات المتابعة
+export function kpis(d: ReportInput, emergencyNeed: number) {
+  const sr = d.salary > 0 ? Math.round((d.monthlySaving / d.salary) * 100) : 0
+  const cushion = d.expenses > 0 ? Math.round((Math.max(0, d.savings) / d.expenses) * 10) / 10 : 0
+  const invShare = d.netWorth > 0 ? Math.round((Math.max(0, d.investments) / d.netWorth) * 100) : 0
+  const runway = d.expenses > 0 ? Math.round((d.netWorth / (d.expenses * 12)) * 10) / 10 : 0
+  const progress = Math.min(100, Math.round((d.netWorth / GOAL) * 1000) / 10)
+  return [
+    { name: 'نسبة الادخار', now: `${sr}٪`, target: '20٪ فأكثر', ok: sr >= 20 },
+    { name: 'تغطية الطوارئ', now: `${cushion} شهر`, target: '6 شهور', ok: cushion >= 6 },
+    { name: 'نسبة المستثمر من ثروتك', now: `${invShare}٪`, target: '70٪+ بعد الطوارئ', ok: invShare >= 70 || (d.netWorth > 0 && Math.max(0, d.savings) <= emergencyNeed && invShare > 0) },
+    { name: 'كم سنة تعيش من ثروتك', now: `${runway} سنة`, target: '25 سنة = استقلال', ok: runway >= 25 },
+    { name: 'التقدم نحو المليون', now: `${progress}٪`, target: '100٪', ok: progress >= 100 },
+    { name: 'نسبة الأقساط من الراتب', now: 'سجّلها', target: 'أقل من 15٪', ok: false },
+  ]
 }
