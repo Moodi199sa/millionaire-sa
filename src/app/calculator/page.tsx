@@ -97,7 +97,9 @@ export default function CalculatorPage() {
     const monthlySaving = s - e
     const totalMonths = monthlySaving <= 0 ? 99999 : calcMonthsToGoal(netWorth, monthlySaving, rate, GOAL)
     saveUserData({ salary: s, expenses: e, savings: sv, investments: inv, rate, monthlySaving, netWorth, totalMonths })
-    router.push('/result')
+    // لو جاي من التقرير المدفوع (ما كان فيه أرقام)، يرجع للتقرير مباشرة
+    const next = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('next') : null
+    router.push(next === 'report' ? '/report' : '/result')
   }
 
   const next = () => {

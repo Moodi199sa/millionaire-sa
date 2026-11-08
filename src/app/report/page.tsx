@@ -18,7 +18,7 @@ import {
   DossierHeader, DossierHero, DossierBudget, DossierScenarios, DossierAssets, DossierProjects, DossierUpsell,
   DossierTools, DossierPlan, DossierClosing, DossierFooter,
 } from '@/components/report/DossierSections'
-import { getUserData, UserData } from '@/lib/store'
+import { getReportData, UserData } from '@/lib/store'
 import { formatNumber, contributionSplit } from '@/lib/calculator'
 import { ReportData, computeExtras, buildLocalReport } from '@/lib/reportFallback'
 import {
@@ -88,6 +88,7 @@ export default function ReportPage() {
   const [calcRate, setCalcRate] = useState(BALANCED_RATE)
   const [pdfBusy, setPdfBusy] = useState(false)
   const [pdfMode, setPdfMode] = useState(false)
+  const [noData, setNoData] = useState(false)
 
   useEffect(() => {
     // وضع توليد الـPDF داخل إطار مخفي (للجوال): البيانات تجي من الصفحة الأم بدون طلب جديد
@@ -106,7 +107,9 @@ export default function ReportPage() {
       .then((r) => r.json())
       .then((res) => {
         if (res.access) {
-          const d = getUserData() || { salary: 8000, expenses: 5000, savings: 0, investments: 0, rate: 0, monthlySaving: 3000, netWorth: 0, totalMonths: 168 }
+          const d = getReportData()
+          // بدون أرقام: لا نعرض أرقاماً افتراضية — نطلب من العميل يحسب أول (وصوله المدفوع محفوظ)
+          if (!d) { setNoData(true); setLoading(false); return }
           setData(d)
           generateReport(d)
         } else {
@@ -301,6 +304,19 @@ export default function ReportPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdfMode, report, m])
+
+  if (noData) {
+    return (
+      <div className="min-h-screen bg-ink-950 text-white font-tajawal flex items-center justify-center px-4" dir="rtl">
+        <div className="max-w-md text-center">
+          <div className="w-16 h-16 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center mx-auto mb-5"><Calculator size={30} /></div>
+          <h1 className="text-2xl font-extrabold mb-2">تقريرك جاهز — باقي أرقامك</h1>
+          <p className="text-gray-400 leading-relaxed mb-6">ما لقينا أرقامك على هذا الجهاز. أدخلها في الحاسبة (أقل من دقيقة) ونرجعك لتقريرك مباشرة — اشتراكك محفوظ وما يحتاج تدفع مرة ثانية.</p>
+          <Link href="/calculator?next=report" className="btn-primary px-6 py-3.5 text-base">أدخل أرقامي وافتح التقرير</Link>
+        </div>
+      </div>
+    )
+  }
 
   if (!data || !m || loading || !report) {
     return <div className="min-h-screen bg-ink-950 text-white font-tajawal" dir="rtl"><LoadingReport /></div>
