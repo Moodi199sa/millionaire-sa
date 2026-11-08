@@ -68,6 +68,11 @@ export function readiness(d: ReportInput): { score: number; label: string; tone:
 export interface Leak { title: string; body: string; cost: string; tone: 'red' | 'amber' | 'green' }
 export interface RecoveryItem { title: string; amount: number }
 
+export const EMERGENCY_MONTHS = 3
+export const SIDE_INCOME = 2000
+export const BALANCED_RATE = 7
+export const GOLDEN_RATE = 8
+
 export function cashflow(d: ReportInput) {
   const S = Math.max(0, d.salary)
   const E = Math.max(0, d.expenses)
@@ -75,69 +80,64 @@ export function cashflow(d: ReportInput) {
   const savingPct = S > 0 ? Math.round((M / S) * 100) : 0
   const expensePct = S > 0 ? Math.min(100, Math.round((E / S) * 100)) : 0
 
-  // تحرير تقديري ≈ ١٠٪ من المصاريف، مقسّم على ٣ بنود (بحد أدنى وأعلى منطقي)
-  const recovery = roundTo(clamp(E * 0.1, 300, 3000), 50)
+  // خفض النفقات العشوائية بنسبة ~16٪ (بحد أدنى وأعلى منطقي)
+  const recovery = roundTo(clamp(E * 0.16, 300, 4000), 50)
   const items: RecoveryItem[] = [
-    { title: 'إلغاء الاشتراكات المكررة والمنسية', amount: roundTo(recovery * 0.2, 50) },
-    { title: 'سقف شهري لتطبيقات التوصيل والكوفي', amount: roundTo(recovery * 0.5, 50) },
-    { title: 'قاعدة الـ48 ساعة قبل أي شراء غير ضروري', amount: 0 },
+    { title: 'إلغاء الاشتراكات المزدوجة', amount: roundTo(recovery / 6, 50) },
+    { title: 'ميزانية تطبيقات التوصيل والمقاهي', amount: roundTo((recovery * 8) / 15, 50) },
+    { title: 'الشراء بخصومات البطاقات الرقمية', amount: 0 },
   ]
   items[2].amount = Math.max(0, recovery - items[0].amount - items[1].amount)
 
-  // النموذج المستهدف: احتياجات / رغبات / ادخار — الادخار المستهدف ما ينزل عن ٢٠٪
-  const targetSave = S > 0 ? clamp(Math.round(((Math.max(M, 0) + recovery) / S) * 100), 20, 60) : 20
-  const rest = 100 - targetSave
-  const target = { needs: Math.round(rest * 0.72), wants: rest - Math.round(rest * 0.72), save: targetSave }
+  // النموذج الذهبي: أساسيات / رغبات / استثمار
+  const save = S > 0 ? clamp(Math.round(((Math.max(M, 0) + recovery) / S) * 100), 20, 60) : 20
+  const rest = 100 - save
+  const wants = rest >= 60 ? 15 : Math.max(10, Math.round(rest * 0.25))
+  const target = { needs: rest - wants, wants, save }
+
+  const emergencyNeed = E * EMERGENCY_MONTHS
+  const cash = Math.max(0, d.savings)
+  const inv = Math.max(0, d.investments)
+  const excessCash = Math.max(0, cash - emergencyNeed)
 
   const leaks: Leak[] = []
-  const emergencyNeed = E * 6
-  const cash = Math.max(0, d.savings)
-  const excessCash = Math.max(0, cash - emergencyNeed)
-  if (excessCash >= 5000 && d.rate < 7) {
+  if (excessCash > 0) {
     leaks.push({
-      title: `كاش نايم بالحساب (${formatNumber(excessCash)} ر.س)`,
-      body: `صندوق طوارئك يحتاج ${formatNumber(emergencyNeed)} ر.س (6 شهور مصاريف). اللي فوقها جالس بدون شغل، والتضخم ياكل منه كل سنة.`,
-      cost: `−${formatNumber(Math.round(excessCash * 0.07))} ر.س / سنوياً`,
+      title: `تآكل الكاش الفائض (${formatNumber(cash)} ر.س بالحساب الجاري)`,
+      body: `صندوق الطوارئ الفعلي يحتاج ${formatNumber(emergencyNeed)} ر.س فقط (${EMERGENCY_MONTHS} أشهر مصاريف). المبلغ المتبقي (${formatNumber(excessCash)} ر.س) يفقد قرابة 2٪ من قيمته سنوياً بسبب التضخم، ويجب نقله فوراً لمرابحة أو صكوك بعائد يقارب 4.5٪ – 5٪.`,
+      cost: `−${formatNumber(Math.round(excessCash * 0.02))} ر.س / سنوياً`,
       tone: 'red',
     })
-  } else if (cash < emergencyNeed) {
+  } else {
     leaks.push({
-      title: 'صندوق الطوارئ ناقص',
-      body: `تحتاج ${formatNumber(emergencyNeed)} ر.س احتياط (6 شهور مصاريف) وعندك ${formatNumber(cash)} ر.س كاش. أي طارئ بيجبرك تبيع استثماراتك بوقت غلط.`,
-      cost: `ناقصك ${formatNumber(emergencyNeed - cash)} ر.س`,
+      title: 'صندوق الطوارئ غير مكتمل',
+      body: `صندوق الطوارئ الفعلي يحتاج ${formatNumber(emergencyNeed)} ر.س (${EMERGENCY_MONTHS} أشهر مصاريف)، والسيولة الحالية ${formatNumber(cash)} ر.س. أي طارئ سيجبرك على تسييل استثماراتك في توقيت خاطئ.`,
+      cost: `ناقص ${formatNumber(emergencyNeed - cash)} ر.س`,
       tone: 'red',
     })
   }
   leaks.push({
-    title: 'المصاريف الأوتوماتيكية اللي ما تحس فيها',
-    body: `توصيل، كوفي، اشتراكات، عروض. بمصاريفك الحالية (${formatNumber(E)} ر.س) نقدّر تقدر تحرر حوالي ${formatNumber(recovery)} ر.س بالشهر بدون ما تتغير حياتك.`,
-    cost: `−${formatNumber(recovery * 12)} ر.س / سنوياً`,
+    title: 'النفقات التلقائية غير المفلترة',
+    body: `تطبيقات التوصيل والمقاهي المتكررة تستهلك وسطياً ${formatNumber(items[1].amount)} ر.س شهرياً فوق الحاجة الواقعية. ضبطها بحد إنفاق أسبوعي يعيد توجيهها للتراكم المركب.`,
+    cost: `−${formatNumber(items[1].amount * 12)} ر.س / سنوياً`,
     tone: 'amber',
   })
-  if (d.rate < 7 && M > 0) {
-    const now = calcMonthsToGoal(d.netWorth, M, d.rate, GOAL)
-    const inv = calcMonthsToGoal(d.netWorth, M, 7, GOAL)
-    if (now < NEVER && inv < now) {
-      leaks.push({
-        title: 'فلوسك تدخر بس ما تشتغل',
-        body: `ادخارك يمشي على عائد ${d.rate}٪. نفس المبلغ بمحفظة متوازنة (حوالي 7٪ تاريخياً) يوصلك أبكر — بدون ما تدفع ريال زيادة.`,
-        cost: `تأخير ${dur(now - inv)}`,
-        tone: 'green',
-      })
-    }
-  } else {
-    leaks.push({
-      title: 'الادخار اللي يجي "بعد الصرف"',
-      body: 'لو تنتظر آخر الشهر عشان تشوف وش باقي، دايم بيكون الباقي أقل. التحويل لازم يصير يوم نزول الراتب.',
-      cost: 'أكبر سبب لتذبذب الادخار',
-      tone: 'green',
-    })
-  }
+  const nowM = d.totalMonths
+  const autoM = M > 0 ? calcMonthsToGoal(d.netWorth, M, Math.max(d.rate, BALANCED_RATE), GOAL) : NEVER
+  const lag = nowM < NEVER && autoM < nowM ? nowM - autoM : 0
+  leaks.push({
+    title: 'حرمان المحفظة من التوزيع الدوري',
+    body: inv > 0
+      ? `ترك المحفظة البادئة (${formatNumber(inv)} ر.س) دون تغذية آلية في يوم استلام الراتب يفقدك قوة متوسط التكلفة (DCA) والاستفادة من تذبذبات السوق.`
+      : 'ترك مدخراتك دون تغذية آلية لمحفظة استثمارية في يوم استلام الراتب يفقدك قوة متوسط التكلفة (DCA) والاستفادة من تذبذبات السوق.',
+    cost: lag > 0 ? `تأخير ${yearsShort(lag).replace(' سنة', ' سنوات')}` : 'فرصة ضائعة',
+    tone: 'green',
+  })
 
-  return { S, E, M, savingPct, expensePct, recovery, items, target, leaks, emergencyNeed, cash }
+  return { S, E, M, savingPct, expensePct, recovery, items, target, leaks, emergencyNeed, cash, inv, excessCash }
 }
 
-// ─── القسم الثاني: السيناريوهات وجدول السنوات ─────────────────────────────
+// ─── القسم الثاني: السيناريوهات ───────────────────────────────────────────
 export interface Scenario {
   key: 'A' | 'B' | 'C'
   tag: string
@@ -149,34 +149,39 @@ export interface Scenario {
   note: string
 }
 
-export const SIDE_INCOME = 1500
-export const BALANCED_RATE = 7
+// خسارة القوة الشرائية بسبب التضخم (2٪) عند الوصول
+export function inflationLoss(months: number): number {
+  if (months >= NEVER || months <= 0) return 0
+  return Math.round(GOAL - GOAL / Math.pow(1.02, months / 12))
+}
 
 export function scenarios(d: ReportInput, recovery: number): Scenario[] {
-  const M = d.monthlySaving
-  const rB = Math.max(d.rate, BALANCED_RATE)
+  const M = Math.max(0, d.monthlySaving)
   const A = d.totalMonths
-  const mB = Math.max(0, M) + recovery
-  const mC = mB + SIDE_INCOME
-  const B = calcMonthsToGoal(d.netWorth, mB, rB, GOAL)
-  const C = calcMonthsToGoal(d.netWorth, mC, rB, GOAL)
-  const saved = (x: number) => (A >= NEVER ? (x < NEVER ? 'تتحول من "ما توصل" إلى موعد واضح' : '') : A - x > 0 ? `توفّر ${dur(A - x)} من عمرك` : '')
+  const rB = Math.max(d.rate, BALANCED_RATE)
+  const rC = Math.max(d.rate, GOLDEN_RATE)
+  const mC = M + recovery + SIDE_INCOME
+  const B = calcMonthsToGoal(d.netWorth, M, rB, GOAL)
+  const C = calcMonthsToGoal(d.netWorth, mC, rC, GOAL)
+  const startK = d.netWorth >= 1000 ? `${formatNumber(Math.round(d.netWorth / 1000))}k` : formatNumber(d.netWorth)
+  const shorter = (x: number) => (A >= NEVER ? (x < NEVER ? 'تحويل الهدف من مستحيل إلى موعد محدد' : '') : A - x > 0 ? `اختصار ${dur(A - x)}` : '')
   return [
     {
-      key: 'A', tag: 'السيناريو أ', title: 'تكمل على نفس الوضع',
-      desc: `تدخر ${formatNumber(Math.max(0, M))} ر.س بالشهر بعائد ${d.rate}٪ — بدون أي تغيير.`,
-      monthly: Math.max(0, M), rate: d.rate, months: A,
-      note: A >= NEVER ? 'بهالأرقام المليون ما يجي' : 'المسار الحالي',
+      key: 'A', tag: 'السيناريو أ', title: 'الادخار البنكي الراكد',
+      desc: `الاستمرار بادخار ${formatNumber(M)} ر.س شهرياً بعائد ${d.rate}٪ دون استثمار فعلي، مع خسارة القوة الشرائية سنوياً.`,
+      monthly: M, rate: d.rate, months: A,
+      note: A >= NEVER ? 'لن تصل بهذا الوضع' : `خسارة تضخم تراكمي: ${formatNumber(inflationLoss(A))} ر.س`,
     },
     {
-      key: 'B', tag: 'السيناريو ب', title: `تسكّر التسريبات وتستثمر (${rB}٪)`,
-      desc: `تضيف ${formatNumber(recovery)} ر.س من التسريبات، وتستثمر كل شهر ${formatNumber(mB)} ر.س بمحفظة متوازنة.`,
-      monthly: mB, rate: rB, months: B, note: saved(B),
+      key: 'B', tag: 'السيناريو ب', title: `استثمار المحفظة المتوازنة (${rB}٪)`,
+      desc: `استثمار ${formatNumber(M)} ر.س الشهرية مع المحفظة البادئة (${startK}) في أصول متنوعة تستهدف ${rB}٪ سنوياً بمركب شهري.`,
+      monthly: M, rate: rB, months: B, note: shorter(B),
     },
     {
-      key: 'C', tag: 'السيناريو ج (الذهبي)', title: `+ دخل جانبي ${formatNumber(SIDE_INCOME)} ر.س`,
-      desc: `نفس السيناريو ب + قناة دخل جانبية صغيرة. المجموع ${formatNumber(mC)} ر.س تستثمرها كل شهر.`,
-      monthly: mC, rate: rB, months: C, note: saved(C),
+      key: 'C', tag: 'السيناريو ج (الذهبي)', title: `استثمار ${rC}٪ + دخل جانبي ${formatNumber(SIDE_INCOME)} ر.س`,
+      desc: `ضخ ${formatNumber(mC)} ر.س شهرياً (الادخار + المبلغ المسترد + عائد مشروع إضافي) مع توزيع ذكي يستهدف ${rC}٪ سنوياً.`,
+      monthly: mC, rate: rC, months: C,
+      note: A >= NEVER ? (C < NEVER ? 'تحويل الهدف من مستحيل إلى موعد محدد!' : '') : A - C > 0 ? `توفير ${dur(A - C)} من عمرك!` : '',
     },
   ]
 }
@@ -188,9 +193,10 @@ export function yearTable(start: number, monthly: number, rate: number, months: 
   const r = rate / 100 / 12
   const rows: YearRow[] = []
   let w = start
-  const tags: [number, string][] = [[100000, 'كسرت حاجز الـ100 ألف'], [250000, 'ربع المليون'], [500000, 'نص المليون'], [750000, 'آخر ربع'], [GOAL, 'المليون الأول 🏆']]
+  const tags: [number, string][] = [[100000, 'كسر حاجز الـ 100 ألف'], [250000, 'تخطي ربع المليون'], [500000, 'تخطي نصف المليون'], [750000, 'آخر ربع من الطريق']]
   let tagIdx = tags.findIndex(([v]) => start < v)
   if (tagIdx < 0) tagIdx = tags.length
+  const usedTags = new Set<string>()
   const fullYears = Math.floor(months / 12)
   for (let m = 1; m <= months; m++) {
     w = w * (1 + r) + monthly
@@ -199,17 +205,22 @@ export function yearTable(start: number, monthly: number, rate: number, months: 
     if (isYearEnd || isFinal) {
       const deposits = Math.round(start + monthly * m)
       const total = Math.round(w)
+      const gains = total - deposits
       let tag = ''
       while (tagIdx < tags.length && total >= tags[tagIdx][0]) { tag = tags[tagIdx][1]; tagIdx++ }
-      if (!tag) tag = m <= 12 ? 'الانطلاقة' : 'تراكم'
+      if (isFinal) tag = 'تحقيق المليون الأول'
+      else if (!tag) {
+        const g = gains >= deposits * 0.5 ? 'الأرباح تقارب الإيداعات!' : gains >= deposits * 0.12 ? 'بداية الانفجار التراكمي' : ''
+        tag = g && !usedTags.has(g) ? g : rows.length < 2 ? 'مرحلة البناء' : 'تراكم مستمر'
+      }
+      usedTags.add(tag)
       if (isFinal && !isYearEnd) {
-        rows.push({ year: fullYears + 1, deposits, gains: total - deposits, total, tag, final: true, monthLabel: `${dur(m)}` })
+        rows.push({ year: fullYears + 1, deposits, gains, total, tag, final: true, monthLabel: dur(m) })
       } else {
-        rows.push({ year: m / 12, deposits, gains: total - deposits, total, tag, final: isFinal })
+        rows.push({ year: m / 12, deposits, gains, total, tag, final: isFinal })
       }
     }
   }
-  // لو المدة طويلة: أول ٨ سنوات + آخر سنتين
   if (rows.length > 11) return [...rows.slice(0, 8), ...rows.slice(-2)]
   return rows
 }
@@ -227,18 +238,18 @@ export function requiredMonthly(netWorth: number, rate: number, years: number): 
 export interface Bucket { name: string; pct: number; range: string; color: string; desc: string; examples: string }
 
 export const BUCKETS: Bucket[] = [
-  { name: 'صناديق مؤشرات عالمية متوافقة مع الشريعة', pct: 40, range: '8٪ – 10٪', color: '#F59E0B',
-    desc: 'سلة من أكبر الشركات العالمية بصندوق واحد. هذا محرك النمو الأساسي على المدى الطويل.',
-    examples: 'أمثلة: SPUS · HLAL (عبر خدمة الأسواق العالمية في وسيطك)' },
-  { name: 'أسهم سعودية قيادية وموزعة للأرباح', pct: 25, range: '6٪ – 9٪', color: '#10B981',
-    desc: 'شركات كبيرة توزع أرباح بشكل منتظم، أو صندوق مؤشر للسوق السعودي بدل ما تختار أسهم بنفسك.',
+  { name: 'صناديق المؤشرات العالمية المتوافقة مع الشريعة', pct: 40, range: '8٪ – 10٪', color: '#F59E0B',
+    desc: 'الاستثمار في سلة كبرى الشركات العالمية (Apple, Microsoft, Alphabet) المصفاة شرعياً عبر صناديق مثل HLAL / SPUS من خلال منصات وساطة مرخصة تتيح الأسواق العالمية. توفر نمواً قوياً على المدى البعيد.',
+    examples: 'أمثلة: HLAL · SPUS' },
+  { name: 'الأسهم القيادية وعوائد التوزيعات السعودية', pct: 25, range: '6٪ – 9٪', color: '#10B981',
+    desc: 'التركيز على الشركات ذات التدفق النقدي العالي والتوزيعات المنتظمة في السوق السعودي، أو صندوق مؤشر للأسهم السعودية لإعادة استثمار التوزيعات تلقائياً.',
     examples: 'أمثلة: صناديق مؤشرات السوق السعودي المدرجة في تداول' },
-  { name: 'صكوك وصناديق مرابحة', pct: 20, range: '4.5٪ – 6٪', color: '#FACC15',
-    desc: 'الجزء الهادي اللي يمتص الهزات ويعطيك عائد شبه ثابت.',
-    examples: 'أمثلة: صكوك الادخار الحكومية «صح» · صناديق المرابحة' },
-  { name: 'صناديق ريت العقارية', pct: 15, range: '5٪ – 7٪', color: '#3B82F6',
-    desc: 'تملك حصة في عقارات مؤجرة (مستودعات، مولات، مكاتب) وتستلم توزيعات دورية بمبلغ صغير.',
-    examples: 'أمثلة: صناديق ريت المدرجة في السوق السعودي' },
+  { name: 'صكوك وطنية وصناديق مرابحة', pct: 20, range: '4.5٪ – 6٪', color: '#FACC15',
+    desc: 'حائط الصد لامتصاص صدمات الأسواق وتوفير سيولة دفاعية، عبر صكوك الحكومة للأفراد (صح) أو صناديق المرابحة، مع استقرار عالٍ في القيمة.',
+    examples: 'أمثلة: صكوك «صح» · صناديق المرابحة' },
+  { name: 'صناديق الاستثمار العقاري المتداولة (ريتات)', pct: 15, range: '5٪ – 7٪', color: '#3B82F6',
+    desc: 'امتلاك حصص في عقارات مدرّة للدخل (مستودعات لوجستية، مجمعات تجارية) عبر صناديق الريت المدرجة في تداول، مع توزيعات دورية.',
+    examples: 'أمثلة: جدوى ريت الحرمين · دراية ريت · الراجحي ريت' },
 ]
 
 export function blendedReturn(): number {
@@ -412,7 +423,7 @@ export function priorities(d: ReportInput, emergencyNeed: number) {
     { title: 'ميزانية مكتوبة وفائض شهري موجب', desc: 'تعرف وين يروح كل ريال، ودخلك أكبر من مصروفك.', status: d.monthlySaving > 0 ? 'done' : 'now' },
     { title: 'احتياط مبدئي = شهر مصاريف', desc: `${formatNumber(E)} ر.س بحساب منفصل — يمنعك من الدين عند أول طارئ.`, status: cash >= E ? 'done' : 'now' },
     { title: 'سداد الديون الاستهلاكية الغالية', desc: 'بطاقات ائتمانية وقروض شخصية — سدادها عائد مضمون أعلى من أغلب الاستثمارات.', status: 'check' },
-    { title: 'صندوق طوارئ كامل = 6 شهور', desc: `${formatNumber(emergencyNeed)} ر.س بمكان سهل السحب (حساب ادخار أو مرابحة).`, status: cash >= emergencyNeed ? 'done' : 'now' },
+    { title: 'صندوق طوارئ = 3 شهور (و6 للأمان الأعلى)', desc: `${formatNumber(emergencyNeed)} ر.س بمكان سهل السحب (حساب ادخار أو مرابحة).`, status: cash >= emergencyNeed ? 'done' : 'now' },
     { title: 'استثمار 20٪ أو أكثر من الراتب', desc: 'بمحفظة متنوعة وبتحويل تلقائي شهري.', status: sr >= 0.2 && d.rate >= 7 ? 'done' : 'now' },
     { title: 'قناة دخل ثانية', desc: 'تسرّع الوصول وتقلل خطر الاعتماد على راتب واحد.', status: 'next' },
     { title: 'الاستقلال المالي', desc: 'ثروة عوائدها تغطي مصاريفك بدون راتب.', status: 'next' },
@@ -455,7 +466,7 @@ export function kpis(d: ReportInput, emergencyNeed: number) {
   const progress = Math.min(100, Math.round((d.netWorth / GOAL) * 1000) / 10)
   return [
     { name: 'نسبة الادخار', now: `${sr}٪`, target: '20٪ فأكثر', ok: sr >= 20 },
-    { name: 'تغطية الطوارئ', now: `${cushion} شهر`, target: '6 شهور', ok: cushion >= 6 },
+    { name: 'تغطية الطوارئ', now: `${cushion} شهر`, target: '3 – 6 شهور', ok: cushion >= 3 },
     { name: 'نسبة المستثمر من ثروتك', now: `${invShare}٪`, target: '70٪+ بعد الطوارئ', ok: invShare >= 70 || (d.netWorth > 0 && Math.max(0, d.savings) <= emergencyNeed && invShare > 0) },
     { name: 'كم سنة تعيش من ثروتك', now: `${runway} سنة`, target: '25 سنة = استقلال', ok: runway >= 25 },
     { name: 'التقدم نحو المليون', now: `${progress}٪`, target: '100٪', ok: progress >= 100 },

@@ -17,8 +17,8 @@ const SAR = 'ر.س'
 export function TableOfContents({ items }: { items: { id: string; n: string; title: string; desc: string }[] }) {
   return (
     <section data-pdf-break>
-      <SectionHead icon={ListChecks} kicker="محتويات التقرير" title="وش بتلقى في تقريرك؟"
-        sub="12 قسم مرتبة من التشخيص إلى التنفيذ. اقرأه مرة كامل، وبعدها ارجع للقسم اللي تحتاجه." />
+      <SectionHead icon={ListChecks} kicker="ملحق التقرير" title="تحليلات وأدوات إضافية مبنية على أرقامك"
+        sub="هذا الملحق يكمّل الحقيبة التنفيذية أعلاه بتفاصيل أعمق. اقرأه مرة كامل، وبعدها ارجع للجزء اللي تحتاجه." />
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.map((it) => (
           <a key={it.id} href={`#${it.id}`} className="card p-4 flex items-start gap-3 hover:border-amber-400/30 transition-colors">
@@ -84,7 +84,7 @@ export function PrioritiesAndDebt({ steps, debt, S }: {
   const label = (s: StepStatus) => s === 'done' ? 'منجز' : s === 'now' ? 'أنت هنا' : s === 'check' ? 'راجعها بنفسك' : 'بعدها'
   return (
     <section id="priorities" data-pdf-break className="scroll-mt-36">
-      <SectionHead icon={ListOrdered} kicker="القسم الثاني: سلّم الأولويات والديون"
+      <SectionHead icon={ListOrdered} kicker="ملحق: سلّم الأولويات والديون"
         title="وش تسوي أول؟ الترتيب الصح لفلوسك"
         sub="أكبر غلط مالي مو إنك ما تستثمر — إنك تسوي الخطوة الصح بالترتيب الغلط."
         side={<SideTag icon={ListOrdered} tone="gray">مبني على ترتيب المخططين الماليين المعتمد</SideTag>} />
@@ -194,7 +194,7 @@ export function TimeAndRisk({ delay, doubleYears, rate, stress, inflation, base,
 }) {
   return (
     <section id="risk" data-pdf-break className="scroll-mt-36">
-      <SectionHead icon={Clock} tone="green" kicker="القسم الرابع: الوقت والتضخم والمخاطر"
+      <SectionHead icon={Clock} tone="green" kicker="ملحق: الوقت والتضخم والمخاطر"
         title="اختبار الضغط: وش يصير لو الدنيا ما مشت مثل الخطة؟"
         sub="الخطة الجيدة مو اللي تنجح بالظروف المثالية — اللي تصمد لما يصير شي غلط."
         side={<SideTag icon={ShieldAlert} tone="gray">محاكاة شهرية على مسارك المسرّع</SideTag>} />
@@ -262,9 +262,9 @@ export function ZakatRetirementProtection({ zakat, S }: { zakat: { onCash: numbe
   const housing = Math.round((S * 0.28) / 50) * 50
   return (
     <section id="protect" data-pdf-break className="scroll-mt-36">
-      <SectionHead icon={Umbrella} kicker="القسم السادس: الزكاة والتقاعد والحماية"
+      <SectionHead icon={Umbrella} kicker="ملحق: الزكاة والتقاعد والحماية"
         title="الأشياء اللي أغلب الخطط تنساها"
-        sub="زكاتك، تقاعدك، سكنك، وتأمينك — كلها تأثر على مليونك أكثر مما تتوقع." />
+        sub="زكاتك، تقاعدك، سكنك، وتأمينك — كلها تؤثر على مليونك أكثر مما تتوقع." />
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="card p-5 lg:p-7">
           <h3 className="text-lg font-extrabold mb-1 flex items-center gap-2"><HandCoins size={18} className="text-amber-400" />الزكاة في خطتك</h3>
@@ -276,7 +276,7 @@ export function ZakatRetirementProtection({ zakat, S }: { zakat: { onCash: numbe
           <ul className="space-y-2 text-sm text-gray-300 leading-relaxed">
             <li>• <b className="text-white">الأسهم للمضاربة:</b> تُزكّى بقيمتها السوقية 2.5٪.</li>
             <li>• <b className="text-white">الأسهم للاستثمار الطويل:</b> فيها تفصيل عند العلماء (بعضهم يرى الزكاة على الموجودات الزكوية للشركة فقط) — اسأل الهيئة الشرعية في منصتك.</li>
-            <li>• <b className="text-white">الصناديق:</b> زكاتها حسب مكوناتها، وكثير من مدراء الصناديق ينشرون مقدار الزكاة للوحدة.</li>
+            <li>• <b className="text-white">الصناديق:</b> زكاتها حسب مكوناتها، وكثير من مديري الصناديق ينشرون مقدار الزكاة للوحدة.</li>
           </ul>
           <p className="text-[11px] text-gray-500 mt-3">حدد "يوم زكاة" ثابت كل سنة وخلّه في تقويمك. الأرقام هنا تقديرية — راجع مختص لحالتك.</p>
         </div>
@@ -298,7 +298,7 @@ export function ZakatRetirementProtection({ zakat, S }: { zakat: { onCash: numbe
             <p className="text-2xl font-extrabold text-blue-300 tabular-nums">{formatNumber(housing)} {SAR} <span className="text-xs text-gray-400">بالشهر</span></p>
           </div>
           <ul className="space-y-2 text-sm text-gray-300 leading-relaxed">
-            <li>• قبل الشراء: شيك على أهليتك لبرامج الدعم السكني في منصة "سكني".</li>
+            <li>• قبل الشراء: تأكد من أهليتك لبرامج الدعم السكني في منصة "سكني".</li>
             <li>• الدفعة الأولى تُجمع بحساب مستقل — مو من صندوق الطوارئ ولا من الاستثمار طويل الأجل.</li>
             <li>• قارن القسط بالإيجار + الصيانة + تكلفة الفرصة للدفعة الأولى، مو القسط لحاله.</li>
           </ul>
@@ -336,7 +336,7 @@ export function MoneyPsychology() {
   ]
   return (
     <section id="mind" data-pdf-break className="scroll-mt-36">
-      <SectionHead icon={Brain} tone="green" kicker="القسم الثامن: علم النفس المالي"
+      <SectionHead icon={Brain} tone="green" kicker="ملحق: علم النفس المالي"
         title="أكبر خطر على مليونك… أنت"
         sub="الدراسات في الاقتصاد السلوكي تقول: السلوك يفرّق أكثر من المعرفة. هذي 6 فخاخ وكيف تتجنبها." />
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -358,7 +358,7 @@ export function MoneyPsychology() {
 export function KpiReview({ items }: { items: { name: string; now: string; target: string; ok: boolean }[] }) {
   return (
     <section id="kpi" data-pdf-break className="scroll-mt-36">
-      <SectionHead icon={Gauge} kicker="القسم الحادي عشر: لوحة مؤشراتك"
+      <SectionHead icon={Gauge} kicker="ملحق: لوحة مؤشراتك"
         title="6 أرقام تراقبها — وكل شي ثاني تفاصيل"
         sub="ما تحتاج تتابع السوق يومياً. تابع هالمؤشرات كل 3 شهور وبتعرف بالضبط وين أنت." />
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
@@ -389,7 +389,7 @@ export function KpiReview({ items }: { items: { name: string; now: string; targe
   )
 }
 
-// ─── المسرد + الأسئلة + المصادر ─────────────────────────────────────────
+// ─── قاموس المصطلحات + الأسئلة + المصادر ─────────────────────────────────────────
 export function GlossaryFaqSources() {
   const terms = [
     ['العائد المركب', 'ربح على ربحك. فلوسك تكسب، والمكسب نفسه يكسب.'],
@@ -423,12 +423,12 @@ export function GlossaryFaqSources() {
   ]
   return (
     <section id="glossary" data-pdf-break className="scroll-mt-36">
-      <SectionHead icon={BookOpen} tone="green" kicker="القسم الثاني عشر: المرجع"
-        title="المسرد، الأسئلة الشائعة، والمصادر"
+      <SectionHead icon={BookOpen} tone="green" kicker="ملحق: المرجع"
+        title="قاموس المصطلحات، الأسئلة الشائعة، والمصادر"
         sub="كل مصطلح استخدمناه — بلغة بسيطة — ومن وين جبنا الأرقام." />
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="card p-5 lg:p-7">
-          <h3 className="text-lg font-extrabold mb-4 flex items-center gap-2"><BookOpen size={18} className="text-amber-400" />مسرد المصطلحات</h3>
+          <h3 className="text-lg font-extrabold mb-4 flex items-center gap-2"><BookOpen size={18} className="text-amber-400" />قاموس المصطلحات</h3>
           <dl className="grid sm:grid-cols-2 gap-3">
             {terms.map(([t, d]) => <div key={t} className="card-soft p-3"><dt className="text-sm font-extrabold text-amber-200 mb-0.5">{t}</dt><dd className="text-xs text-gray-400 leading-relaxed">{d}</dd></div>)}
           </dl>
@@ -452,3 +452,58 @@ export function GlossaryFaqSources() {
 }
 
 
+
+// ─── دليل الـ50 منصة وأداة ──────────────────────────────────────────────
+const PLATFORM_GROUPS: { title: string; color: string; items: [string, string][] }[] = [
+  { title: 'إنشاء المتاجر والبيع', color: '#F59E0B', items: [
+    ['سلة', 'متجر إلكتروني سعودي جاهز خلال دقائق'], ['زد', 'منصة متاجر سعودية مع ربط شحن ودفع'], ['Shopify', 'متجر عالمي مرن مع إضافات كثيرة'],
+    ['TikTok Shop', 'البيع مباشرة داخل تيك توك'], ['أمازون السعودية', 'سوق ضخم للبائعين الأفراد والشركات'], ['نون', 'سوق إلكتروني خليجي للبائعين'],
+    ['Gumroad', 'بيع المنتجات الرقمية والقوالب'], ['Lemon Squeezy', 'بيع المنتجات الرقمية والاشتراكات عالمياً'] ] },
+  { title: 'العمل الحر والخدمات', color: '#10B981', items: [
+    ['مستقل', 'أكبر منصة عمل حر عربية للمشاريع'], ['خمسات', 'بيع الخدمات المصغرة بأسعار ثابتة'], ['Upwork', 'عملاء دوليون بأجور أعلى'],
+    ['Fiverr', 'سوق عالمي للخدمات المصغرة'], ['LinkedIn', 'الوصول للشركات وصنّاع القرار'], ['منصة العمل الحر', 'وثيقة العمل الحر الرسمية في السعودية'] ] },
+  { title: 'الدفع والتحصيل', color: '#3B82F6', items: [
+    ['ميسر', 'بوابة دفع سعودية للمتاجر والتطبيقات'], ['Tap Payments', 'بوابة دفع خليجية سهلة الربط'], ['HyperPay', 'بوابة دفع واسعة الانتشار في المملكة'],
+    ['Paymob', 'بوابة دفع بروابط وApple Pay'], ['تابي', 'اشتر الآن وادفع لاحقاً — يرفع المبيعات'], ['تمارا', 'تقسيط للعملاء بدون فوائد'] ] },
+  { title: 'الشحن والتوصيل', color: '#A855F7', items: [
+    ['أرامكس', 'شحن محلي ودولي للمتاجر'], ['سمسا', 'شحن سريع داخل المملكة'], ['سبل', 'البريد السعودي والعناوين الوطنية'], ['J&T Express', 'شحن اقتصادي للتجارة الإلكترونية'] ] },
+  { title: 'الذكاء الاصطناعي', color: '#EC4899', items: [
+    ['ChatGPT', 'كتابة، تحليل، وأفكار تسويقية'], ['Claude', 'كتابة طويلة وتحليل مستندات وبرمجة'], ['Gemini', 'مساعد Google مدمج مع أدواتها'],
+    ['Perplexity', 'بحث سريع مع مصادر'], ['Midjourney', 'توليد صور تسويقية احترافية'], ['ElevenLabs', 'تعليق صوتي واقعي بالعربي'],
+    ['HeyGen', 'فيديوهات بأفاتار ناطق'], ['NotebookLM', 'تلخيص ملفاتك وأبحاثك'] ] },
+  { title: 'التصميم والمحتوى', color: '#14B8A6', items: [
+    ['Canva', 'تصاميم وعروض ومنشورات بسرعة'], ['CapCut', 'مونتاج فيديوهات قصيرة'], ['Figma', 'تصميم واجهات وهويات'],
+    ['Descript', 'تعديل الفيديو والبودكاست كنص'], ['Adobe Express', 'قوالب تصميم جاهزة'], ['Pexels', 'صور وفيديوهات مجانية للاستخدام التجاري'] ] },
+  { title: 'الأتمتة والإنتاجية', color: '#F97316', items: [
+    ['Make', 'أتمتة المهام وربط التطبيقات بدون برمجة'], ['Zapier', 'أتمتة سهلة لآلاف التطبيقات'], ['n8n', 'أتمتة مفتوحة المصدر لمشاريع أكبر'],
+    ['Notion', 'تنظيم المشاريع والقوالب'], ['Google Workspace', 'بريد احترافي وملفات مشتركة'], ['Trello', 'إدارة مهام بنظام البطاقات'], ['Calendly', 'حجز المواعيد تلقائياً'] ] },
+  { title: 'المحاسبة والتنظيم', color: '#84CC16', items: [
+    ['قيود', 'محاسبة سحابية سعودية وفواتير إلكترونية'], ['دفترة', 'فواتير ومخزون للمشاريع الصغيرة'], ['وافق', 'محاسبة وفوترة متوافقة مع الزكاة'],
+    ['المركز السعودي للأعمال', 'إصدار السجل التجاري إلكترونياً'], ['منشآت', 'دعم وبرامج للمنشآت الصغيرة والمتوسطة'] ] },
+]
+
+export function PlatformsGuide() {
+  const total = PLATFORM_GROUPS.reduce((s, g) => s + g.items.length, 0)
+  return (
+    <section id="platforms" data-pdf-break className="scroll-mt-24">
+      <SectionHead icon={BookOpen} kicker="ملحق: الكتيب التنفيذي"
+        title={`دليل الـ ${total} منصة وأداة لتسريع الأرباح`}
+        sub="أهم المنصات السعودية والعالمية لإنشاء المتاجر، والعمل الحر، والدفع، والشحن، والذكاء الاصطناعي، والأتمتة." />
+      <div className="grid sm:grid-cols-2 gap-4">
+        {PLATFORM_GROUPS.map((g) => (
+          <div key={g.title} className="card p-5">
+            <h3 className="font-extrabold mb-3 flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: g.color }} />{g.title} <span className="text-xs text-gray-500 font-bold">({g.items.length})</span></h3>
+            <div className="space-y-2">
+              {g.items.map(([n, d]) => (
+                <div key={n} className="flex items-start justify-between gap-3 text-sm card-soft px-3 py-2">
+                  <b className="shrink-0" style={{ color: g.color }}>{n}</b><span className="text-xs text-gray-400 text-left">{d}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <Takeaway>لا تشترك في كل شي. اختر أداة وحدة من كل فئة تحتاجها لمشروعك، وجرّب النسخة المجانية أول. الأسماء أمثلة للاسترشاد وليست إعلاناً أو توصية.</Takeaway>
+    </section>
+  )
+}

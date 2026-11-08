@@ -9,12 +9,15 @@ import {
   Lightbulb, Briefcase, FileSpreadsheet, BellRing, Flag, CheckCircle2, Share2, MessageCircle,
   Scale, AlertTriangle, Zap, Calculator, ChevronLeft, Brain, Coffee, Wallet, Gavel, Lock,
 } from 'lucide-react'
-import SiteShell from '@/components/site/SiteShell'
 import { SectionHead, SideTag, Num, Takeaway } from '@/components/report/ui'
 import {
   TableOfContents, BudgetDetail, PrioritiesAndDebt, SensitivityGrid, TimeAndRisk, ZakatRetirementProtection,
-  MoneyPsychology, KpiReview, GlossaryFaqSources,
+  MoneyPsychology, KpiReview, GlossaryFaqSources, PlatformsGuide,
 } from '@/components/report/ExtendedSections'
+import {
+  DossierHeader, DossierHero, DossierBudget, DossierScenarios, DossierAssets, DossierProjects, DossierUpsell,
+  DossierTools, DossierPlan, DossierClosing, DossierFooter,
+} from '@/components/report/DossierSections'
 import { getUserData, UserData } from '@/lib/store'
 import { formatNumber, contributionSplit } from '@/lib/calculator'
 import { ReportData, computeExtras, buildLocalReport } from '@/lib/reportFallback'
@@ -22,44 +25,10 @@ import {
   GOAL, NEVER, dur, yearsShort, reportId, readiness, cashflow, scenarios, yearTable, requiredMonthly,
   BUCKETS, blendedReturn, trackerCsv, reminderIcs, downloadFile, SIDE_INCOME, BALANCED_RATE,
   sensitivity, delayCost, stressTests, inflationView, saveMoreTomorrow, rule72, budgetLines, priorities,
-  debtView, zakatView, kpis,
+  debtView, zakatView, kpis, inflationLoss,
 } from '@/lib/reportModel'
 
 const SAR = 'ر.س'
-
-function Ring({ score }: { score: number }) {
-  const r = 70, c = 2 * Math.PI * r
-  const color = score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : score >= 40 ? '#F97316' : '#EF4444'
-  return (
-    <svg viewBox="0 0 180 180" className="w-40 h-40 lg:w-48 lg:h-48 -rotate-90">
-      <circle cx="90" cy="90" r={r} fill="none" stroke="#2E3846" strokeWidth="14" />
-      <circle cx="90" cy="90" r={r} fill="none" stroke={color} strokeWidth="14" strokeLinecap="round"
-        strokeDasharray={`${(score / 100) * c} ${c}`} />
-    </svg>
-  )
-}
-
-function Donut({ center }: { center: string }) {
-  const r = 70, c = 2 * Math.PI * r
-  let acc = 0
-  return (
-    <div className="relative w-52 h-52 mx-auto">
-      <svg viewBox="0 0 180 180" className="w-full h-full -rotate-90">
-        {BUCKETS.map((b) => {
-          const len = (b.pct / 100) * c
-          const el = <circle key={b.name} cx="90" cy="90" r={r} fill="none" stroke={b.color} strokeWidth="26"
-            strokeDasharray={`${len - 2} ${c - len + 2}`} strokeDashoffset={-acc} />
-          acc += len
-          return el
-        })}
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-extrabold text-amber-300 tabular-nums">{center}</span>
-        <span className="text-[10px] text-gray-400 leading-tight text-center">عائد سنوي<br />تاريخي تقريبي</span>
-      </div>
-    </div>
-  )
-}
 
 function LoadingReport() {
   const [step, setStep] = useState(0)
@@ -81,31 +50,6 @@ function LoadingReport() {
   )
 }
 
-const NAV = [
-  { id: 'flows', label: 'الميزانية' },
-  { id: 'scenarios', label: 'المسار التراكمي' },
-  { id: 'risk', label: 'اختبار الضغط' },
-  { id: 'assets', label: 'توزيع الأصول' },
-  { id: 'income', label: 'الدخل الجانبي' },
-  { id: 'plan', label: 'خطة 90 يوم' },
-  { id: 'kpi', label: 'المؤشرات' },
-]
-
-const TOC = [
-  { id: 'flows', n: '01', title: 'الهندسة العكسية للميزانية', desc: 'توزيع راتبك، التسريبات، وميزانية بند بند' },
-  { id: 'priorities', n: '02', title: 'سلّم الأولويات والديون', desc: 'وش تسوي أول، وحدود الأقساط الصحية' },
-  { id: 'scenarios', n: '03', title: 'محاكاة التراكم المركب', desc: '3 سيناريوهات، جدول سنوي، ومصفوفة حساسية' },
-  { id: 'risk', n: '04', title: 'الوقت والتضخم والمخاطر', desc: 'اختبار الضغط وتكلفة التأجيل' },
-  { id: 'assets', n: '05', title: 'توزيع الأصول', desc: 'محفظة 4 فئات بالمبالغ ووين تنفذ' },
-  { id: 'protect', n: '06', title: 'الزكاة والتقاعد والحماية', desc: 'الأشياء اللي أغلب الخطط تنساها' },
-  { id: 'income', n: '07', title: 'محرك الدخل الجانبي', desc: 'أفكار تناسبك مع خطة انطلاق' },
-  { id: 'mind', n: '08', title: 'علم النفس المالي', desc: '6 فخاخ سلوكية وحلولها' },
-  { id: 'tools', n: '09', title: 'صندوق الأدوات', desc: 'شيت تتبّع، تذكير شهري، رقم الاستقلال' },
-  { id: 'plan', n: '10', title: 'خطة أول 90 يوم', desc: '3 مراحل وتفصيل أسبوعي' },
-  { id: 'kpi', n: '11', title: 'لوحة المؤشرات', desc: '6 أرقام تراقبها كل 3 شهور' },
-  { id: 'glossary', n: '12', title: 'المرجع', desc: 'المسرد، الأسئلة، ومصادر الأرقام' },
-]
-
 // يقص الصفوف الفاضية (لون الخلفية) من أسفل اللقطة
 function trimBottom(c: HTMLCanvasElement): HTMLCanvasElement {
   const ctx = c.getContext('2d')
@@ -124,6 +68,14 @@ function trimBottom(c: HTMLCanvasElement): HTMLCanvasElement {
   out.width = width; out.height = h
   out.getContext('2d')!.drawImage(c, 0, 0, width, h, 0, 0, width, h)
   return out
+}
+
+// توحيد الأرقام (العربية-الهندية → إنجليزية) في نصوص التقرير، مثل باقي الموقع
+function latinDigits<T>(v: T): T {
+  if (typeof v === 'string') return v.replace(/[٠-٩]/g, (c) => String(c.charCodeAt(0) - 0x0660)).replace(/٬/g, ',').replace(/٫/g, '.') as unknown as T
+  if (Array.isArray(v)) return v.map(latinDigits) as unknown as T
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, latinDigits(x)])) as T
+  return v
 }
 
 // ─── الصفحة ─────────────────────────────────────────────────────────────
@@ -177,13 +129,13 @@ export default function ReportPage() {
         try {
           const ai = JSON.parse(json.result)
           // الـAI يعطي النصوص الإبداعية، والحقول الحسابية تُحسب محلياً دائماً
-          setReport({ ...ai, ...computeExtras(d) })
+          setReport(latinDigits({ ...ai, ...computeExtras(d) }))
           return
         } catch {}
       }
       throw new Error('fallback')
     } catch {
-      setReport(buildLocalReport(d))
+      setReport(latinDigits(buildLocalReport(d)))
     } finally {
       setLoading(false)
     }
@@ -247,7 +199,7 @@ export default function ReportPage() {
       await new Promise((r) => setTimeout(r, 150))
       // نلتقط بعرض ثابت مناسب للورق (A4) عشان الخط يطلع مقروء والصفحات ممتلئة
       const prevW = root.style.width, prevMax = root.style.maxWidth
-      if (window.innerWidth >= 1024) { root.style.width = '900px'; root.style.maxWidth = '900px' }
+      if (window.innerWidth >= 1024) { root.style.width = '1100px'; root.style.maxWidth = '1100px' }
       await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 120)))
       const restore = () => { root.style.width = prevW; root.style.maxWidth = prevMax }
       const sections = Array.from(root.children) as HTMLElement[]
@@ -351,7 +303,7 @@ export default function ReportPage() {
   }, [pdfMode, report, m])
 
   if (!data || !m || loading || !report) {
-    return <SiteShell><LoadingReport /></SiteShell>
+    return <div className="min-h-screen bg-ink-950 text-white font-tajawal" dir="rtl"><LoadingReport /></div>
   }
 
   const { flow, sc, best, table, split, ext, ready: rd, id } = m
@@ -372,19 +324,13 @@ export default function ReportPage() {
   const strengths = report.strengths || []
   const cushion = flow.E > 0 ? Math.floor(flow.cash / flow.E) : 0
   const risks = (report.risk_analysis || []).map((r, i) => i === 0
-    ? { ...r, mitigation: `عندك كاش يغطي ${cushion} ${cushion === 1 ? 'شهر' : cushion === 2 ? 'شهرين' : 'شهور'} مصاريف — ${cushion >= 6 ? 'وضعك آمن' : 'الهدف توصل 6 شهور'}` }
+    ? { ...r, mitigation: `عندك كاش يغطي ${cushion} ${cushion === 1 ? 'شهر' : cushion === 2 ? 'شهرين' : 'شهور'} مصاريف — ${cushion >= 6 ? 'وضعك آمن' : 'الهدف 3 شهور كحد أدنى'}` }
     : r)
   const weaknesses = report.weaknesses || []
 
-  const headline = alreadyMillion
-    ? 'تجاوزت المليون الأول — الحين وقت تكبيره وحمايته'
-    : A >= NEVER && C < NEVER ? `من "ما توصل" إلى مليونك خلال ${yearsShort(C)}`
-    : C < A ? `نختصر طريقك للمليون من ${yearsShort(A)} إلى ${yearsShort(C)}`
-    : 'نبني لك أساس متين يوصلك للمليون'
-
   const weekStep = emergencyGap > 0
     ? `افتح حساب ادخار منفصل اليوم، وفعّل تحويل تلقائي بمبلغ ${formatNumber(Math.max(500, data.monthlySaving))} ${SAR} يوم 27 من كل شهر. أول هدف: تكمّل صندوق الطوارئ (ناقصك ${formatNumber(emergencyGap)} ${SAR}).`
-    : `افتح محفظة استثمارية عند وسيط مرخّص هالأسبوع، وحط أول دفعة ${formatNumber(investMonthly)} ${SAR} موزعة حسب القسم الخامس. وفعّل تحويل تلقائي يوم 27.`
+    : `افتح محفظة استثمارية عند وسيط مرخّص هالأسبوع، وحط أول دفعة ${formatNumber(investMonthly)} ${SAR} موزعة حسب القسم الثالث. وفعّل تحويل تلقائي يوم 27.`
 
   const zubda = [
     { t: `نسبة ادخارك ${flow.savingPct}٪`, s: flow.savingPct >= 20 ? 'فوق القاعدة الذهبية (20٪) — أساسك قوي' : `تحت القاعدة الذهبية (20٪) بـ${20 - flow.savingPct} نقاط — وهذا أسهل شي نصلحه` },
@@ -398,96 +344,51 @@ export default function ReportPage() {
 
   const shareText = `💰 طلعت تقرير تسريع الثروة حقي — ${A < NEVER && C < A ? `اختصرت طريقي للمليون من ${yearsShort(A)} إلى ${yearsShort(C)}` : `خطتي للمليون الأول جاهزة`}.\nاحسب متى تصير مليونير:\nhttps://saudimillion.com/s/${data.totalMonths}`
 
+  const quarter = (() => { const d = new Date(); return `${['الربع الأول', 'الربع الثاني', 'الربع الثالث', 'الربع الرابع'][Math.floor(d.getMonth() / 3)]} ${d.getFullYear()}` })()
+  const tier = rd.score >= 80 ? { label: 'جاهزية متقدمة', desc: 'طاقتك الادخارية تشكل أرضية صلبة للانتقال الفوري إلى مرحلة التراكم المضاعف.' }
+    : rd.score >= 60 ? { label: 'جاهزية جيدة', desc: 'أساسك المالي جيد، وتحتاج تفعيل الاستثمار الآلي لتسريع التراكم.' }
+    : rd.score >= 40 ? { label: 'جاهزية متوسطة', desc: 'ضبط التسريبات ورفع نسبة الادخار سينقلك سريعاً إلى مرحلة التراكم.' }
+    : { label: 'مرحلة التأسيس', desc: 'البداية الصحيحة الآن: صندوق طوارئ، ميزانية منضبطة، ثم استثمار شهري ثابت.' }
+  const APPENDIX = [
+    { id: 'a-zubda', n: '01', title: 'الزبدة وخطوتك هالأسبوع', desc: 'أهم 5 نقاط وأول خطوة عملية' },
+    { id: 'a-diag', n: '02', title: 'قراءة صريحة لوضعك', desc: 'نقاط القوة والضعف والمخاطر' },
+    { id: 'a-budget', n: '03', title: 'الميزانية بند بند', desc: 'سقوف شهرية بالريال لكل بند' },
+    { id: 'priorities', n: '04', title: 'سلّم الأولويات والديون', desc: 'وش تسوي أول، وحدود الأقساط' },
+    { id: 'a-sens', n: '05', title: 'مصفوفة الحساسية', desc: 'كل مزيج ادخار وعائد + الحاسبة العكسية' },
+    { id: 'risk', n: '06', title: 'اختبار الضغط والتضخم', desc: 'وش يصير لو صار شي غلط' },
+    { id: 'protect', n: '07', title: 'الزكاة والتقاعد والحماية', desc: 'الأشياء اللي أغلب الخطط تنساها' },
+    { id: 'a-ideas', n: '08', title: 'أفكار دخل مخصصة لك', desc: 'مبنية على أرقامك' },
+    { id: 'platforms', n: '09', title: 'دليل الـ50 منصة وأداة', desc: 'متاجر، دفع، شحن، ذكاء اصطناعي' },
+    { id: 'mind', n: '10', title: 'علم النفس المالي', desc: '6 فخاخ سلوكية وحلولها' },
+    { id: 'a-month', n: '11', title: 'الشهر الأول أسبوع بأسبوع', desc: 'مع تذكير شهري في تقويمك' },
+    { id: 'kpi', n: '12', title: 'لوحة المؤشرات', desc: '6 أرقام تراقبها كل 3 شهور' },
+    { id: 'glossary', n: '13', title: 'المرجع', desc: 'قاموس المصطلحات، الأسئلة، والمصادر' },
+  ]
+
   return (
-    <SiteShell>
-      {/* شريط التقرير */}
-      <div className="sticky top-[72px] z-30 bg-ink-900/90 backdrop-blur-md border-b border-white/[0.06] no-print">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 h-14 flex items-center justify-between gap-3">
-          <nav className="hidden lg:flex items-center gap-5 text-sm font-bold text-gray-400">
-            {NAV.map((n) => <a key={n.id} href={`#${n.id}`} className="hover:text-white transition-colors">{n.label}</a>)}
-          </nav>
-          <span className="lg:hidden text-sm font-extrabold">تقريرك <span className="text-amber-400">الشامل</span></span>
-          <div className="flex items-center gap-2">
-            <button onClick={() => window.print()} className="btn-ghost px-3 py-2 text-xs"><Printer size={15} /> طباعة</button>
-            <button onClick={() => downloadPDF()} disabled={pdfBusy} className="btn-primary px-4 py-2 text-xs"><Download size={15} /> {pdfBusy ? `يجهز ${pdfProgress}٪` : 'تحميل PDF'}</button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-ink-950 text-white font-tajawal" dir="rtl">
+      <DossierHeader onPrint={() => window.print()} onPdf={() => downloadPDF()} busy={pdfBusy} progress={pdfProgress} />
 
       <main id="report-content" className="report-print max-w-7xl mx-auto px-4 lg:px-8 py-8 lg:py-12 space-y-16 lg:space-y-24">
+        <DossierHero id={id} quarter={quarter} A={A} C={C} score={rd.score} tier={tier}
+          S={flow.S} E={flow.E} M={flow.M} expensePct={flow.expensePct} savingPct={flow.savingPct}
+          cash={flow.cash} inv={flow.inv} inflationLossA={inflationLoss(A)} />
+        <DossierBudget S={flow.S} E={flow.E} M={flow.M} expensePct={flow.expensePct} savingPct={flow.savingPct}
+          recovery={flow.recovery} items={flow.items} target={flow.target} leaks={flow.leaks} />
+        <DossierScenarios sc={sc} table={table} best={best} split={split} />
+        <DossierAssets monthly={best.monthly} blended={blended} />
+        <DossierProjects />
+        <DossierUpsell />
+        <DossierTools onTracker={() => downloadFile('متتبع-الثروة-saudimillion.csv', trackerCsv(data, best.monthly, best.rate), 'text/csv;charset=utf-8')}
+          fire={{ expenses: flow.E, netWorth: data.netWorth, monthly: best.monthly, rate: best.rate }} />
+        <DossierPlan emergencyNeed={flow.emergencyNeed} subs={flow.items[0].amount} excessCash={flow.excessCash} invMonthly={best.monthly} monthlySaving={data.monthlySaving} />
+        <DossierClosing id={id} shareText={shareText} />
 
-        {/* ═══ الغلاف ═══ */}
-        <section className="relative rounded-3xl border border-amber-400/15 p-5 lg:p-10 overflow-hidden"
-          style={{ background: 'radial-gradient(120% 90% at 100% 0%, rgba(245,158,11,0.10), transparent 55%), radial-gradient(90% 80% at 0% 100%, rgba(16,185,129,0.08), transparent 60%), #161C25' }}>
-          <div className="flex flex-wrap items-center gap-2 pb-5 mb-6 border-b border-white/[0.06]">
-            <span className="chip bg-amber-400/10 text-amber-300 border border-amber-400/25"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse-dot" />ملف تنفيذي شخصي</span>
-            <span className="chip bg-white/[0.04] text-gray-300 border border-white/10"><Hash size={12} />رقم التقرير: <Num>{id}</Num></span>
-            <span className="chip bg-white/[0.04] text-gray-300 border border-white/10"><CalendarDays size={12} />{today}</span>
-            <span className="chip bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 lg:mr-auto"><BadgeCheck size={13} />مبني على أرقامك أنت — مو قالب عام</span>
-          </div>
-
-          <div className="grid lg:grid-cols-[1fr_340px] gap-8 items-start">
-            <div>
-              <p className="flex items-center gap-2 text-amber-300 font-bold text-sm mb-3"><Star size={16} />خطة العمل للوصول لأول <Num>1,000,000</Num> ريال</p>
-              <h1 className="text-3xl lg:text-5xl font-extrabold leading-tight mb-2">تقرير تسريع الثروة الشامل</h1>
-              <p className="text-xl lg:text-3xl font-extrabold text-amber-grad leading-snug mb-5">{headline}</p>
-              {report.motivational_opener && <p className="text-base lg:text-lg text-white/90 font-bold mb-3 leading-relaxed">{report.motivational_opener}</p>}
-              <p className="text-sm lg:text-base text-gray-300 leading-loose mb-6">
-                هالتقرير (12 قسم) مبني على أرقامك بالريال، ويشغّل لك ٣ محركات مع بعض:{' '}
-                <b className="text-amber-300">تسكير التسريبات</b>، <b className="text-emerald-400">استثمار تلقائي كل شهر</b>، و<b className="text-amber-300">قناة دخل جانبية تضيف +{formatNumber(SIDE_INCOME)} {SAR}</b> بالشهر.
-              </p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="card-soft p-4 flex items-center gap-4">
-                  <span className="w-12 h-12 rounded-xl bg-red-400/10 text-red-300 flex items-center justify-center shrink-0"><Hourglass size={22} /></span>
-                  <div>
-                    <p className="text-xs text-gray-400 mb-0.5">المسار الحالي (بدون تغيير)</p>
-                    <p className="text-lg font-extrabold">{dur(A)}</p>
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.07] p-4 flex items-center gap-4">
-                  <span className="w-12 h-12 rounded-xl bg-emerald-400/15 text-emerald-400 flex items-center justify-center shrink-0"><Rocket size={22} /></span>
-                  <div>
-                    <p className="text-xs text-emerald-300/80 mb-0.5">المسار المسرّع اللي نوصي فيه</p>
-                    <p className="text-lg font-extrabold text-emerald-400">{dur(C)}{A < NEVER && C < A && <span className="text-xs text-emerald-300/80 font-bold mr-2">(−{dur(A - C)})</span>}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="card p-6 text-center">
-              <p className="text-sm text-gray-400 font-bold mb-3">مؤشر جاهزيتك المالية</p>
-              <div className="relative w-fit mx-auto">
-                <Ring score={rd.score} />
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-5xl font-extrabold tabular-nums">{rd.score}</span>
-                  <span className="text-xs text-gray-400">من 100</span>
-                </div>
-              </div>
-              <p className={`mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold border ${rd.tone === 'green' ? 'text-emerald-400 border-emerald-400/25 bg-emerald-400/10' : rd.tone === 'amber' ? 'text-amber-300 border-amber-400/25 bg-amber-400/10' : rd.tone === 'orange' ? 'text-orange-300 border-orange-400/25 bg-orange-400/10' : 'text-red-300 border-red-400/25 bg-red-400/10'}`}><CheckCircle2 size={13} />{rd.label}</p>
-              <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">يقيس نسبة ادخارك، ومدة وصولك، وثروتك الحالية، وفائضك الشهري.</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-8 pt-6 border-t border-white/[0.06]">
-            {[
-              { l: 'الراتب الشهري', v: formatNumber(flow.S), cls: 'card-soft' },
-              { l: `المصاريف الشهرية (${flow.expensePct}٪)`, v: formatNumber(flow.E), cls: 'card-soft' },
-              { l: `الادخار الشهري (${flow.savingPct}٪)`, v: formatNumber(Math.max(0, flow.M)), cls: 'rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06]', vc: 'text-emerald-400' },
-              { l: 'الثروة الحالية', v: formatNumber(data.netWorth), cls: 'card-soft' },
-              { l: 'العائد المفترض حالياً', v: `${data.rate}٪`, cls: 'rounded-2xl border border-amber-400/25 bg-amber-400/[0.07]', vc: 'text-amber-300', noSar: true },
-            ].map((t, i) => (
-              <div key={i} className={`${t.cls} p-4 ${i === 4 ? 'col-span-2 lg:col-span-1' : ''}`}>
-                <p className="text-[11px] lg:text-xs text-gray-400 mb-1">{t.l}</p>
-                <p className={`text-lg lg:text-xl font-extrabold tabular-nums ${t.vc || ''}`}>{t.v}{!t.noSar && <span className="text-xs text-gray-500 font-bold mr-1">{SAR}</span>}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <TableOfContents items={TOC} />
+        {/* ═══════════════ الملحق ═══════════════ */}
+        <TableOfContents items={APPENDIX} />
 
         {/* ═══ الزبدة ═══ */}
-        <section className="grid lg:grid-cols-[1fr_1.1fr] gap-5">
+        <section id="a-zubda" data-pdf-break className="grid lg:grid-cols-[1fr_1.1fr] gap-5 scroll-mt-24">
           <div className="rounded-3xl border border-amber-400/30 p-6 lg:p-8 flex flex-col"
             style={{ background: 'linear-gradient(160deg, rgba(245,158,11,0.14), rgba(245,158,11,0.03) 60%), #1A212B' }}>
             <span className="chip bg-amber-400 text-ink-950 w-fit mb-4"><Zap size={13} />ابدأ من هنا</span>
@@ -509,7 +410,7 @@ export default function ReportPage() {
         </section>
 
         {/* ═══ قراءة صريحة ═══ */}
-        <section data-pdf-break>
+        <section id="a-diag" data-pdf-break className="scroll-mt-24">
           <SectionHead icon={Brain} kicker="تشخيصك" title="قراءة صريحة لوضعك المالي" sub="بدون مجاملة وبدون تخويف — وين أنت قوي، ووين تحتاج تشتغل." />
           <div className="grid lg:grid-cols-3 gap-5">
             <div className="card p-6 lg:col-span-2">
@@ -573,161 +474,20 @@ export default function ReportPage() {
           </div>
         </section>
 
-        {/* ═══ القسم الأول: التدفقات ═══ */}
-        <section id="flows" data-pdf-break className="scroll-mt-36">
-          <SectionHead icon={PieChart} kicker="القسم الأول: الهندسة العكسية للميزانية"
-            title="تشخيص التدفقات وقاعدة الادخار المعدّلة لك"
-            sub={`نقارن توزيع راتبك الحالي بالنموذج المستهدف، ونكشف التسريبات اللي تاكل من ثروتك بهدوء.`}
-            side={<SideTag icon={Scissors}>الهدف: تحرير {formatNumber(flow.recovery)} {SAR} بالشهر بدون ما تحس</SideTag>} />
-          <div className="grid lg:grid-cols-[1.25fr_1fr] gap-5">
-            <div className="card p-5 lg:p-7">
-              <div className="flex items-center justify-between gap-3 mb-6">
-                <h3 className="text-lg font-extrabold">وضعك الحالي مقابل النموذج المستهدف</h3>
-                <span className="text-xs text-gray-400">الراتب: <Num>{formatNumber(flow.S)}</Num> {SAR}</span>
-              </div>
-              <p className="text-sm text-gray-400 mb-2">توزيع راتبك الحين</p>
-              <div className="flex h-9 rounded-xl overflow-hidden text-[11px] lg:text-xs font-extrabold mb-1">
-                <div className="bg-amber-500 text-ink-950 flex items-center justify-center" style={{ width: `${Math.max(flow.expensePct, 8)}%` }}>مصاريف {flow.expensePct}٪</div>
-                <div className="bg-emerald-500 text-ink-950 flex items-center justify-center" style={{ width: `${Math.max(100 - flow.expensePct, 8)}%` }}>ادخار {Math.max(0, 100 - flow.expensePct)}٪</div>
-              </div>
-              <p className="text-[11px] text-gray-500 mb-6">مصاريف <Num>{formatNumber(flow.E)}</Num> {SAR} · ادخار <Num>{formatNumber(Math.max(0, flow.M))}</Num> {SAR}</p>
-
-              <p className="text-sm text-gray-400 mb-2">النموذج المستهدف لك (احتياجات / رغبات / ادخار)</p>
-              <div className="flex h-9 rounded-xl overflow-hidden text-[11px] lg:text-xs font-extrabold mb-1">
-                <div className="bg-blue-500 text-white flex items-center justify-center" style={{ width: `${flow.target.needs}%` }}>أساسيات {flow.target.needs}٪</div>
-                <div className="bg-amber-400 text-ink-950 flex items-center justify-center" style={{ width: `${Math.max(flow.target.wants, 10)}%` }}>رغبات {flow.target.wants}٪</div>
-                <div className="bg-emerald-500 text-ink-950 flex items-center justify-center" style={{ width: `${flow.target.save}%` }}>استثمار {flow.target.save}٪</div>
-              </div>
-              <p className="text-[11px] text-gray-500 mb-5">
-                أساسيات <Num>{formatNumber(flow.S * flow.target.needs / 100)}</Num> · رغبات <Num>{formatNumber(flow.S * flow.target.wants / 100)}</Num> · استثمار <Num>{formatNumber(flow.S * flow.target.save / 100)}</Num> {SAR}
-              </p>
-              <p className="text-sm text-gray-300 leading-relaxed mb-6">
-                القاعدة المشهورة 50/30/20 تقول ادخر 20٪ على الأقل. بس اللي يبي يوصل أسرع لازم يخلط أقل بين <b className="text-white">"اللي أحتاجه"</b> و<b className="text-white">"اللي أبيه"</b>. هالنموذج مفصّل على راتبك: نرفع الاستثمار لـ{flow.target.save}٪ من نفس المصاريف — بدون حرمان.
-              </p>
-
-              <div className="rounded-2xl border border-white/[0.08] bg-ink-900/60 p-4 lg:p-5">
-                <p className="font-extrabold text-amber-300 mb-3 flex items-center gap-2"><Sparkles size={16} />معادلة استرداد الـ{formatNumber(flow.recovery)} {SAR} خطوة بخطوة</p>
-                <div className="grid sm:grid-cols-3 gap-2.5">
-                  {flow.items.map((it, i) => (
-                    <div key={i} className="card-soft p-3.5">
-                      <p className="text-xs text-gray-300 mb-1.5 leading-relaxed">{i + 1}. {it.title}</p>
-                      <p className="text-sm font-extrabold text-emerald-400 tabular-nums">+{formatNumber(it.amount)} {SAR} / شهرياً</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="card p-5 lg:p-7">
-              <h3 className="text-lg font-extrabold mb-1 flex items-center gap-2"><Scissors size={18} className="text-red-400" />تقرير تسريبات السيولة</h3>
-              <p className="text-xs text-gray-400 mb-5">من أرقامك، هذي أكثر الأشياء اللي تبطّئك:</p>
-              <div className="space-y-3">
-                {flow.leaks.map((l, i) => (
-                  <div key={i} className={`rounded-2xl border p-4 ${l.tone === 'red' ? 'border-red-400/20 bg-red-400/[0.04]' : l.tone === 'amber' ? 'border-amber-400/20 bg-amber-400/[0.04]' : 'border-emerald-400/20 bg-emerald-400/[0.04]'}`}>
-                    <div className="flex items-start justify-between gap-3 mb-1.5">
-                      <p className={`text-sm font-extrabold ${l.tone === 'red' ? 'text-red-300' : l.tone === 'amber' ? 'text-amber-300' : 'text-emerald-300'}`}>{i + 1}. {l.title}</p>
-                      <span className={`text-[11px] font-extrabold shrink-0 tabular-nums ${l.tone === 'red' ? 'text-red-300' : l.tone === 'amber' ? 'text-amber-300' : 'text-emerald-300'}`}>{l.cost}</span>
-                    </div>
-                    <p className="text-xs text-gray-300 leading-relaxed">{l.body}</p>
-                  </div>
-                ))}
-              </div>
-              {report.expense_analysis && (
-                <div className="mt-5 pt-5 border-t border-white/[0.06]">
-                  <p className="text-sm font-extrabold mb-3">وين تروح مصاريفك عادة؟ <span className="text-[11px] text-gray-500 font-bold">(تقدير بالنسب الشائعة)</span></p>
-                  <div className="space-y-2.5">
-                    {report.expense_analysis.map((e, i) => (
-                      <div key={i}>
-                        <div className="flex justify-between text-xs mb-1"><span className="font-bold">{e.category}</span><Num className="text-gray-400">~{formatNumber(e.amount)} {SAR}</Num></div>
-                        <div className="h-1.5 bg-ink-700 rounded-full overflow-hidden"><div className="h-full bg-amber-400/80 rounded-full" style={{ width: `${e.pct * 2.5}%` }} /></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+        <section id="a-budget" data-pdf-break className="scroll-mt-24">
+          <SectionHead icon={Wallet} kicker="ملحق: الميزانية التفصيلية" title="ميزانيتك الشهرية بند بند"
+            sub="ترجمة النموذج الذهبي إلى سقوف شهرية بالريال لكل بند من مصاريفك." />
           <BudgetDetail lines={ext.budget} S={flow.S} />
         </section>
 
         <PrioritiesAndDebt steps={ext.steps} debt={ext.debt} S={flow.S} />
 
-        {/* ═══ القسم الثالث: السيناريوهات ═══ */}
-        <section id="scenarios" data-pdf-break className="scroll-mt-36">
-          <SectionHead icon={TrendingUp} tone="green" kicker="القسم الثالث: محاكاة التراكم المركب"
-            title="مصفوفة السيناريوهات وجدول التدفق السنوي"
-            sub="٣ طرق توصلك للمليون — وكم سنة من عمرك توفرها كل وحدة."
-            side={<SideTag icon={Calculator} tone="gray">مبنية على الفائدة المركبة شهرياً</SideTag>} />
-          <div className="grid lg:grid-cols-3 gap-4 mb-5">
-            {sc.map((s) => {
-              const gold = s.key === 'C'
-              return (
-                <div key={s.key} className={`relative rounded-3xl p-5 lg:p-6 flex flex-col ${gold ? 'border-2 border-amber-400/70 lg:order-none' : s.key === 'B' ? 'border border-emerald-400/20 bg-ink-800' : 'card'}`}
-                  style={gold ? { background: 'linear-gradient(170deg, rgba(245,158,11,0.16), rgba(245,158,11,0.02) 55%), #1A212B' } : undefined}>
-                  {gold && <span className="absolute -top-3 right-1/2 translate-x-1/2 chip bg-amber-400 text-ink-950 whitespace-nowrap">الخيار الأسرع اللي نوصي فيه</span>}
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`chip border ${gold ? 'bg-amber-400/15 text-amber-200 border-amber-400/30' : 'bg-white/[0.04] text-gray-300 border-white/10'}`}>{s.tag}</span>
-                    <span className={`text-xs font-bold ${gold ? 'text-amber-300' : s.key === 'B' ? 'text-emerald-400' : 'text-red-300'}`}>{gold ? '⚡ خارق' : s.key === 'B' ? 'المسار الذكي' : 'بطيء ومستهلك'}</span>
-                  </div>
-                  <h3 className={`text-lg font-extrabold mb-2 ${gold ? 'text-amber-200' : ''}`}>{s.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed mb-5">{s.desc}</p>
-                  <div className={`mt-auto rounded-2xl p-4 text-center ${gold ? 'bg-amber-400/15' : 'bg-ink-950/60'}`}>
-                    <p className="text-xs text-gray-400 mb-1">الزمن للوصول</p>
-                    <p className={`text-2xl lg:text-[28px] font-extrabold ${gold ? 'text-amber-300' : s.key === 'B' ? 'text-emerald-400' : 'text-white'}`}>{dur(s.months)}</p>
-                  </div>
-                  {s.note && <p className={`text-xs font-bold text-center mt-3 ${s.key === 'A' ? 'text-red-300/80' : 'text-emerald-400'}`}>{s.note}</p>}
-                </div>
-              )
-            })}
-          </div>
-
-          {table.length > 0 && (
-            <div className="card p-4 lg:p-7 mb-5">
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                <h3 className="text-lg font-extrabold flex items-center gap-2"><Table2 size={18} className="text-amber-400" />جدول التدفق السنوي للمسار المسرّع</h3>
-                <span className="text-xs text-gray-500">استثمار <Num>{formatNumber(best.monthly)}</Num> {SAR}/شهر بعائد {best.rate}٪</span>
-              </div>
-              <div className="overflow-x-auto -mx-4 px-4">
-                <table className="w-full min-w-[560px] text-sm">
-                  <thead>
-                    <tr className="text-gray-400 text-xs border-b border-white/[0.08]">
-                      <th className="text-right font-bold py-3">المرحلة</th>
-                      <th className="text-right font-bold py-3">من جيبك</th>
-                      <th className="text-right font-bold py-3">أرباح التراكم</th>
-                      <th className="text-right font-bold py-3">صافي الثروة</th>
-                      <th className="text-center font-bold py-3">الإنجاز</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.map((r, i) => (
-                      <tr key={i} className={`border-b border-white/[0.05] ${r.final ? 'bg-amber-400/[0.08]' : ''}`}>
-                        <td className={`py-3 font-extrabold ${r.final ? 'text-amber-300' : ''}`}>
-                          <span className={`inline-block w-2 h-2 rounded-full ml-2 ${r.final ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-                          {r.final && r.monthLabel ? `بعد ${r.monthLabel}` : `نهاية السنة ${r.year}`}
-                        </td>
-                        <td className="py-3 text-gray-300"><Num>{formatNumber(r.deposits)}</Num></td>
-                        <td className="py-3 text-emerald-400 font-bold"><Num>+{formatNumber(r.gains)}</Num></td>
-                        <td className={`py-3 font-extrabold ${r.final ? 'text-emerald-400 text-base' : ''}`}><Num>{formatNumber(r.total)}</Num></td>
-                        <td className="py-3 text-center">
-                          <span className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full ${r.final ? 'bg-amber-400 text-ink-950' : r.tag === 'تراكم' || r.tag === 'الانطلاقة' ? 'bg-white/[0.05] text-gray-400' : 'bg-emerald-400/10 text-emerald-400'}`}>{r.tag}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {split.gains > 0 && (
-                <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-                  * لاحظ: من المليون، <b className="text-white"><Num>{formatNumber(split.contributions)}</Num> {SAR}</b> من جيبك و<b className="text-emerald-400"><Num>{formatNumber(split.gains)}</Num> {SAR}</b> أرباح تراكمية. وكل ما تقدمت السنين، العائد يشتغل أكثر منك — هذي القوة الحقيقية للفائدة المركبة.
-                </p>
-              )}
-            </div>
-          )}
-
+        <section id="a-sens" data-pdf-break className="scroll-mt-24">
+          <SectionHead icon={Target} tone="green" kicker="ملحق: مصفوفة الحساسية" title="كل مزيج ادخار وعائد — ومتى يوصلك"
+            sub="جرّب بعينك: وش يصير لو زدت ادخارك، أو لو تغيّر العائد." />
           <SensitivityGrid grid={ext.grid} userRate={data.rate} bestExtra={best.monthly - Math.max(0, data.monthlySaving)} bestRate={best.rate} />
-
-          {/* الحاسبة العكسية */}
           <div className="h-5" />
+          {/* الحاسبة العكسية */}
           <div className="card p-5 lg:p-7 grid lg:grid-cols-[1fr_1fr] gap-6 items-center">
             <div>
               <h3 className="text-lg font-extrabold mb-1 flex items-center gap-2"><Target size={18} className="text-amber-400" />الحاسبة العكسية: حدد متى تبي توصل</h3>
@@ -752,85 +512,15 @@ export default function ReportPage() {
                 : <p className="text-sm text-emerald-400 font-bold">ادخارك الحالي يكفي — بس لازم يتحول من ادخار إلى استثمار.</p>}
             </div>
           </div>
-          <Takeaway>الفرق بين السيناريو أ وج مو راتب أعلى — هو {formatNumber(flow.recovery)} {SAR} تحررها + {formatNumber(SIDE_INCOME)} {SAR} دخل جانبي + استثمار تلقائي. ثلاث قرارات تاخذها مرة وحدة، والفائدة المركبة تكمل الباقي.</Takeaway>
         </section>
 
         <TimeAndRisk delay={ext.delay} doubleYears={rule72(best.rate)} rate={best.rate} stress={ext.stress} inflation={ext.infl} base={best.months} smt={ext.smt} netWorth={data.netWorth} />
 
-        {/* ═══ القسم الخامس: توزيع الأصول ═══ */}
-        <section id="assets" data-pdf-break className="scroll-mt-36">
-          <SectionHead icon={Wallet} kicker="القسم الخامس: توزيع الأصول ومنصات التنفيذ"
-            title="استراتيجية توزيع محفظتك في السوق السعودي"
-            sub="محفظة نمو متوازنة متوافقة مع الضوابط الشرعية، موزعة على ٤ فئات — بالمبالغ من استثمارك الشهري."
-            side={<SideTag icon={ShieldCheck}>تأكد إن أي منصة مرخصة من هيئة السوق المالية قبل ما تفتح حساب</SideTag>} />
-
-          {emergencyGap > 0 && (
-            <div className="rounded-2xl border border-red-400/25 bg-red-400/[0.05] p-4 lg:p-5 mb-5 flex items-start gap-3">
-              <ShieldCheck size={22} className="text-red-300 shrink-0 mt-0.5" />
-              <p className="text-sm text-gray-200 leading-relaxed"><b className="text-red-300">قبل أي استثمار:</b> كمّل صندوق الطوارئ (<Num>{formatNumber(flow.emergencyNeed)}</Num> {SAR} = 6 شهور مصاريف) بحساب ادخار أو صندوق مرابحة سهل السحب. ناقصك <b className="tabular-nums">{formatNumber(emergencyGap)} {SAR}</b> — بمعدل {formatNumber(investMonthly)} {SAR} بالشهر تخلصه خلال {dur(Math.ceil(emergencyGap / Math.max(1, investMonthly)))}، وبعدها تبدأ التوزيع اللي تحت.</p>
-            </div>
-          )}
-
-          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-5">
-            <div className="space-y-3">
-              {BUCKETS.map((b, i) => {
-                const Icon = [Globe2, Building2, Landmark, Building][i]
-                return (
-                  <div key={b.name} className="card p-5">
-                    <div className="flex items-start gap-4">
-                      <span className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: b.color + '22', color: b.color }}><Icon size={20} /></span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
-                          <h3 className="font-extrabold">{i + 1}. {b.name} ({b.pct}٪)</h3>
-                          <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg tabular-nums" style={{ background: b.color + '18', color: b.color }}>عائد تاريخي: {b.range}</span>
-                        </div>
-                        <p className="text-xs text-gray-400 mb-2">نصيبه من خطتك: <b className="text-white tabular-nums">{formatNumber(Math.round(investMonthly * b.pct / 100))} {SAR}</b> شهرياً</p>
-                        <p className="text-sm text-gray-300 leading-relaxed">{b.desc}</p>
-                        <p className="text-[11px] text-gray-500 mt-2">{b.examples}</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="card p-6">
-              <h3 className="text-lg font-extrabold text-center mb-1">الوزن النسبي لمحفظتك</h3>
-              <p className="text-xs text-gray-400 text-center mb-5">استثمار شهري <Num>{formatNumber(investMonthly)}</Num> {SAR}</p>
-              <Donut center={`${blended}٪`} />
-              <div className="space-y-2 mt-6">
-                {BUCKETS.map((b) => (
-                  <div key={b.name} className="flex items-center justify-between gap-2 card-soft px-3 py-2.5 text-xs">
-                    <span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: b.color }} />{b.name}</span>
-                    <b className="tabular-nums" style={{ color: b.color }}>{b.pct}٪</b>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 pt-5 border-t border-white/[0.06]">
-                <p className="text-sm font-extrabold mb-3">وين تنفّذ؟ (أمثلة لمنصات سعودية)</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  {[
-                    ['دراية / الراجحي المالية', 'أسهم وصناديق محلية وعالمية'],
-                    ['سهم كابيتال', 'تداول أسهم أمريكية وسعودية'],
-                    ['أبيان المالية', 'استثمار آلي (روبو أدفايزر)'],
-                    ['صكوك «صح»', 'ادخار حكومي بعائد ثابت'],
-                  ].map(([n, d]) => (
-                    <div key={n} className="card-soft p-2.5 flex items-start gap-2"><CheckCircle2 size={14} className="text-emerald-400 shrink-0 mt-0.5" /><span><b>{n}</b><br /><span className="text-gray-400">{d}</span></span></div>
-                  ))}
-                </div>
-                <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">أمثلة للتوضيح مو توصية. تحقق من الترخيص على موقع هيئة السوق المالية cma.org.sa، وقارن الرسوم قبل ما تختار.</p>
-              </div>
-            </div>
-          </div>
-          <Takeaway>ابدأ بالبسيط: صندوق مؤشر عالمي متوافق + صندوق مؤشر سعودي + صكوك. أعد التوازن مرة بالسنة، ولا تغيّر الأوزان بسبب الأخبار.</Takeaway>
-        </section>
-
         <ZakatRetirementProtection zakat={ext.zakat} S={flow.S} />
 
-        {/* ═══ القسم السابع: الدخل الجانبي ═══ */}
         {ideas.length > 0 && (
-          <section id="income" data-pdf-break className="scroll-mt-36">
-            <SectionHead icon={Rocket} kicker="القسم السابع: محرك تسريع الدخل"
-              title="أفكار دخل جانبي تناسب وضعك"
+          <section id="a-ideas" data-pdf-break className="scroll-mt-24">
+            <SectionHead icon={Rocket} kicker="ملحق: أفكار دخل مخصصة" title="أفكار دخل إضافية تناسب وضعك"
               sub="أفكار عملية تقدر تبدأها جنب وظيفتك برأس مال صغير — مع أول خطوة لكل وحدة."
               side={<SideTag icon={Target} tone="green">الهدف: +{formatNumber(SIDE_INCOME)} {SAR} بالشهر تنضاف لمحفظتك</SideTag>} />
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -862,126 +552,29 @@ export default function ReportPage() {
               })}
             </div>
 
-            {/* عرض الدليل */}
-            <div className="mt-6 rounded-3xl border-2 border-amber-400/50 p-6 lg:p-10 no-print"
-              style={{ background: 'radial-gradient(100% 120% at 100% 0%, rgba(245,158,11,0.16), transparent 55%), #1A212B' }}>
-              <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
-                <div>
-                  <span className="chip bg-amber-400/15 text-amber-300 border border-amber-400/30 mb-4"><Briefcase size={13} />الخطوة اللي بعد التقرير</span>
-                  <h3 className="text-2xl lg:text-4xl font-extrabold leading-tight mb-3">دليل الـ100 فكرة مشروع للسوق السعودي</h3>
-                  <p className="text-sm lg:text-base text-gray-300 leading-relaxed mb-5">التقرير عطاك الاتجاه. الدليل يعطيك الفكرة اللي تناسب ميزانيتك ووقتك — مع رأس المال، والربح المتوقع، وخطة اليوم الأول لكل فكرة.</p>
-                  <div className="grid sm:grid-cols-2 gap-2.5 mb-6">
-                    {['100 فكرة مع خطوات تنفيذ', 'رأس المال والربح لكل فكرة', 'خطة اليوم الأول', 'فلترة حسب رأس المال'].map((f) => (
-                      <div key={f} className="card-soft px-3 py-2.5 text-sm font-bold flex items-center gap-2"><CheckCircle2 size={15} className="text-emerald-400 shrink-0" />{f}</div>
-                    ))}
-                  </div>
-                  <Link href="/ideas-checkout" className="btn-primary px-6 py-3.5 text-base">افتح الدليل الكامل — 49 {SAR} <ChevronLeft size={18} /></Link>
-                  <p className="text-xs text-gray-500 mt-3 flex items-center gap-1.5"><Lock size={12} />دفع آمن عبر Paymob · وصول فوري</p>
-                </div>
-                <div className="card p-5">
-                  <p className="text-xs text-gray-400 mb-2">ليش يستاهل؟</p>
-                  <p className="text-sm text-gray-200 leading-relaxed">
-                    لو الدليل ساعدك تطلع بس <b className="text-amber-300">{formatNumber(SIDE_INCOME)} {SAR}</b> بالشهر، هذا يختصر طريقك للمليون{' '}
-                    <b className="text-emerald-400">{sc[1].months < NEVER && C < sc[1].months ? dur(sc[1].months - C) : 'سنين'}</b> — مقابل 49 ريال مرة وحدة.
-                  </p>
-                </div>
-              </div>
-            </div>
           </section>
         )}
 
+        <PlatformsGuide />
+
         <MoneyPsychology />
 
-        {/* ═══ القسم التاسع: الأدوات ═══ */}
-        <section id="tools" data-pdf-break className="scroll-mt-36">
-          <SectionHead icon={Briefcase} kicker="القسم التاسع: الحزمة المرفقة"
-            title="صندوق أدواتك لتسريع الثروة"
-            sub="أدوات جاهزة مفصّلة على أرقامك — حمّلها وابدأ التطبيق اليوم."
-            side={<SideTag icon={Sparkles} tone="amber">مضمّنة مع تقريرك بدون أي تكلفة إضافية</SideTag>} />
-          <div className="grid lg:grid-cols-3 gap-4">
-            <div className="card p-6 flex flex-col">
-              <span className="w-12 h-12 rounded-xl bg-emerald-400/10 text-emerald-400 flex items-center justify-center mb-4"><FileSpreadsheet size={22} /></span>
-              <h3 className="text-lg font-extrabold mb-2">شيت تتبّع ثروتك (36 شهر)</h3>
-              <p className="text-sm text-gray-400 leading-relaxed mb-5">ملف Excel فيه خطتك شهر بشهر: الادخار المخطط والثروة المتوقعة. تعبّي الفعلي كل شهر والشيت يحسب لك الفرق تلقائياً.</p>
-              <button onClick={() => downloadFile('متتبع-الثروة-saudimillion.csv', trackerCsv(data, investMonthly, best.rate), 'text/csv;charset=utf-8')}
-                className="mt-auto no-print w-full py-3 rounded-xl border border-emerald-400/30 bg-emerald-400/[0.06] text-emerald-300 font-bold text-sm flex items-center justify-center gap-2 hover:bg-emerald-400/10 transition-colors">
-                <Download size={16} /> حمّل الشيت (Excel)
-              </button>
+        <section id="a-month" data-pdf-break className="scroll-mt-24">
+          <SectionHead icon={CalendarDays} tone="green" kicker="ملحق: الشهر الأول" title="الشهر الأول أسبوع بأسبوع"
+            sub="تفصيل أدق للمرحلة الأولى من خطة الـ90 يوماً، مع تذكير شهري يثبّت العادة." />
+          <div className="card p-5 lg:p-6 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p className="font-extrabold mb-1 flex items-center gap-2"><BellRing size={18} className="text-amber-400" />تذكير "يوم المليون" الشهري</p>
+              <p className="text-sm text-gray-400">تذكير يتكرر يوم 27 من كل شهر في تقويم جوالك: "حوّل {formatNumber(best.monthly)} {SAR} قبل لا تصرف".</p>
             </div>
-            <div className="card p-6 flex flex-col">
-              <span className="w-12 h-12 rounded-xl bg-amber-400/10 text-amber-400 flex items-center justify-center mb-4"><BellRing size={22} /></span>
-              <h3 className="text-lg font-extrabold mb-2">تذكير "يوم المليون" الشهري</h3>
-              <p className="text-sm text-gray-400 leading-relaxed mb-5">تذكير يتكرر يوم 27 من كل شهر في تقويم جوالك: "حوّل {formatNumber(investMonthly)} {SAR} قبل لا تصرف". أكثر شي يفرّق بين اللي يوصل واللي ما يوصل هو الاستمرار.</p>
-              <button onClick={() => downloadFile('تذكير-يوم-المليون.ics', reminderIcs(investMonthly), 'text/calendar;charset=utf-8')}
-                className="mt-auto no-print w-full py-3 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] text-amber-300 font-bold text-sm flex items-center justify-center gap-2 hover:bg-amber-400/10 transition-colors">
-                <CalendarDays size={16} /> أضفه لتقويمي
-              </button>
-            </div>
-            <div className="card p-6 flex flex-col">
-              <span className="w-12 h-12 rounded-xl bg-blue-400/10 text-blue-400 flex items-center justify-center mb-4"><Flame size={22} /></span>
-              <h3 className="text-lg font-extrabold mb-2">رقم استقلالك المالي (FIRE)</h3>
-              <p className="text-sm text-gray-400 leading-relaxed mb-4">المبلغ اللي لو وصلته، عوائده تغطي مصاريفك (<Num>{formatNumber(flow.E)}</Num> {SAR}/شهر) بدون ما تحتاج راتب — حسب قاعدة السحب الآمن 4٪.</p>
-              <div className="mt-auto rounded-xl bg-ink-950/60 border border-white/[0.06] p-4 text-center">
-                <p className="text-3xl font-extrabold text-blue-300 tabular-nums">{formatNumber(fireNumber)} <span className="text-sm">{SAR}</span></p>
-                <p className="text-xs text-gray-400 mt-1">{fireMonths === 0 ? 'وصلته فعلاً 🎉' : fireMonths >= NEVER ? 'تحتاج ترفع استثمارك الشهري' : `بالمسار المسرّع توصله خلال ${dur(fireMonths)}`}</p>
-              </div>
-            </div>
+            <button onClick={() => downloadFile('تذكير-يوم-المليون.ics', reminderIcs(best.monthly), 'text/calendar;charset=utf-8')}
+              className="no-print shrink-0 px-5 py-3 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] text-amber-300 font-bold text-sm flex items-center justify-center gap-2 hover:bg-amber-400/10 transition-colors">
+              <CalendarDays size={16} /> أضفه لتقويمي
+            </button>
           </div>
-        </section>
-
-        {/* ═══ القسم السادس: خطة ٩٠ يوم ═══ */}
-        <section id="plan" data-pdf-break className="scroll-mt-36">
-          <SectionHead icon={Flag} tone="green" kicker="القسم العاشر: خارطة التنفيذ"
-            title="خطة العمل لأول 90 يوم (خطوة بخطوة)"
-            sub="٣ مراحل شهرية واضحة — مهمة وحدة بكل مرة عشان ما تتشتت."
-            side={<SideTag icon={Zap} tone="gray">ابدأ من بكرة</SideTag>} />
-          <div className="grid lg:grid-cols-3 gap-4 mb-5">
-            {[
-              { badge: 'الشهر الأول (الأيام 1–30)', icon: ShieldCheck, color: 'emerald', title: 'وقف النزيف وابنِ الأساس', goal: 'تحرير السيولة الضايعة وتأمين الطوارئ',
-                items: [
-                  `افتح حساب ادخار منفصل وفعّل أمر تحويل دائم يوم 27 بمبلغ ${formatNumber(Math.max(0, data.monthlySaving))} ${SAR}`,
-                  `راجع كشف آخر 3 شهور وألغِ اشتراكات بقيمة ${formatNumber(flow.items[0].amount)} ${SAR}+`,
-                  `حط سقف للتوصيل والكوفي يحرر ${formatNumber(flow.items[1].amount)} ${SAR} بالشهر`,
-                  emergencyGap > 0 ? `وجّه الفائض لصندوق الطوارئ (ناقصه ${formatNumber(emergencyGap)} ${SAR})` : 'صندوق طوارئك مكتمل — خله بحساب منفصل وما تلمسه',
-                ] },
-              { badge: 'الشهر الثاني (الأيام 31–60)', icon: PieChart, color: 'amber', title: 'أتمتة الاستثمار', goal: 'تشغيل محرك الفائدة المركبة رسمياً',
-                items: [
-                  'افتح محفظة استثمارية عند وسيط مرخص (قارن الرسوم أول)',
-                  `ضخ أول دفعة ${formatNumber(investMonthly)} ${SAR} حسب أوزان المحفظة (40/25/20/15)`,
-                  flow.cash > flow.emergencyNeed ? `انقل الكاش الزايد (${formatNumber(flow.cash - flow.emergencyNeed)} ${SAR}) لصكوك أو صندوق مرابحة` : 'فعّل الاستثمار الدوري الشهري التلقائي إن كانت المنصة تدعمه',
-                  'حمّل شيت التتبّع وسجّل أول شهر',
-                ] },
-              { badge: 'الشهر الثالث (الأيام 61–90)', icon: Rocket, color: 'amber', title: 'إطلاق أول قناة دخل جانبي', goal: `أول ${formatNumber(SIDE_INCOME)} ${SAR} إضافية للمحفظة`,
-                items: [
-                  `اختر فكرة وحدة من القسم السابع${ideas[0] ? ` (مثل: ${ideas[0].title})` : ''}`,
-                  'جهّز عرض بسيط أو نموذج تجريبي وكلّم أول 10 عملاء محتملين',
-                  'كل ريال من الدخل الجانبي يروح للمحفظة مباشرة — مو للمصاريف',
-                  'راجع شيت التتبّع: كم سبقت الخطة أو تأخرت؟',
-                ] },
-            ].map((p, i) => {
-              const Icon = p.icon
-              const green = p.color === 'emerald'
-              return (
-                <div key={i} className={`rounded-3xl p-5 lg:p-6 border ${green ? 'border-emerald-400/20' : 'border-amber-400/20'} bg-ink-800`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`chip ${green ? 'bg-emerald-400/10 text-emerald-400' : 'bg-amber-400/10 text-amber-300'}`}>{p.badge}</span>
-                    <Icon size={20} className={green ? 'text-emerald-400' : 'text-amber-400'} />
-                  </div>
-                  <h3 className="text-xl font-extrabold mb-1">{p.title}</h3>
-                  <p className="text-xs text-gray-400 mb-4">الهدف: {p.goal}</p>
-                  <ul className="space-y-2.5">
-                    {p.items.map((it, j) => (
-                      <li key={j} className="flex items-start gap-2 text-sm text-gray-200 leading-relaxed"><CheckCircle2 size={16} className={`shrink-0 mt-0.5 ${green ? 'text-emerald-400' : 'text-amber-400'}`} />{it}</li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            })}
-          </div>
-
           {report.monthly_plan && report.monthly_plan.length > 0 && (
             <div className="card p-5 lg:p-7">
-              <h3 className="text-lg font-extrabold mb-4">تفصيل الشهر الأول — أسبوع بأسبوع</h3>
+              <h3 className="text-lg font-extrabold mb-4">المهام الأسبوعية</h3>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {report.monthly_plan.map((w, i) => (
                   <div key={i} className="card-soft p-4">
@@ -993,7 +586,6 @@ export default function ReportPage() {
               </div>
             </div>
           )}
-          <Takeaway>لا تحاول تسوي كل شي بأسبوع. مهمة وحدة بكل مرة، وعلّم عليها. بعد 90 يوم بتكون سبقت أغلب الناس اللي حولك.</Takeaway>
         </section>
 
         {/* ═══ عقلية المليون ═══ */}
@@ -1009,40 +601,8 @@ export default function ReportPage() {
 
         <GlossaryFaqSources />
 
-        {/* ═══ الختام ═══ */}
-        <section data-pdf-break className="rounded-3xl border border-amber-400/25 p-6 lg:p-10 grid lg:grid-cols-[1fr_340px] gap-8 items-center"
-          style={{ background: 'radial-gradient(90% 100% at 100% 0%, rgba(16,185,129,0.08), transparent 60%), #1A212B' }}>
-          <div>
-            <p className="flex items-center gap-2 text-emerald-400 text-sm font-bold mb-3"><span className="w-2 h-2 rounded-full bg-emerald-400" />وثيقة خطتك المالية</p>
-            <h2 className="text-2xl lg:text-4xl font-extrabold leading-tight mb-4">الحين عندك الخارطة اللي أغلب الناس ما يرسمونها أبداً</h2>
-            <p className="text-sm lg:text-base text-gray-300 leading-loose mb-6">{report.closing_message}</p>
-            <div className="flex flex-wrap gap-3 no-print">
-              <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"><MessageCircle size={17} />شارك إنجازك عبر واتساب</a>
-              <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"
-                className="btn-ghost px-5 py-3 text-sm"><Share2 size={17} />شارك على X</a>
-              <Link href="/calculator" className="btn-ghost px-5 py-3 text-sm"><Calculator size={17} />أعد الحساب بأرقام ثانية</Link>
-            </div>
-          </div>
-          <div className="card p-6 text-center">
-            <span className="w-16 h-16 rounded-full border-2 border-amber-400/60 bg-amber-400/10 text-amber-300 flex items-center justify-center mx-auto mb-4 animate-glow"><BadgeCheck size={30} /></span>
-            <p className="text-lg font-extrabold">تقرير شخصي مخصص</p>
-            <p className="text-xs text-gray-400 tracking-widest mt-1 tabular-nums" dir="ltr">{id}</p>
-            <p className="text-xs text-gray-500 mt-4 pt-4 border-t border-white/[0.06] leading-relaxed">ارجع له كل 3 شهور وحدّث أرقامك — كل ما زاد استثمارك، تقصر المدة.</p>
-          </div>
-        </section>
-
-        {/* إخلاء المسؤولية */}
-        <section className="card-soft p-5 lg:p-6 flex items-start gap-3">
-          <Gavel size={18} className="text-amber-400 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-extrabold text-amber-300 mb-1.5 flex items-center gap-2"><Scale size={14} />إخلاء المسؤولية</p>
-            <p className="text-xs text-gray-400 leading-loose">
-              هالتقرير للتخطيط المالي والتوعية فقط، ومبني على الأرقام اللي دخلتها وافتراضات عوائد تاريخية تقريبية. ما يعتبر توصية بشراء أو بيع أي ورقة مالية، والعوائد الماضية ما تضمن العوائد المستقبلية. الأمثلة على المنصات والصناديق للتوضيح فقط. استشر مستشار مالي مرخّص قبل أي قرار استثماري كبير.
-            </p>
-          </div>
-        </section>
+        <DossierFooter />
       </main>
-    </SiteShell>
+    </div>
   )
 }
