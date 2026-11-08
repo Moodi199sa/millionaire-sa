@@ -135,4 +135,7 @@ input[type='number'] { -moz-appearance: textfield; }
 
 @media print {
   .no-print { display: none !important; }
+  html, body { background: #12171F !important; }
+  .report-print, .report-print * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .report-print section { break-inside: avoid-page; }
 }
